@@ -1,0 +1,441 @@
+hibernate (1.99-1) unstable; urgency=low
+
+  * New upstream release, which scaling_setspeed returning "<unsupported>"
+    properly (closes: #479643).
+
+ -- martin f. krafft <madduck@debian.org>  Fri, 09 May 2008 11:09:01 +0100
+
+hibernate (1.98.1-1) unstable; urgency=low
+
+  * New upstream version, which fixes a stupid bug I introduced in fixing the
+    bashisms.
+
+ -- martin f. krafft <madduck@debian.org>  Mon, 31 Mar 2008 09:44:21 +0200
+
+hibernate (1.98-1) unstable; urgency=low
+
+  * Acknowledge NMU, thanks Morten!
+  * New upstream release:
+    - fixes get_env_var_of_process (closes: #457185)
+    - implements USuspendRamPciSave  to allow passing the -v option to s2ram
+      (closes: #473322).
+    - implements USuspendRamRadeontool to allow passing the -r option to s2ram;
+      thanks to Matthijs Kooijman (closes: #445974).
+    - works around a bashism when mktemp is not available;
+      thanks to Morten Werner Forsbring (closes: #464989).
+    - removes further bashisms (local variables are initialised on
+      declaration) (also closes: #464989).
+  * debian/control: Now maintained in Git, so update Vcs-* headers.
+  * Bump debhelper compatibility level to 6; no changes required.
+  * Bump Standards-Version to 3.7.3; no changes required.
+
+ -- martin f. krafft <madduck@debian.org>  Sun, 30 Mar 2008 17:10:41 +0200
+
+hibernate (1.97-1.1) unstable; urgency=low
+
+   * Non-maintainer upload
+   * Adding dependencies from cryptdisk to the LSB init.d dependency
+     headers in hibernate's init.d script. This prevents that the hibernate
+     init.d script is placed at the very first of the boot sequence when
+     using dependency based boot sequencing and the cryptdisk package is
+     not installed. Thanks to Petter Reinholdtsen for bugreport and patch
+     (closes: #458722).
+
+ -- Morten Werner Forsbring <werner@debian.org>  Sun, 24 Feb 2008 21:19:27 +0100 
+
+hibernate (1.97-1) unstable; urgency=low
+
+  * New upstream release (closes: #447589):
+    - introduces USuspendRamUnsureOk to enable use of s2ram's system-specific
+      options if it's unsure; thanks to Andrew Pimlott (closes: #433028).
+    - scriptlets.d/lock now supports XtrLock; thanks to "cg" (closes: #427475).
+    - get_env_var_of_process is now in the main script; thanks to Pascal
+      Dormeau (closes: #433003).
+    - Fixes manpage typo; thanks Justin Pryzby (closes: #443732).
+    - The galeon and sylpheed-claws scriptlets by Norbert Buchmuller are now
+      officially distributed (see #427376).
+    - patch by Joey Hess which fixes the backlight script to work better if
+      the backlight was initially below 10% (closes: #434825).
+    - scriptlets.d/sysfs_power_state now uses `uname -m` instead of `arch`;
+      thanks to Uwe Herman (closes: #436287).
+    - prevents double execution of included configuration files Thanks to
+      "CSights" and Martin Ziegler for analysing this.
+      (closes: #433965, #392712).
+    - patch by Matthias Hensler which fixes filewriter support for Tux-On-Ice
+      (closes: #441801).
+    - use start-stop-daemon instead of backgrounding ifup (closes: #422539).
+    - adds anacron to sample RestartServices line (closes: #414100).
+
+ -- martin f. krafft <madduck@debian.org>  Mon, 22 Oct 2007 15:04:30 +0200
+
+hibernate (1.96~pre-svn.r1136-1) unstable; urgency=low
+
+  * New upstream checkout:
+    - includes xbacklight scriptlet by Joey Hess (closes: #430148).
+    - includes gaim scriptlet by Norbert Buchmuller (closes: #427376).
+    - includes networkmanager scriptlet by Markus Becker (closes: #387456).
+    - disabled vbetool by default for suspend-to-RAM (see #400688).
+  * Prevent DownInterfaces auto from storing network interfaces it did not
+    down, so that they are not brought up by NetworkStart if they weren't up
+    before the suspend (closes: #432316).
+  * Completed LSB init.d dependency headers; now starts after cryptdisks and
+    before swap is mounted in mountall.
+
+ -- martin f. krafft <madduck@debian.org>  Mon, 09 Jul 2007 23:43:05 +0200
+
+hibernate (1.96~pre-svn.r1125-1) unstable; urgency=low
+
+  * The^W A Joey Hess tribute release:
+      < joeyh> bloody debian maintainer filters
+      * joeyh applies for a bugzilla.fedora account
+    sorry for taking to long to integrate your patches. Don't leave us.
+
+  * New checkout from upstream repository, which
+    - fixes a syntax error and thus closes: #427962.
+    - runs ifup in the background to prevent locking problems and closes: #422539.
+    - introduces SwitchToTextModeOnResume to work around an X bug (#420400)
+      and thus closes: #420401.
+
+ -- martin f. krafft <madduck@debian.org>  Thu, 07 Jun 2007 18:58:01 +0200
+
+hibernate (1.96~pre-svn.r1121-1) unstable; urgency=low
+
+  * Checkout from upstream repository
+    - add patch by Enrico Tassi which adds options for -a/-m flags to s2ram to
+      the ususpend method (closes: #427684).
+
+ -- martin f. krafft <madduck@debian.org>  Sat, 23 Jun 2007 18:23:11 +0100
+
+hibernate (1.96~pre-svn.r1116-1) unstable; urgency=low
+
+  * Snapshot of current upstream repository; see CHANGELOG for details.
+  * Blacklist the ipw3945 module (closes: #427252).
+
+ -- martin f. krafft <madduck@debian.org>  Sun, 03 Jun 2007 14:34:03 +0200
+
+hibernate (1.95-1) UNRELEASED; urgency=low
+
+  * New upstream release:
+    - Fix gfx_brightness if thinks the brightness is 0 (closes: #410750).
+    - Add videodump to dump and reload the video RAM (closes: #410751).
+    - Screen now does not lock when --no-suspend is given.
+    - Support renamed swap and file directories in suspend2 2.2.8.4 and thus
+      enable support on 2.6.19 kernel (closes: #416289).
+    - Enable 2ram -p/-s options in a similar way to -f; thanks to Enrico
+      Tassi (closes: #416967).
+    - See CHANGELOG for more...
+  * Fix bugscript to output s2ram -n instead of -v, thanks Joey Hess.
+
+ -- martin f. krafft <madduck@debian.org>  Sun, 03 Jun 2007 12:57:54 +0200
+
+hibernate (1.94-2) unstable; urgency=low
+
+  * Handle a read-only /usr/local directory as per policy 9.1.2. Thanks to Sam
+    Hocevar for the report (closes: #392513).
+
+ -- martin f. krafft <madduck@debian.org>  Thu, 12 Oct 2006 10:43:08 +0200
+
+hibernate (1.94-1) unstable; urgency=low
+
+  * New upstream release:
+    - properly escape amarok process listing (closes: #378282).
+    - does not fail if KDE sessions are already locked (closes: #384471).
+    - enables verbose output earlier (closes: #370713).
+  * Merged several patches into upstream code:
+    - Patch by Joey Hess to save/restore brightness levels with GFX cards
+      (closes: #384140).
+    - Patch against vbetool scriptlet to log stderr output to log file, and
+      only let output through to real stderr if verbosity >=2 is selected
+      (closes: #381927).
+    - Corrected typo in hibernate.conf manpage (closes: #386799).
+    - Reworded the init.d script message about invalidating stale signatures
+      (closes: #381903).
+    - Added ath_pci to blacklisted modules (see #383169).
+    - Added scriptlet to remount /boot read-only if /boot is a separate
+      partition, contains an XFS filesystem, hibernate was asked to update the
+      Grub menu file, and this feature has not been disabled in the
+      configuration file (closes: #317479, #317479, #386623).
+      Also added README.xfs to document caveats for users of the XFS
+      filesystem.
+    - Improved ususpend method. Now supports USuspendRamForce (boolean) to
+      pass the -f option to s2ram. Also tests with s2ram's -n option if s2ram
+      is used and the option is not set. I also made disk.conf and ram.conf
+      prefer the uswsusp methods, if they are available. If you do not want to
+      use them, use the sysfs-{ram,disk}.conf files, which are the former
+      ram.conf and disk.conf files.
+    - Use /proc/net/dev instead of ifconfig to enumerate network devices,
+      because the latter would ignore madwifi interfaces.
+  * Now actually installs the ususpend configuration (though not
+    ususpend.conf), which I had previously forgotten. Thanks to René van
+    Bevern and Christian Schuerer for pointing it out (closes: #378347).
+  * Added recommendation on vbetool, thanks to Minh Ha Duong.
+  * Added recommendation on uswsusp, so that the new uswsusp code gets used
+    if supported by the kernel (>= 2.6.17rc1), and suspend2 is not available.
+  * Fixed up recommendations (other packages that most people will want to
+    use) and suggestions (other packages used but not needed by many).
+  * Added a hibernation HOWTO by Barak A. Pearlmutter to
+    /usr/share/doc/hibernate (closes: #377389).
+  * Moved vbetool options from sysfs-ram.conf to ram.conf; they're also
+    applicable to ususpend.
+  * Create log file with 0644:root:adm permissions (closes: #381033).
+  * Added hibernate-ram and hibernate-disk symlinks which automatically use
+    ram.conf or disk.conf as configuration file, rather than hibernate.conf
+    (closes: #386426).
+
+ -- martin f. krafft <madduck@debian.org>  Tue, 10 Oct 2006 09:41:11 +0200
+
+hibernate (1.93-1) unstable; urgency=low
+
+  * New upstream release.
+  * Also let kbd satisfy the console-tools dependency (closes: #372150).
+
+ -- martin f. krafft <madduck@debian.org>  Fri, 14 Jul 2006 00:28:31 +0200
+
+hibernate (1.91-2) unstable; urgency=low
+
+  * Taking over principal maintainership.
+  * Let's not reverse the patch for #369632. Sorry.
+  * Changed BackupGrubMenuFile in example configuration to Debian location.
+  * Reworded package description and copyright file a bit.
+  * Added debian/watch file.
+  * Just noticed that hibernate.conf(5) documents the order with which options
+    are processed if specified multiple times (closes: #354341, #354350).
+
+ -- martin f. krafft <madduck@debian.org>  Mon,  5 Jun 2006 16:49:39 +0200
+
+hibernate (1.91-1) unstable; urgency=low
+
+  * The "I bet Joey Hess actually gets 40 hours to each day" release.
+  * Acknowledge NMU by Luk Claes; thanks! (closes: #360588, #363928)
+  * New upstream release. This release started out as a Debian revision, but
+    upstream simply decided to fold all changes into a new release. Thanks!
+    Here's a summary of what's new, see upstream Changelog for credits:
+    - fixes OnSuspend/OnResume (closes: #369632).
+    - improves PID detection of the running X process (closes: #350670).
+    - allows to disable xmessage dialogs (closes: #350676).
+    - allows pausing of audio output during suspend (closes: #350667).
+    - fixes font quoting issues (closes: #350767).
+    - fixes X locking with mawk (thanks to EspeonEefi) (closes: #345295).
+    - now has an option to run i915resolution on resume (closes: #349491).
+      Thus, we also suggest the 915resolution.
+    - favour pccardctl over the deprecatedd cardctl command (closes: #361673).
+    - inspired by the work of Jan Weiner, hibernate can now try different
+      suspend methods until one succeeds (closes: #336635).
+    - now logs timestamps (closes: #354397).
+    - new configuration file structure, which allows for inclusions
+      (closes: #354332).
+  * Make rmdir in prerm script write stderr to /dev/null since we actually
+    really don't care about *any* warnings, including those about read-only
+    /usr/local.
+  * Removing the suggestion for kernel-patch-suspend2. There's really no point
+    in suggesting it because what hibernate actually needs is a patched
+    kernel, not the patch itself. Maybe one day our kernels can "provide"
+    patches... I added a note to the new suspend2.conf file instead.
+  * Added a dependency on console-tools because hibernate currently needs chvt
+    (closes: #345122).
+  * Pushed Standards-Version to 3.7.2; no changes needed.
+  * Added dpatch to the source tree to make patch tracking easier.
+
+ -- martin f. krafft <madduck@debian.org>  Mon,  5 Jun 2006 13:41:37 +0200
+
+hibernate (1.12-1.1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * Don't fail when /usr/local is read only (Closes: #360588).
+  * Fix spelling error in description (Closes: #363928).
+
+ -- Luk Claes <luk@debian.org>  Sat,  3 Jun 2006 20:08:55 +0200
+
+hibernate (1.12-1) unstable; urgency=low
+
+  * New upstream release (closes: #332240).
+    - Supports swsusp 2.2-rc8 which renamed the /proc entries again.
+  * Remove empty /usr/local/share/hibernate when purged (closes: #328296).
+  * Fix lock scriptlet to work with mawk (closes: #326695).
+  * Update address of FSF in copyright file.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Fri, 21 Oct 2005 14:17:00 +0800
+
+hibernate (1.10-1) unstable; urgency=low
+
+  * New upstream release.
+  * Don't break when people use mawk, not gawk, as /usr/bin/awk
+    (closes: #317410).
+  * Correct the location of grub menu file backups to /var/backups, not
+    /var/backup (closes: #310759).
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Tue, 26 Jul 2005 19:12:29 +0800
+
+hibernate (1.09-1) unstable; urgency=low
+
+  * New upstream release (closes: #316614).
+  * README no longer refers incorrectly to hibernate-cleanup.sh (which is
+    instead installed as /etc/init.d/hibernate on Debian systems).
+  * Uses /bin/echo rather than the shell's built-in echo for extra
+    robustness against kernel bugs (closes: #309635).
+  * The grub scriptlet now edits /boot/grub/menu.lst by default, in line
+    with what Debian's grub uses (closes: #313425).
+  * The grub scriptlet keeps backups in /var/backup by default
+    (closes: #310759).
+  * Remove superfluous quotes around `uname` in grub scriptlet
+    (closes: #310758).
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Tue,  5 Jul 2005 17:35:46 +0800
+
+hibernate (1.07-1) unstable; urgency=low
+
+  * New upstream release.
+  * Check for /var/run/suspend2-new-kernel to prevent people losing data
+    by accidentally suspending with an old kernel and resuming with a
+    newer kernel (closes: #298391).
+  * Provides an "Include" directive for reading other files within
+    hibernate.conf (closes: #299901).
+  * More robust grub scriptlet (closes: #300445).
+  * Updated module blacklist, including correct module names and buggy
+    kernel version ranges for VIA chipset drivers (closes: #302177).
+  * Package description more accurately describes the supported suspend
+    methods (closes: #297130).
+  * Updated Uploaders field to include Martin Krafft.
+  * Don't install the modules_gentoo scriptlet, as it isn't relevant on a
+    Debian system.
+  * Add a README.Debian file documenting where to get software suspend patches.
+  * Install the example ram.conf configuration file.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Mon,  2 May 2005 22:39:02 +0800
+
+hibernate (1.05-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Wed, 16 Feb 2005 11:20:16 +0800
+
+hibernate (1.03-1) unstable; urgency=low
+
+  * New upstream release.
+  * Clock scriptlet now calls /etc/init.d/hwclock.sh on Debian
+    systems (closes: #287935).
+  * Services listed in RestartServices are started in reverse order to
+    being stopped (closes: #287936).
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Wed,  5 Jan 2005 18:12:57 +0800
+
+hibernate (1.02-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Wed, 24 Nov 2004 22:48:41 +0800
+
+hibernate (1.01-1) unstable; urgency=low
+
+  * New upstream release.
+  * Works correctly with current software suspend patches (closes: #280106).
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Sat, 20 Nov 2004 14:00:06 +0800
+
+hibernate (0.99-1) unstable; urgency=low
+
+  * New upstream release.
+    - Now the lock scriptlet works with mawk.
+  * Minor tweaks from Erich Schubert <erich@debian.org>.
+  * Don't Suggests: kernel-patch-swsusp, as that package is not in the
+    official archive, not maintained, and not likely to be updated in the
+    forseeable future.
+  * Add console-tools and vlock to Recommends.
+  * Don't Depend on dash (although it's still nice to have, the script
+    runs faster in dash than bash).
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Mon, 11 Oct 2004 21:54:58 +0800
+
+hibernate (0.98-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Fri, 20 Aug 2004 12:23:18 +0800
+
+hibernate (0.97+0.98-rc2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Sat, 14 Aug 2004 20:34:04 +0800
+
+hibernate (0.97+0.98-rc1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Sat, 14 Aug 2004 11:51:28 +0800
+
+hibernate (0.97-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Sat, 31 Jul 2004 20:58:53 +0800
+
+hibernate (0.96-1) unstable; urgency=low
+
+  * New upstream release, almost unchanged from rc2.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Sun, 25 Jul 2004 00:31:09 +0800
+
+hibernate (0.95+0.96-rc2-1) unstable; urgency=low
+
+  * New upstream version.
+  * Various bootsplash changes.
+  * Updated VIM syntax highlighting.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Sat, 24 Jul 2004 17:50:48 +0800
+
+hibernate (0.95+0.96-rc1-1) unstable; urgency=low
+
+  * New upstream version.
+  * Fix the lock scriptlet when locking virtual consoles.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Sat, 24 Jul 2004 11:45:16 +0800
+
+hibernate (0.95-3) unstable; urgency=low
+
+  * Merge some of the latest changes from SVN.
+  * New scriptlet "lock" thanks to Carsten Rietzschel.
+  * Update version number inside script to 0.95 (from 0.95-rc5)
+  * Un-break the -F / --config-file option.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Fri, 23 Jul 2004 09:37:33 +0800
+
+hibernate (0.95-2) unstable; urgency=low
+
+  * Fix the misclaunch scriptlet so that it doesn't always abort the
+    suspend regardless of the exit status of the programme being launched.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Thu, 22 Jul 2004 12:59:00 +0800
+
+hibernate (0.95-1) unstable; urgency=low
+
+  * New upstream release (rc4 released as 0.95 with essentially no changes).
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Wed, 21 Jul 2004 21:09:05 +0800
+
+hibernate (0.94+0.95-rc4-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Wed, 21 Jul 2004 20:46:19 +0800
+
+hibernate (0.94+0.95-rc1-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Fri, 16 Jul 2004 17:55:11 +0800
+
+hibernate (0.94-2) unstable; urgency=low
+  
+  * Fix mistake in where scriptlets where installed, so that things
+    actually work.
+  * Rename package to hibernate.
+  
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Thu, 15 Jul 2004 17:42:04 +0800
+
+suspend-script (0.94-1) unstable; urgency=low
+
+  * Initial Debian package.
+
+ -- Cameron Patrick <cameron@patrick.wattle.id.au>  Tue, 13 Jul 2004 15:40:06 +0800
+

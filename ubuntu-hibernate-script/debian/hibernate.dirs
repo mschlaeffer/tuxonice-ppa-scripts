@@ -1,0 +1,3 @@
+etc/logrotate.d
+etc/hibernate/scriptlets.d
+usr/share/bug/hibernate

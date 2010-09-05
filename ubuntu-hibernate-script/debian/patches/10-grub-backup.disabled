@@ -1,0 +1,63 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 10-grub-backup.dpatch by martin f. krafft <madduck@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Moves the grub menu.lst backup file to /var/backups .
+
+@DPATCH@
+diff -urNad upstream.trunk~/common.conf upstream.trunk/common.conf
+--- upstream.trunk~/common.conf	2006-09-13 15:17:41.000000000 +0200
++++ upstream.trunk/common.conf	2006-09-13 15:17:52.000000000 +0200
+@@ -54,7 +54,7 @@
+ # ChangeGrubMenu yes
+ # GrubMenuFile /boot/grub/menu.lst
+ # AlternateGrubMenuFile /boot/grub/menu-suspended.lst
+-# BackupGrubMenuFile /boot/grub/menu.lst.hibernate.bak
++# BackupGrubMenuFile /var/backups/grub.conf.hibernate
+ 
+ ### hardware_tweaks
+ # IbmAcpi yes
+diff -urNad upstream.trunk~/scriptlets.d/grub upstream.trunk/scriptlets.d/grub
+--- upstream.trunk~/scriptlets.d/grub	2006-09-13 15:16:38.000000000 +0200
++++ upstream.trunk/scriptlets.d/grub	2006-09-13 15:17:44.000000000 +0200
+@@ -1,18 +1,20 @@
+ # -*- sh -*-
+ # vim:ft=sh:ts=8:sw=4:noet
+ 
++GRUB_MENU_DFLT_BACKUP_FILE="/var/backups/grub.conf.hibernate"
++
+ AddConfigHandler GrubConfigOptions
+ AddConfigHelp "ChangeGrubMenu <boolean>" "Change grub's config file to show system is suspended before suspending and restore after resume."
+ AddConfigHelp "GrubMenuFile <filename>" "Filename of grub's config file. Default is /boot/grub/grub.conf."
+ AddConfigHelp "AlternateGrubMenuFile <filename>" "Filename of the grub config file to put in place when the machine is suspended. If this is not specified, the script will add a small header to the existing grub menu."
+-AddConfigHelp "BackupGrubMenuFile <filename>" "Where to keep a backup of your real grub menu file. Defaults to the current grub menu file with '.hibernate.bak' appended."
++AddConfigHelp "BackupGrubMenuFile <filename>" "Where to keep a backup of your real grub menu file. Defaults to ${GRUB_MENU_DFLT_BACKUP_FILE}."
+ 
+ AddOptionHandler GrubCmdlineOptions
+ AddShortOption 'g'
+ AddLongOption 'restore-grub'
+ AddOptionHelp '-g, --restore-grub' 'Restores the grub menu to normal (use if a resume was not completed sucessfully) and exits the script. A suspend is not performed.'
+ 
+-GRUB_MENU_FILE="/boot/grub/grub.conf"
++GRUB_MENU_FILE="/boot/grub/menu.lst"
+ 
+ GRUB_BEGIN_SENTINEL="### BEGIN HIBERNATE SENTINEL"
+ GRUB_END_SENTINEL="### END HIBERNATE SENTINEL"
+@@ -25,7 +27,7 @@
+ 	    vecho 2 "Changing grub menu..."
+ 
+ 	    # Make a backup, and abort if we fail to.
+-	    if ! cp "$GRUB_MENU_FILE" "${BACKUP_GRUB_MENU_FILE:-$GRUB_MENU_FILE.hibernate.bak}" ; then
++	    if ! cp "$GRUB_MENU_FILE" "${BACKUP_GRUB_MENU_FILE:-$GRUB_MENU_DFLT_BACKUP_FILE}" ; then
+ 		vecho 0 "Could not make backup of grub menu. Not changing!"
+ 		return 1 # abort if not forced
+ 	    fi
+@@ -65,7 +67,7 @@
+ 		$GRUB_MENU_FILE > $GRUB_MENU_FILE.hibernate.new \
+ 		&& mv $GRUB_MENU_FILE.hibernate.new $GRUB_MENU_FILE
+ 	else
+-	    mv "${BACKUP_GRUB_MENU_FILE:-$GRUB_MENU_FILE.hibernate.bak}" "$GRUB_MENU_FILE"
++	    mv "${BACKUP_GRUB_MENU_FILE:-$GRUB_MENU_DFLT_BACKUP_FILE}" "$GRUB_MENU_FILE"
+ 	fi
+     fi
+ }

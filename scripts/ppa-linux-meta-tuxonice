@@ -1,0 +1,69 @@
+#!/bin/bash
+
+UBUNTU=$1
+#KERNEL=$2
+MAJOR=$2
+MINOR=$3
+PPA=$4
+DPUT=$5
+#DPUT="ppa:tuxonice/tuxonice-testing"
+#DPUT="ppa:tuxonice/ppa"
+DEBIAN=debian
+
+if [ "$UBUNTU" = lucid ]; then
+  CONTROL=control.common
+else
+  CONTROL=control
+fi
+
+# clean, pull and checkout current Ubuntu kernel
+cd ubuntu-$UBUNTU-meta
+ubuntu-git-clean
+git pull
+ubuntu-git-checkout $MAJOR.$MINOR
+cd meta-source
+
+KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2 | cut -d. -f1-3`
+
+# add tuxonice to control.d
+# files: debian.master/control.d/*
+cp -a $DEBIAN/control.d $DEBIAN/control.d.old
+for i in $DEBIAN/control.d/*; do
+  mv $i $i-tuxonice
+  for j in $DEBIAN/control.d.old/*; do
+    FLAVOUR=`echo $j | cut -d/ -f3`
+    cp $i-tuxonice $i-tuxonice.old
+    sed "s/-$FLAVOUR\([^a-z0-9-]\)/-$FLAVOUR-tuxonice\1/g" $i-tuxonice.old > $i-tuxonice;
+    cp $i-tuxonice $i-tuxonice.old
+    sed "s/-$FLAVOUR$/-$FLAVOUR-tuxonice/g" $i-tuxonice.old > $i-tuxonice;
+  done
+  rm $i-tuxonice.old
+  FLAVOUR=`echo $i | cut -d/ -f3`
+  cp $DEBIAN/$CONTROL $DEBIAN/$CONTROL.old
+  sed "s/-$FLAVOUR\([^a-z0-9-]\)/-$FLAVOUR-tuxonice\1/g" $DEBIAN/$CONTROL.old > $DEBIAN/$CONTROL;
+  cp $DEBIAN/$CONTROL $DEBIAN/$CONTROL.old
+  sed "s/-$FLAVOUR$/-$FLAVOUR-tuxonice/g" $DEBIAN/$CONTROL.old > $DEBIAN/$CONTROL;
+done
+rm -rf $DEBIAN/control.d.old
+rm $DEBIAN/$CONTROL.old
+
+# edit changelog
+cp $DEBIAN/changelog $DEBIAN/changelog.old
+echo "linux-meta ($KERNEL.$MAJOR.$MINOR~ppa$PPA) $UBUNTU; urgency=low" > $DEBIAN/changelog
+echo "" >> $DEBIAN/changelog
+echo "  * TuxOnIce enabled package." >> $DEBIAN/changelog
+echo "" >> $DEBIAN/changelog
+echo " -- " `bzr whoami` "  " `date -R` >> $DEBIAN/changelog
+echo "" >> $DEBIAN/changelog
+cat $DEBIAN/changelog.old >> $DEBIAN/changelog
+rm $DEBIAN/changelog.old
+
+# prepare, build and upload package
+fakeroot $DEBIAN/rules clean
+debuild -S -sd -I.git -I.gitignore -i'\.git.*'
+#echo dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
+dput $DPUT ../linux-meta_$KERNEL.$MAJOR.$MINOR~ppa${PPA}_source.changes
+cd ..
+cd ..
+
+#ubuntu-git-clean

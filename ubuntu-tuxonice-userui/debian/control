@@ -1,0 +1,27 @@
+Source: tuxonice-userui
+Priority: extra
+Section: misc
+Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
+XSBC-Original-Maintainer: Arnaud Fontaine <arnau@debian.org>
+Build-Depends: cdbs (>= 0.4.23-1.1),
+               debhelper (>= 6.0.7),
+               libmng-dev (>= 1.0.5),
+               libfreetype6-dev,
+               libpng12-dev,
+               libusplash-dev [!ia64],
+               quilt,
+Standards-Version: 3.8.1
+Homepage: http://www.tuxonice.net/userui
+
+Package: tuxonice-userui
+Architecture: i386 ia64 powerpc ppc64 amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, initramfs-tools
+Suggests: hibernate
+Description: user-space interfaces for TuxOnIce
+ TuxOnIce is an alternative implementation to suspend a Linux machine
+ by writing its state to memory for later resuming. A kernel patch for
+ TuxOnIce is available separately.
+ .
+ This package provides several user interfaces which improve the
+ user's experience during the suspend and resume processes. It is not
+ needed for TuxOnIce functionality.

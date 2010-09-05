@@ -1,0 +1,13 @@
+#!/bin/bash
+
+UBUNTU=$1
+TUXONICEDIR=/home/martin/ubuntu/git/ubuntu-$UBUNTU+tuxonice
+
+echo -n "  tuxonice: "
+PWD=`pwd`
+cd $TUXONICEDIR
+tuxonice-git-clean > /dev/null 2> /dev/null
+git pull > /dev/null 2> /dev/null
+tuxonice-git-log | grep "Bump version to" | head -n 1 | sed -e 's/.*Bump version to //' -e 's/\.$//'
+cd $PWD
+

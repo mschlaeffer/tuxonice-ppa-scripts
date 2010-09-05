@@ -1,0 +1,19 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 99-debian-misc.dpatch by martin f. krafft <madduck@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Change laptop-mode init.d script name.
+
+@DPATCH@
+diff -urNad hibernate-1.91~/common.conf hibernate-1.91/common.conf
+--- hibernate-1.91~/common.conf	2006-06-05 14:13:19.328072919 +0200
++++ hibernate-1.91/common.conf	2006-06-05 14:13:26.517094913 +0200
+@@ -99,7 +99,7 @@
+ # IncompatiblePrograms xmms
+ 
+ ### services
+-# RestartServices laptop_mode anacron
++# RestartServices laptop-mode anacron
+ # StopServices alsasound
+ # StartServices aumix
+ 

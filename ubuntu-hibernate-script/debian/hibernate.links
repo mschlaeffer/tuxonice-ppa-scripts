@@ -1,0 +1,4 @@
+usr/sbin/hibernate usr/sbin/hibernate-disk
+usr/share/man/man8/hibernate.8.gz usr/share/man/man8/hibernate-disk.8.gz
+usr/sbin/hibernate usr/sbin/hibernate-ram
+usr/share/man/man8/hibernate.8.gz usr/share/man/man8/hibernate-ram.8.gz

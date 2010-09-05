@@ -1,0 +1,43 @@
+#!/bin/sh
+# -*- shell-script -*-
+
+PREREQ=""
+
+prereqs()
+{
+    echo "$PREREQ"
+}
+
+case $1 in
+    prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+#TUXONICE_ENABLED=/sys/power/tuxonice/user_interface/enabled
+
+# Don't do  anything if the  kernel does not  support tuxonice_userui,
+# nor the module is there
+#if [ -f ${TUXONICE_ENABLED} ]; then
+#    if [ `cat ${TUXONICE_ENABLED}` = 0 ]; then
+#	echo "TuxOnIce user interface is disabled, skipping..."
+#	exit 0
+#    fi
+#elif [ ! -f ${MODULESDIR}/kernel/power/tuxonice_userui.ko ]; then
+#    echo "This kernel does not seem to support TuxOnIce user interface, skipping..."
+#    exit 0
+#fi
+
+# Add the module and its  dependencies and load it automatically if it
+# exists
+#force_load tuxonice_userui
+
+TUXONICEDIR=/usr/lib/tuxonice-userui
+
+mkdir -p ${DESTDIR}${TUXONICEDIR}
+
+copy_exec ${TUXONICEDIR}/tuxoniceui ${TUXONICEDIR}
+

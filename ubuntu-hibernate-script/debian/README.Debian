@@ -1,0 +1,29 @@
+hibernate for Debian
+====================
+
+Patches for Suspend2 which apply to vanilla (non-Debian) kernels can be
+obtained from the upstream web site at http://www.suspend2.net/
+
+Those who prefer to run Debian kernels (compiled from the sources in the
+kernel-source-2.6.x packages) won't be able to use these patches, due to the
+changes in the Debian kernels and the invasiveness of the suspend2 patch.
+A kernel patch package for Debian (linux-patch-suspend2) is planned. Please
+contact me if you would be able to donate time to make it happen.
+
+Hibernate will just fall back to using the in-kernel suspend methods when
+suspend2 is not present.
+
+Users with /boot/grub on an XFS partition, make sure to read
+/usr/share/doc/README.xfs!
+
+hibernate is maintained with SVN as part of Alioth's collab-maint project. Get
+the source from
+
+  anonymous: svn://svn.debian.org/svn/collab-maint/deb-maint/hibernate/trunk
+  developer: svn+ssh://<username>@svn.debian.org/svn/collab-maint/deb-maint/hibernate/trunk
+
+It is designed to be used with svn-buildpackage.
+
+ -- martin f. krafft <madduck@debian.org>  Sat, 15 Jul 2006 19:07:59 +0200
+
+$Id$

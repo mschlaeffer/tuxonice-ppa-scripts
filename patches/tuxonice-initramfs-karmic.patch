@@ -1,0 +1,51 @@
+diff -Nurp a/debian.master/control-scripts/postinst b/debian/control-scripts/postinst
+--- a/debian.master/control-scripts/postinst	2010-04-04 12:10:55.533568315 +0200
++++ b/debian.master/control-scripts/postinst	2010-04-04 12:09:57.506231042 +0200
+@@ -822,6 +822,32 @@ sub find_initrd_tool {
+       split (/[:,\s]+/, $ramdisk);
+ }
+ 
++# adding lzo kernel module to ramdisk for tuxonice
++system('echo lzo > /usr/share/initramfs-tools/modules.d/tuxonice');
++
++# needed for tuxonice to resume
++system("echo '#!/bin/sh' > /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system('echo PREREQ=\"\" >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume');
++system("echo >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo 'prereqs()' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo '{' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system('echo \ \ \ \ \ \ \ \ echo\ \"\$PREREQ\" >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume');
++system("echo '}' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system('echo "case \$1 in" >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume');
++system("echo '# get pre-requisites' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo 'prereqs)' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo '        prereqs' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo '        exit 0' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo '        ;;' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo 'esac' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo 'if [ -d /sys/power/tuxonice ]; then' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo '        echo > /sys/power/tuxonice/do_resume' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("echo 'fi' >> /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++system("chmod +x /usr/share/initramfs-tools/scripts/local-premount/tuxonice_do_resume");
++
+ # The initrd symlink should probably be in the same dir that the
+ # symlinks are in
+ if ($initrd) {
+@@ -889,10 +914,10 @@ if (-x $notifier) {
+ 
+ # Let programs know not to hibernate if the kernel that would be used for
+ # resume-from-hibernate is likely to differ from the currently running kernel.
+-system("mountpoint -q /var/run");
+-if ($? eq 0) {
+-	system("touch /var/run/do-not-hibernate");
+-}
++#system("mountpoint -q /var/run");
++#if ($? eq 0) {
++#	system("touch /var/run/do-not-hibernate");
++#}
+ 
+ # Only change the symlinks if we are not being upgraded
+ if (! defined $ARGV[1] || ! $ARGV[1] || $ARGV[1] =~ m/<unknown>/og) {

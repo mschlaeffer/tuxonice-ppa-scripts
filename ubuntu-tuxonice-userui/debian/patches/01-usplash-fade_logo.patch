@@ -1,0 +1,14 @@
+--- a/usplash/userui_usplash_core.c
++++ b/usplash/userui_usplash_core.c
+@@ -33,9 +33,11 @@
+ static int userui_usplash_yres = 0;
+ static int userui_usplash_verbose = 1;
+ 
++/*
+ #ifndef fade_logo
+ void fade_logo(on, step) { }
+ #endif
++*/
+ 
+ static void read_usplash_conf() {
+     char s[1024];

@@ -1,0 +1,131 @@
+#!/bin/bash
+
+UBUNTU=$1
+#KERNEL=$2
+MAJOR=$2
+MINOR=$3
+PPA=$4
+TOI=$5
+DPUT=$6
+#DPUT="ppa:tuxonice/tuxonice-testing"
+#DPUT="ppa:tuxonice/ppa"
+
+#if [ "$UBUNTU" = jaunty ]; then
+#  DEBIAN=debian
+#else
+  DEBIAN=debian.master
+#fi
+
+#echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
+
+# clean, pull and checkout current Ubuntu kernel
+cd ubuntu-$UBUNTU
+ubuntu-git-clean
+git pull
+ubuntu-git-checkout $MAJOR.$MINOR
+
+KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2`
+
+echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
+
+# prepare and apply tuxonice patches
+#make mrproper
+#git checkout ./debian
+git apply ../tuxonice-$TOI-$UBUNTU.patch
+git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
+
+if [ "$UBUNTU" = jaunty ]; then
+  CONFIG="config\."
+else
+  CONFIG="config.flavour"
+fi
+
+# add tuxonice config
+# files: debian.master/config/$ARCH/config.flavour.$FLAVOUR
+for i in `find $DEBIAN/config | grep "$CONFIG"`; do
+  mv $i $i-tuxonice;
+  cat ../tuxoniceppa/config/tuxonice-$UBUNTU.config >> $i-tuxonice;
+done
+
+# add tuxonice to kernel-versions.in
+# file: debian.master/d-i/kernel-versions.in
+cp $DEBIAN/d-i/kernel-versions.in $DEBIAN/d-i/kernel-versions.in.tmp
+cat $DEBIAN/d-i/kernel-versions.in.tmp | \
+  grep -v ^$ | grep -v ^# | \
+    awk '{ print $1 "\t" $2 "\t" $3"-tuxonice" "\t" $4"-tuxonice" "\t" $5 "\t" $6 "\t" $7 }' \
+    > $DEBIAN/d-i/kernel-versions.in
+rm $DEBIAN/d-i/kernel-versions.in.tmp
+
+# add tuxonice to vars.$FLAVOUR
+# files: debian.master/control.d/vars.$FLAVOUR
+for i in `find $DEBIAN | grep \/vars\.`; do
+  mv $i $i-tuxonice;
+done
+
+# add tuxonice to $FLAVOUR.mk
+# files: debian.master/rules.d/$FLAVOUR.mk
+cp -a $DEBIAN/rules.d/ $DEBIAN/rules.d.tmp
+for i in $DEBIAN/rules.d.tmp/*; do
+  sed '/^flavours/s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $i \
+    > `echo $i | sed 's/.tmp//g'`
+done
+rm -rf $DEBIAN/rules.d.tmp
+
+# fix modules.dep
+# (error: lzo not found in initrd)
+cp $DEBIAN/control.stub.in $DEBIAN/control.stub.in.old
+sed '/Build-Depends-Indep/s/$/, cpio/' $DEBIAN/control.stub.in.old > $DEBIAN/control.stub.in
+rm $DEBIAN/control.stub.in.old
+
+# add tuxonice to abi
+# files: debian.master/abi/*
+for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v modules`; do
+  mv $i $i-tuxonice;
+done
+for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep modules`; do
+  mv $i `echo $i | sed 's/.modules/-tuxonice.modules/'`;
+done
+
+# fix abi
+# (error: abi missing while building)
+LAST=`ls $DEBIAN/abi/ | grep $KERNEL | tail -n 1`
+cp -a $DEBIAN/abi/$LAST $DEBIAN/abi/$KERNEL-$MAJOR.$MINOR
+echo $MAJOR > $DEBIAN/abi/$KERNEL-$MAJOR.$MINOR/abiname
+# manual corrections for some builds:
+#cp -a $DEBIAN/abi/$LAST $DEBIAN/abi/$KERNEL-$MAJOR.34
+#echo 21 > $DEBIAN/abi/$KERNEL-21.$MINOR/abiname
+
+# edit changelog
+cp $DEBIAN/changelog $DEBIAN/changelog.old
+echo "linux ($KERNEL-$MAJOR.$MINOR~ppa$PPA) $UBUNTU; urgency=low" > $DEBIAN/changelog
+echo "" >> $DEBIAN/changelog
+echo "  * TuxOnIce $TOI added." >> $DEBIAN/changelog
+echo "" >> $DEBIAN/changelog
+echo " -- " `bzr whoami` "  " `date -R` >> $DEBIAN/changelog
+echo "" >> $DEBIAN/changelog
+cat $DEBIAN/changelog.old >> $DEBIAN/changelog
+rm $DEBIAN/changelog.old
+
+if [ "$UBUNTU" = lucid ]; then
+  DEBIAN=debian
+fi
+
+# add tuxonice to getabis
+# file: debian.master/scripts/misc/getabis
+cp $DEBIAN/scripts/misc/getabis $DEBIAN/scripts/misc/getabis.tmp
+sed '/getall /s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $DEBIAN/scripts/misc/getabis.tmp > $DEBIAN/scripts/misc/getabis
+rm $DEBIAN/scripts/misc/getabis.tmp
+
+# add skipabi
+cp $DEBIAN/rules.d/0-common-vars.mk $DEBIAN/rules.d/0-common-vars.mk.old
+sed 's/^AUTOBUILD=/skipabi=true\nAUTOBUILD=/' $DEBIAN/rules.d/0-common-vars.mk.old > $DEBIAN/rules.d/0-common-vars.mk
+rm $DEBIAN/rules.d/0-common-vars.mk.old
+
+# build package and upload
+fakeroot debian/rules clean
+debuild -S -sd -I.git -I.gitignore -i'\.git.*'
+#echo dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
+dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
+cd ..
+
+#ubuntu-git-clean

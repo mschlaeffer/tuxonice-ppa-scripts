@@ -1,0 +1,16 @@
+#!/bin/bash
+
+RELEASE=$1
+
+if [ "$RELEASE" = lucid ]; then
+  echo 2.6.32
+fi
+
+if [ "$RELEASE" = karmic ]; then
+  echo 2.6.31
+fi
+
+if [ "$RELEASE" = jaunty ]; then
+  echo 2.6.28
+fi
+

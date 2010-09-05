@@ -1,0 +1,22 @@
+hibernate (1.90-1) unstable; urgency=low
+
+  This version of hibernate introduces significant changes to the
+  configuration file structure. Previously, /etc/hibernate/hibernate.conf was
+  the one-stop configuration file, supporting one suspend method (suspend2 by
+  default). If you wanted to support ACPI as well, you needed a separate file
+  (/etc/hibernate/ram.conf in our case).
+
+  Hibernate now supports two new directives: Include and TryMethod. The first
+  one is designed for common settings to all suspend methods (such as hooks),
+  which can now be exported to a single, commonly used file (common.conf).
+  TryMethod, on the other hand, is an include directive especially made for
+  the different suspend methods (suspend2, disk/sysfs, ram/ACPI). If
+  encountered, hibernate will load the file, try to suspend, and simply move
+  on to the next TryMethod (or Include, or directive), if it failed. This
+  allows different suspend methods to be tried in turn and should make your
+  life much easier.
+
+  Note that your old configuration files will continue to work, but you may
+  want to consider moving over to the new structure at your next convenience.
+
+ -- martin f. krafft <madduck@debian.org>  Mon,  5 Jun 2006 12:14:54 +0200

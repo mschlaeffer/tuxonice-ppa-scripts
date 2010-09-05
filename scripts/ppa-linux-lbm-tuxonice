@@ -1,0 +1,63 @@
+#!/bin/bash
+
+UBUNTU=$1
+#KERNEL=$2
+MAJOR=$2
+MINOR=$3
+PPA=$4
+DPUT=$5
+#DPUT="ppa:tuxonice/tuxonice-testing"
+#DPUT="ppa:tuxonice/ppa"
+DEBIAN=debian
+
+# clean, pull and checkout current Ubuntu kernel
+cd ubuntu-$UBUNTU-lbm
+ubuntu-git-clean
+git pull
+ubuntu-git-checkout $MAJOR.$MINOR
+
+KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2`
+
+# add tuxonice to kernel-versions.in
+# file: debian.master/d-i/kernel-versions.in
+cp $DEBIAN/d-i/kernel-versions.in $DEBIAN/d-i/kernel-versions.in.tmp
+cat $DEBIAN/d-i/kernel-versions.in.tmp | \
+  grep -v ^$ | grep -v ^# | \
+    awk '{ print $1 "\t" $2 "\t" $3"-tuxonice" "\t" $4"-tuxonice" "\t" $5 "\t" $6 "\t" $7 }' \
+    > $DEBIAN/d-i/kernel-versions.in
+rm $DEBIAN/d-i/kernel-versions.in.tmp
+
+# add tuxonice to vars.$FLAVOUR
+# files: debian.master/control.d/vars.$FLAVOUR
+for i in `find $DEBIAN | grep \/vars\.`; do
+  mv $i $i-tuxonice;
+done
+
+# add tuxonice to $FLAVOUR.mk
+# files: debian.master/rules.d/$FLAVOUR.mk
+cp -a $DEBIAN/rules.d/ $DEBIAN/rules.d.tmp
+for i in $DEBIAN/rules.d.tmp/*; do
+  sed '/^flavours/s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $i \
+    > `echo $i | sed 's/.tmp//g'`
+done
+rm -rf $DEBIAN/rules.d.tmp
+
+# changelog
+cp debian/changelog debian/changelog.old
+echo "linux-backports-modules-$KERNEL ($KERNEL-$MAJOR.$MINOR~ppa$PPA) $UBUNTU; urgency=low" > debian/changelog
+echo "" >> debian/changelog
+echo "  * TuxOnIce enabled package." >> debian/changelog
+echo "" >> debian/changelog
+echo " -- " `bzr whoami` "  " `date -R` >> $DEBIAN/changelog
+echo "" >> debian/changelog
+cat debian/changelog.old >> debian/changelog
+rm debian/changelog.old
+
+# build package and upload
+fakeroot debian/rules clean
+debuild -S -sd -I.git -I.gitignore -i'\.git.*'
+#echo dput $DPUT ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
+dput $DPUT ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
+cd ..
+
+#ubuntu-git-clean

@@ -1,0 +1,19 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 50-init.d-lsb-depends.dpatch by martin f. krafft <madduck@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+@DPATCH@
+diff -urNad upstream.trunk~/init.d/hibernate-cleanup.sh upstream.trunk/init.d/hibernate-cleanup.sh
+--- upstream.trunk~/init.d/hibernate-cleanup.sh	2007-06-23 18:22:03.000000000 +0100
++++ upstream.trunk/init.d/hibernate-cleanup.sh	2007-06-23 18:22:48.000000000 +0100
+@@ -20,6 +20,8 @@
+ # Default-Stop:
+ # Required-Start:
+ # Required-Stop:
++# Should-Start:      udev devfsd raid2 mdadm lvm evms cryptdisks
++# X-Start-Before:    mountall
+ # Short-Description: invalidates stale swsusp and TuxOnIce image
+ # Description:       This script invalidates any stale swsusp and TuxOnIce images. It
+ #                    searches all swap partitions on your machine, as well as

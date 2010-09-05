@@ -1,0 +1,29 @@
+#!/bin/bash
+
+RELEASE=$1
+KERNEL=`ubuntu-release2kernel $RELEASE`
+
+lynx -dump https://launchpad.net/ubuntu/$RELEASE/+source/linux | \
+  grep -e \]linux\  -e ^"   Release" -e "   Security" -e "   Updates" -e "   Proposed" | \
+  sed -e 's/^ *//g' -e 's/^[ +]*[[0-9]*]linux //g' -e 'y/RSUP/rsup/' | \
+  sed ':a;N;$!ba;s/\([a-z]\)\n/\1 /g' | \
+  awk '{print $2 " " $1}'
+
+lynx -dump http://launchpad.net/~tuxonice/+archive/ppa/+packages > ~dump-$RELEASE
+echo -n `cat ~dump-$RELEASE | \
+  grep -i -e "\[package-source\] linux - $KERNEL" | \
+  sed -e "s/.*\($KERNEL-[.~+0-9a-z-]*\).*/\1 ppa:tuxonice\/ppa/"`
+REF=`grep "linux - $KERNEL"  ~dump-$RELEASE | sed 's/ *\[\([0-9]*\)\].*/\1/'`
+LINK=`grep "^  $REF." ~dump-$RELEASE | awk '{print $2}'`
+echo \ `lynx -dump $LINK | grep "  \* TuxOnIce" | awk '{print $3}'`
+
+lynx -dump http://launchpad.net/~tuxonice/+archive/tuxonice-testing/+packages > ~dump-$RELEASE
+echo -n `cat ~dump-$RELEASE | \
+  grep -i -e "\[package-source\] linux - $KERNEL" | \
+  sed -e "s/.*\($KERNEL-[.~+0-9a-z-]*\).*/\1 ppa:tuxonice\/tuxonice-testing/"`
+REF=`grep "linux - $KERNEL"  ~dump-$RELEASE | sed 's/ *\[\([0-9]*\)\].*/\1/'`
+LINK=`grep "^  $REF." ~dump-$RELEASE | awk '{print $2}'`
+echo \ `lynx -dump $LINK | grep "  \* TuxOnIce" | awk '{print $3}'`
+
+rm ~dump-$RELEASE
+

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+UBUNTU=$1
+#KERNEL=$2
+MAJOR=$2
+MINOR=$3
+PPA=$4
+UVER=$5
+DPUT=$6
+#DPUT="ppa:tuxonice/tuxonice-testing"
+#DPUT="ppa:tuxonice/ppa"
+
+#echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
+
+# clean, pull and checkout current Ubuntu kernel
+cd hibernate-script
+ubuntu-git-clean
+git pull
+
+cp -a ../tuxoniceppa/ubuntu-hibernate-script/* .
+#cp install.sh install.sh.old
+#sed 's/conf\///' install.sh.old > install.sh
+#rm install.sh.old
+#cp debian/hibernate.install debian/hibernate.install.old
+#sed 's/conf\///' debian/hibernate.install.old > debian/hibernate.install
+#rm debian/hibernate.install.old
+#cp conf/* .
+#rm -rf conf
+
+# edit changelog
+cp debian/changelog debian/changelog.old
+echo "hibernate ($MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER) $UBUNTU; urgency=low" > debian/changelog
+echo "" >> debian/changelog
+echo "  * New upstream GIT snapshot." >> debian/changelog
+echo "" >> debian/changelog
+echo " -- " `bzr whoami` "  " `date -R` >> debian/changelog
+echo "" >> debian/changelog
+cat debian/changelog.old >> debian/changelog
+rm debian/changelog.old
+
+# build package and upload
+debuild -S -sd -I.git -I.gitignore -i'\.git.*'
+#echo tuxonice-userui_$MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER\_source.changes
+dput $DPUT ../hibernate_$MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER\_source.changes
+cd ..
+
+#ubuntu-git-clean
+

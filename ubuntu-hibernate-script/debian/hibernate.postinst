@@ -1,0 +1,21 @@
+#!/bin/sh -eu
+#
+# Post-install script for Debian hibernate package
+#
+# Originally written by Cameron Patrick, 2004 and released to the public domain.
+# Modified by martin f. krafft.
+#
+# Copyright © martin f. krafft <madduck@debian.org>
+# Released under the terms of the Artistic Licence 2.0
+#
+# $Id$
+#
+
+if [ "${1:-}" = configure ]; then
+  mkdir --parent /usr/local/share/hibernate/scriptlets.d || :
+fi
+
+# See #369953
+set +u
+#DEBHELPER#
+set -u

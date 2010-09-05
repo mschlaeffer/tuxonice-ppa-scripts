@@ -1,0 +1,8 @@
+#!/bin/bash
+
+VERSION=$1
+
+ubuntu-git-log | \
+  grep $VERSION -B 1 | \
+  grep commit | \
+  cut -d\  -f2

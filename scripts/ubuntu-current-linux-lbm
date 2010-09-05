@@ -1,0 +1,21 @@
+#!/bin/bash
+
+RELEASE=$1
+KERNEL=`ubuntu-release2kernel $RELEASE`
+
+lynx -dump https://launchpad.net/ubuntu/$RELEASE/+source/linux-backports-modules-$KERNEL | \
+  grep -e \]linux-backports-modules-$KERNEL\  -e ^"   Release" -e "   Security" -e "   Updates" -e "   Proposed" | \
+  sed -e 's/^ *//g' -e "s/^[ +]*[[0-9]*]linux-backports-modules-$KERNEL //g" -e 'y/RSUP/rsup/' | \
+  sed ':a;N;$!ba;s/\([a-z]\)\n/\1 /g' | \
+  awk '{print $2 " " $1}'
+
+lynx -dump http://launchpad.net/~tuxonice/+archive/ppa/+packages | \
+  grep -A 1 -i -e "\[package-source\] linux-backports-modules-$KERNEL" | \
+  grep -v "\[package-source\] linux-backports-modules-$KERNEL" | \
+  sed -e "s/.*\($KERNEL.[.~+0-9a-z-]*\) .*/\1 ppa:tuxonice\/ppa/"
+
+lynx -dump http://launchpad.net/~tuxonice/+archive/tuxonice-testing/+packages | \
+  grep -A 1 -i -e "\[package-source\] linux-backports-modules-$KERNEL" | \
+  grep -v "\[package-source\] linux-backports-modules-$KERNEL" | \
+  sed -e "s/.*\($KERNEL.[.~+0-9a-z-]*\) .*/\1 ppa:tuxonice\/tuxonice-testing/"
+

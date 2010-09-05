@@ -1,0 +1,19 @@
+#!/bin/bash
+
+UBUNTU=$1
+
+echo $UBUNTU
+tuxonice-current $UBUNTU
+echo "  linux:"
+ubuntu-current-linux $UBUNTU | sort -n
+echo "  linux-meta:"
+ubuntu-current-linux-meta $UBUNTU | sort -n
+echo "  linux-lbm:"
+ubuntu-current-linux-lbm $UBUNTU | sort -n
+if [ "$UBUNTU" = jaunty ]; then
+  echo "  linux-lrm:"
+  ubuntu-current-linux-lrm $UBUNTU | sort -n
+fi
+
+#tuxonice-current $UBUNTU
+

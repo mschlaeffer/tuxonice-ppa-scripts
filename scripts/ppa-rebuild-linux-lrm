@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# usage: ppa-rebuild-linux-lrm jaunty ppa:tuxonice/tuxonice-testing
+
+UBUNTU=$1
+DPUT=$2
+
+ubuntu-current-linux-lrm $UBUNTU > ~tmp
+TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | tail -n 1`
+PPATAG=`cat ~tmp | grep "$DPUT" | tail -n 1`
+VERSION=`echo $TAG | awk '{print $1}'`
+PPAVERSION=`echo $PPATAG | awk '{print $1}'`
+rm ~tmp
+
+echo "$VERSION $UBUNTU"
+echo "$PPAVERSION $DPUT"
+
+echo "checking PPA < UBUNTU ..."
+echo "  $PPAVERSION < $VERSION"
+if [ `dpkg --compare-versions "$PPAVERSION" lt "$VERSION"` ]; then
+  REBUILD=true
+  PPA=1
+fi
+
+if [ -z "$REBUILD" ]; then
+  echo "not rebuilding"
+  exit 0
+fi
+
+echo "rebuilding $UBUNTU linux-meta-lrm: $VERSION~ppa$PPA for $DPUT"
+#ppa-linux-lrm-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT
+cd ..
+

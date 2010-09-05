@@ -1,0 +1,44 @@
+#!/bin/bash
+
+UBUNTU=$1
+#KERNEL=$2
+MAJOR=$2
+MINOR=$3
+PPA=$4
+UVER=$5
+DPUT=$6
+#DPUT="ppa:tuxonice/tuxonice-testing"
+#DPUT="ppa:tuxonice/ppa"
+
+#echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
+
+# clean, pull and checkout current Ubuntu kernel
+cd tuxonice-userui
+ubuntu-git-clean
+git pull
+
+cp -a ../tuxoniceppa/ubuntu-tuxonice-userui .
+
+if [ "$UBUNTU" = jaunty ]; then
+  rm debian/patches/*
+fi
+
+# edit changelog
+cp debian/changelog debian/changelog.old
+echo "tuxonice-userui ($MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER) $UBUNTU; urgency=low" > debian/changelog
+echo "" >> debian/changelog
+echo "  * New upstream GIT snapshot." >> debian/changelog
+echo "" >> debian/changelog
+echo " -- " `bzr whoami` "  " `date -R` >> debian/changelog
+echo "" >> debian/changelog
+cat debian/changelog.old >> debian/changelog
+rm debian/changelog.old
+
+# build package and upload
+debuild -S -sd -I.git -I.gitignore -i'\.git.*'
+#echo tuxonice-userui_$MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER\_source.changes
+dput $DPUT ../tuxonice-userui_$MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER\_source.changes
+cd ..
+
+#ubuntu-git-clean
+

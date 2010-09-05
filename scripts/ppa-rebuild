@@ -1,0 +1,28 @@
+#!/bin/bash
+
+echo "checking updates for UBUNTU lucid:"
+ubuntu-current lucid
+echo
+ppa-rebuild-linux lucid ppa:tuxonice/tuxonice-testing
+ppa-rebuild-linux-meta lucid ppa:tuxonice/tuxonice-testing
+ppa-rebuild-linux-lbm lucid ppa:tuxonice/tuxonice-testing
+echo
+echo
+
+echo "checking updates for UBUNTU karmic:"
+ubuntu-current karmic
+echo
+ppa-rebuild-linux karmic ppa:tuxonice/tuxonice-testing
+ppa-rebuild-linux-meta karmic ppa:tuxonice/tuxonice-testing
+ppa-rebuild-linux-lbm karmic ppa:tuxonice/tuxonice-testing
+echo
+echo
+
+echo "checking updates for UBUNTU jaunty:"
+ubuntu-current jaunty
+echo
+ppa-rebuild-linux jaunty ppa:tuxonice/tuxonice-testing
+ppa-rebuild-linux-meta jaunty ppa:tuxonice/tuxonice-testing
+ppa-rebuild-linux-lbm jaunty ppa:tuxonice/tuxonice-testing
+ppa-rebuild-linux-lrm jaunty ppa:tuxonice/tuxonice-testing
+

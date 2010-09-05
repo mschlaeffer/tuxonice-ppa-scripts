@@ -1,0 +1,30 @@
+Source: hibernate
+Section: utils
+Priority: extra
+Maintainer: martin f. krafft <madduck@debian.org>
+Uploaders: Cameron Patrick <cameron@patrick.wattle.id.au>
+Build-Depends: debhelper (>> 6), dpatch
+Standards-Version: 3.7.3
+Vcs-Git: git://git.debian.org/collab-maint/hibernate.git
+Vcs-Browser: http://git.debian.org/?p=collab-maint/hibernate.git
+
+Package: hibernate
+Architecture: all
+Depends: console-tools | kbd
+Recommends: dash, hdparm, vbetool, uswsusp
+Suggests: 915resolution, xscreensaver | kscreensaver | gnome-screensaver | xlock | vlock
+Conflicts: suspend-script (<= 0.94-1)
+Replaces: suspend-script (<= 0.94-1)
+Description: smartly puts your computer to sleep (suspend to RAM or disk)
+ The hibernate script helps you in putting your computer to sleep, using one
+ of the various methods available in the kernel.
+ .
+ Hibernate can take care of loading and unloading modules, provides various
+ hacks needed to get some video cards to resume properly under X, can
+ optionally restart networking and system services, and basically do whatever
+ else you ask it. It can be extended by writing new "scriptlets" which run at
+ different points during the suspend process.
+ .
+ Currently the script supports all suspend mechanisms available through the
+ /sys/power/state interface (including ACPI suspend and the in-kernel software
+ suspend), as well as Software Suspend 2 (http://www.suspend2.net)

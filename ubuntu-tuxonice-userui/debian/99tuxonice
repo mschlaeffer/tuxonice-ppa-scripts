@@ -1,0 +1,14 @@
+#!/bin/sh
+
+. "${PM_FUNCTIONS}"
+
+case $1 in
+    suspend|hibernate)
+	if [ -f "/sys/power/tuxonice/user_interface/enable_escape" ]; then
+	    echo 1 > /sys/power/tuxonice/user_interface/enable_escape
+	fi
+	;;
+    *)
+	exit 0
+	;;
+esac

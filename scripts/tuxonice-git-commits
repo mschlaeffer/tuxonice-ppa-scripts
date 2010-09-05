@@ -1,0 +1,15 @@
+#!/bin/bash
+
+LOGS=1000
+VERSION=$1
+
+git log -n $LOGS --parents | \
+  grep -i -e ^commit -e "merge branch" -e "bump version to" | \
+  grep -i -e "bump version to $VERSION" -A 1000 | \
+  grep -i -e "merge branch" -B 1 | \
+  grep -v "\-\-" | head -n 1 | awk '{ print $4 }'
+
+git log -n $LOGS --parents | \
+  grep -i -e ^commit -e "bump version to" | \
+  grep -i -e "bump version to $VERSION" -B 1 | \
+  grep -v "\-\-" | head -n 1 | awk '{ print $2 }'
