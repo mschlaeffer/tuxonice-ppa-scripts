@@ -13,10 +13,10 @@ DPUT=$6
 #if [ "$UBUNTU" = jaunty ]; then
 #  DEBIAN=debian
 #else
-  DEBIAN=debian.master
+#  DEBIAN=debian.master
 #fi
 
-#echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
+DEBIAN=debian.master
 
 # clean, pull and checkout current Ubuntu kernel
 cd ubuntu-$UBUNTU
@@ -88,9 +88,10 @@ done
 
 # fix abi
 # (error: abi missing while building)
-LAST=`ls $DEBIAN/abi/ | grep $KERNEL | tail -n 1`
+LAST=`ls -1 $DEBIAN/abi/ | grep $KERNEL | tail -n 1`
 cp -a $DEBIAN/abi/$LAST $DEBIAN/abi/$KERNEL-$MAJOR.$MINOR
 echo $MAJOR > $DEBIAN/abi/$KERNEL-$MAJOR.$MINOR/abiname
+
 # manual corrections for some builds:
 #cp -a $DEBIAN/abi/$LAST $DEBIAN/abi/$KERNEL-$MAJOR.34
 #echo 21 > $DEBIAN/abi/$KERNEL-21.$MINOR/abiname
@@ -101,13 +102,19 @@ echo "linux ($KERNEL-$MAJOR.$MINOR~ppa$PPA) $UBUNTU; urgency=low" > $DEBIAN/chan
 echo "" >> $DEBIAN/changelog
 echo "  * TuxOnIce $TOI added." >> $DEBIAN/changelog
 echo "" >> $DEBIAN/changelog
-echo " -- " `bzr whoami` "  " `date -R` >> $DEBIAN/changelog
+echo " -- "`bzr whoami`"  "`date -R` >> $DEBIAN/changelog
 echo "" >> $DEBIAN/changelog
 cat $DEBIAN/changelog.old >> $DEBIAN/changelog
 rm $DEBIAN/changelog.old
 
-if [ "$UBUNTU" = lucid ]; then
-  DEBIAN=debian
+DEBIAN=debian
+
+if [ "$UBUNTU" = jaunty ]; then
+  DEBIAN=debian.master
+fi
+
+if [ "$UBUNTU" = karmic ]; then
+  DEBIAN=debian.master
 fi
 
 # add tuxonice to getabis

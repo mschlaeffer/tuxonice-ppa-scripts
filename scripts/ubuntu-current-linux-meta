@@ -4,7 +4,7 @@ RELEASE=$1
 KERNEL=`ubuntu-release2kernel $RELEASE`
 
 lynx -dump https://launchpad.net/ubuntu/$RELEASE/+source/linux-meta | \
-  grep -e \]linux-meta\  -e ^"   Release" -e "   Security" -e "   Updates" -e "   Proposed" | \
+  grep -e \]linux-meta\  -e "   Release" -e "   Security" -e "   Updates" -e "   Proposed" | \
   sed -e 's/^ *//g' -e 's/^[ +]*[[0-9]*]linux-meta //g' -e 'y/RSUP/rsup/' | \
   sed ':a;N;$!ba;s/\([a-z]\)\n/\1 /g' | \
   awk '{print $2 " " $1}'

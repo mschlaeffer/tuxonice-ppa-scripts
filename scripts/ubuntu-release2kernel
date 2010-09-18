@@ -2,6 +2,10 @@
 
 RELEASE=$1
 
+if [ "$RELEASE" = maverick ]; then
+  echo 2.6.35
+fi
+
 if [ "$RELEASE" = lucid ]; then
   echo 2.6.32
 fi

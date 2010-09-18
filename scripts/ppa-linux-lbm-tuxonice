@@ -48,7 +48,7 @@ echo "linux-backports-modules-$KERNEL ($KERNEL-$MAJOR.$MINOR~ppa$PPA) $UBUNTU; u
 echo "" >> debian/changelog
 echo "  * TuxOnIce enabled package." >> debian/changelog
 echo "" >> debian/changelog
-echo " -- " `bzr whoami` "  " `date -R` >> $DEBIAN/changelog
+echo " -- "`bzr whoami`"  "`date -R` >> $DEBIAN/changelog
 echo "" >> debian/changelog
 cat debian/changelog.old >> debian/changelog
 rm debian/changelog.old

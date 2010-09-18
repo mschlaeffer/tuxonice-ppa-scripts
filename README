@@ -6,6 +6,9 @@ git clone git://kernel.ubuntu.com/ubuntu/ubuntu-lucid.git
 git clone git://kernel.ubuntu.com/ubuntu/ubuntu-lucid-lbm.git
 git clone git://kernel.ubuntu.com/ubuntu/ubuntu-lucid-meta.git
 
+# get original kernel source to reduce upload size
+wget https://launchpad.net/ubuntu/lucid/+source/linux/2.6.32-21.32/+files/linux_2.6.32.orig.tar.gz
+
 # clone tuxonice-userui and hibernate trees:
 git clone git://git.tuxonice.net/tuxonice-userui.git
 git clone git://git.tuxonice.net/hibernate-script.git

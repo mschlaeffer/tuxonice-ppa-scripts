@@ -14,16 +14,20 @@ echo -n `cat ~dump-$RELEASE | \
   grep -i -e "\[package-source\] linux - $KERNEL" | \
   sed -e "s/.*\($KERNEL-[.~+0-9a-z-]*\).*/\1 ppa:tuxonice\/ppa/"`
 REF=`grep "linux - $KERNEL"  ~dump-$RELEASE | sed 's/ *\[\([0-9]*\)\].*/\1/'`
-LINK=`grep "^  $REF." ~dump-$RELEASE | awk '{print $2}'`
-echo \ `lynx -dump $LINK | grep "  \* TuxOnIce" | awk '{print $3}'`
+if [ -n "$REF" ]; then
+  LINK=`grep "^  $REF." ~dump-$RELEASE | awk '{print $2}'`
+  echo \ `lynx -dump $LINK | grep "  \* TuxOnIce" | awk '{print $3}'`
+fi
 
 lynx -dump http://launchpad.net/~tuxonice/+archive/tuxonice-testing/+packages > ~dump-$RELEASE
 echo -n `cat ~dump-$RELEASE | \
   grep -i -e "\[package-source\] linux - $KERNEL" | \
   sed -e "s/.*\($KERNEL-[.~+0-9a-z-]*\).*/\1 ppa:tuxonice\/tuxonice-testing/"`
 REF=`grep "linux - $KERNEL"  ~dump-$RELEASE | sed 's/ *\[\([0-9]*\)\].*/\1/'`
-LINK=`grep "^  $REF." ~dump-$RELEASE | awk '{print $2}'`
-echo \ `lynx -dump $LINK | grep "  \* TuxOnIce" | awk '{print $3}'`
+if [ -n "$REF" ]; then
+  LINK=`grep "^  $REF." ~dump-$RELEASE | awk '{print $2}'`
+  echo \ `lynx -dump $LINK | grep "  \* TuxOnIce" | awk '{print $3}'`
+fi
 
 rm ~dump-$RELEASE
 

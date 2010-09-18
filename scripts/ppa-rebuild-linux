@@ -4,10 +4,11 @@
 
 UBUNTU=$1
 DPUT=$2
-TOI=$3
+#TOI=$3
+DEMO=$3
 
 if [ -z "$TOI" ]; then
-  TOI=`tuxonice-current lucid | awk '{print $2}'`
+  TOI=`tuxonice-current $UBUNTU | tail -n 1 | awk '{print $1}' | sed 's/tuxonice://'`
 fi
 
 ubuntu-current-linux $UBUNTU > ~tmp
@@ -29,25 +30,30 @@ PPAPPA=`echo $PPAVERSION | sed "s/$PPAKERNEL-[0-9]*\.[0-9]*[~+][a-z]*\([0-9]*\).
 echo "$VERSION $UBUNTU"
 echo "$PPAVERSION $DPUT"
 
+PPAVERSION=`echo $PPAVERSION | cut -d~ -f1`
+
 echo "checking PPA < UBUNTU ..."
 echo "  $PPATOI < $TOI"
-if [ `dpkg --compare-versions "$PPATOI" lt "$TOI"` ]; then
+if dpkg --compare-versions "$PPATOI" lt "$TOI"; then
   REBUILD=true
-  tuxonice-git-patch $TOI $UBUNTU
+#  tuxonice-git-patch $TOI $UBUNTU
   PPA=$(( $PPAPPA + 1))
 fi
 echo "  $PPAVERSION < $VERSION"
-if [ `dpkg --compare-versions "$PPAVERSION" lt "$VERSION"` ]; then
+if dpkg --compare-versions "$PPAVERSION" lt "$VERSION"; then
   REBUILD=true
   PPA=1
 fi
 
 if [ -z "$REBUILD" ]; then
-  echo "not rebuilding"
+  echo "not rebuilding $UBUNTU linux-tuxonice: $VERSION with TuxOnIce $TOI for $DPUT"
   exit 0
 fi
 
-echo "rebuilding $UBUNTU linux-tuxonice: $VERSION~ppa$PPA with TuxOnIce $TOI for $DPUT"
-#ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT
+echo "rebuilding $UBUNTU linux-tuxonice: $VERSION~ppa$PPA with TuxOnIce $TOI for $DPUT:"
+echo "  ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT"
+if [ -z "$DEMO" ]; then
+  ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT
+fi
 cd ..
 

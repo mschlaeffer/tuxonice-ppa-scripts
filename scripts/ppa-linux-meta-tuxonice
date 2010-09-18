@@ -10,10 +10,18 @@ DPUT=$5
 #DPUT="ppa:tuxonice/ppa"
 DEBIAN=debian
 
-if [ "$UBUNTU" = lucid ]; then
-  CONTROL=control.common
-else
+echo "building $UBUNTU $MAJOR $MINOR $PPA $DPUT"
+
+if [ "$UBUNTU" = jaunty ]; then
   CONTROL=control
+else
+  CONTROL=control.common
+fi
+
+if [ "$UBUNTU" = karmic ]; then
+  CONTROL=control
+else
+  CONTROL=control.common
 fi
 
 # clean, pull and checkout current Ubuntu kernel
@@ -53,7 +61,7 @@ echo "linux-meta ($KERNEL.$MAJOR.$MINOR~ppa$PPA) $UBUNTU; urgency=low" > $DEBIAN
 echo "" >> $DEBIAN/changelog
 echo "  * TuxOnIce enabled package." >> $DEBIAN/changelog
 echo "" >> $DEBIAN/changelog
-echo " -- " `bzr whoami` "  " `date -R` >> $DEBIAN/changelog
+echo " -- "`bzr whoami`"  "`date -R` >> $DEBIAN/changelog
 echo "" >> $DEBIAN/changelog
 cat $DEBIAN/changelog.old >> $DEBIAN/changelog
 rm $DEBIAN/changelog.old

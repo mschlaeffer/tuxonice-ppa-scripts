@@ -4,6 +4,7 @@
 
 UBUNTU=$1
 DPUT=$2
+DEMO=$3
 
 ubuntu-current-linux-meta $UBUNTU > ~tmp
 TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | tail -n 1`
@@ -12,22 +13,31 @@ VERSION=`echo $TAG | awk '{print $1}'`
 PPAVERSION=`echo $PPATAG | awk '{print $1}'`
 rm ~tmp
 
+KERNEL=`echo $VERSION | sed "s/^\([0-9]*.[0-9]*.[0-9]*\).*/\1/"`
+MAJOR=`echo $VERSION | sed "s/^[0-9]*.[0-9]*.[0-9]*.\([0-9]*\).[0-9]*/\1/"`
+MINOR=`echo $VERSION | sed "s/^[0-9]*.[0-9]*.[0-9]*.[0-9]*.\([0-9]*\)/\1/"`
+
 echo "$VERSION $UBUNTU"
 echo "$PPAVERSION $DPUT"
 
+PPAVERSION=`echo $PPAVERSION | cut -d~ -f1`
+
 echo "checking PPA < UBUNTU ..."
 echo "  $PPAVERSION < $VERSION"
-if [ `dpkg --compare-versions "$PPAVERSION" lt "$VERSION"` ]; then
+if dpkg --compare-versions "$PPAVERSION" lt "$VERSION"; then
   REBUILD=true
   PPA=1
 fi
 
 if [ -z "$REBUILD" ]; then
-  echo "not rebuilding"
+  echo "not rebuilding $UBUNTU linux-meta-tuxonice: $VERSION for $DPUT"
   exit 0
 fi
 
-echo "rebuilding $UBUNTU linux-meta-tuxonice: $VERSION~ppa$PPA for $DPUT"
-#ppa-linux-meta-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT
+echo "rebuilding $UBUNTU linux-meta-tuxonice: $VERSION~ppa$PPA for $DPUT:"
+echo "  ppa-linux-meta-tuxonice $UBUNTU $MAJOR $MINOR $PPA $DPUT"
+if [ -z "$DEMO" ]; then
+  ppa-linux-meta-tuxonice $UBUNTU $MAJOR $MINOR $PPA $DPUT
+fi
 cd ..
 

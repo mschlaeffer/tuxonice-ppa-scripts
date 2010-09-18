@@ -17,7 +17,7 @@ cd tuxonice-userui
 ubuntu-git-clean
 git pull
 
-cp -a ../tuxoniceppa/ubuntu-tuxonice-userui .
+cp -a ../tuxoniceppa/ubuntu-tuxonice-userui/* .
 
 if [ "$UBUNTU" = jaunty ]; then
   rm debian/patches/*
@@ -29,7 +29,7 @@ echo "tuxonice-userui ($MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER) $UBUNTU; urgency=low" 
 echo "" >> debian/changelog
 echo "  * New upstream GIT snapshot." >> debian/changelog
 echo "" >> debian/changelog
-echo " -- " `bzr whoami` "  " `date -R` >> debian/changelog
+echo " -- "`bzr whoami`"  "`date -R` >> debian/changelog
 echo "" >> debian/changelog
 cat debian/changelog.old >> debian/changelog
 rm debian/changelog.old

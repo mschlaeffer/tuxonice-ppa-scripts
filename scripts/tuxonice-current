@@ -1,13 +1,17 @@
 #!/bin/bash
 
 UBUNTU=$1
-TUXONICEDIR=/home/martin/ubuntu/git/ubuntu-$UBUNTU+tuxonice
+TUXONICEDIR=ubuntu-$UBUNTU+tuxonice
 
-echo -n "  tuxonice: "
+echo "  tuxonice: "
 PWD=`pwd`
 cd $TUXONICEDIR
 tuxonice-git-clean > /dev/null 2> /dev/null
 git pull > /dev/null 2> /dev/null
-tuxonice-git-log | grep "Bump version to" | head -n 1 | sed -e 's/.*Bump version to //' -e 's/\.$//'
+VERSION=`git tag -l TuxOnIce* | tail -n 1 | sed 's/TuxOnIce[- ]//'`
+if [ -z "$VERSION" ]; then
+  VERSION=`tuxonice-git-log | grep -e "Bump version to" -e "TuxOnIce" | head -n 1 | sed -e 's/.*Bump version to //' -e 's/\.$//' -e 's/.*TuxOnIce \([0-9a-z.-]*\) .*/\1/'`
+fi
+echo $VERSION
 cd $PWD
 
