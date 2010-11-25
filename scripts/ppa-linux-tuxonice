@@ -25,14 +25,22 @@ git pull
 ubuntu-git-checkout $MAJOR.$MINOR
 
 KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2`
+#KERNEL="2.6.35"
 
 echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
 
 # prepare and apply tuxonice patches
 #make mrproper
 #git checkout ./debian
-git apply ../tuxonice-$TOI-$UBUNTU.patch
+patch -p1 < ../tuxonice-$TOI-$UBUNTU.patch
+if [ $? -ne 0 ]; then
+  exit 1;
+fi
+#git apply ../tuxonice-$TOI-$UBUNTU.patch
 git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
+if [ $? -ne 0 ]; then
+  exit 1;
+fi
 
 if [ "$UBUNTU" = jaunty ]; then
   CONFIG="config\."
