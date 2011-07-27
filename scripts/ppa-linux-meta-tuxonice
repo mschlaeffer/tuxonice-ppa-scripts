@@ -72,6 +72,6 @@ debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 dput $DPUT ../linux-meta_$KERNEL.$MAJOR.$MINOR~ppa${PPA}_source.changes
 cd ..
+ubuntu-git-clean
 cd ..
 
-#ubuntu-git-clean

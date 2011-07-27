@@ -2,6 +2,10 @@
 
 RELEASE=$1
 
+if [ "$RELEASE" = natty ]; then
+  echo 2.6.38
+fi
+
 if [ "$RELEASE" = maverick ]; then
   echo 2.6.35
 fi

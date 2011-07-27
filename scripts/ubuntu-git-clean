@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#git reset --hard HEAD^
 git reset --hard
 git clean -xdf
 git checkout master

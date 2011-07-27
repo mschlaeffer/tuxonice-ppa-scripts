@@ -58,6 +58,6 @@ fakeroot debian/rules clean
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo dput $DPUT ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 dput $DPUT ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
+ubuntu-git-clean
 cd ..
 
-#ubuntu-git-clean

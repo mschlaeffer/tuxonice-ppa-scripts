@@ -32,6 +32,7 @@ echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
 # prepare and apply tuxonice patches
 #make mrproper
 #git checkout ./debian
+echo ../tuxonice-$TOI-$UBUNTU.patch
 patch -p1 < ../tuxonice-$TOI-$UBUNTU.patch
 if [ $? -ne 0 ]; then
   exit 1;
@@ -54,6 +55,13 @@ for i in `find $DEBIAN/config | grep "$CONFIG"`; do
   mv $i $i-tuxonice;
   cat ../tuxoniceppa/config/tuxonice-$UBUNTU.config >> $i-tuxonice;
 done
+
+# config tweaks for flavour virtual
+if [ "$UBUNTU" = natty ]; then
+  cp debian.master/config/enforce debian.master/config/enforce.old
+  sed 's/flavour virtual/flavour virtual-tuxonice/g' debian.master/config/enforce.old > debian.master/config/enforce
+  rm debian.master/config/enforce.old
+fi
 
 # add tuxonice to kernel-versions.in
 # file: debian.master/d-i/kernel-versions.in
@@ -141,6 +149,6 @@ fakeroot debian/rules clean
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
+ubuntu-git-clean
 cd ..
 
-#ubuntu-git-clean

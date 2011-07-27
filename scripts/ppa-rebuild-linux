@@ -4,8 +4,8 @@
 
 UBUNTU=$1
 DPUT=$2
-#TOI=$3
-DEMO=$3
+TOI=$3
+DEMO=$4
 
 if [ -z "$TOI" ]; then
   TOI=`tuxonice-current $UBUNTU | tail -n 1 | awk '{print $1}' | sed 's/tuxonice://'`

@@ -23,6 +23,14 @@ if [ "$UBUNTU" = jaunty ]; then
   rm debian/patches/*
 fi
 
+if [ "$UBUNTU" = natty ]; then
+  cp debian/rules debian/rules.old
+  sed 's/USE_USPLASH=1//' debian/rules.old > debian/rules
+  rm debian/rules.old
+  cp debian/control debian/control.old
+  grep -v libusplash-dev debian/control.old > debian/control
+fi
+
 # edit changelog
 cp debian/changelog debian/changelog.old
 echo "tuxonice-userui ($MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER) $UBUNTU; urgency=low" > debian/changelog

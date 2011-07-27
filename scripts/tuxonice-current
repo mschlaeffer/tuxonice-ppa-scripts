@@ -8,7 +8,8 @@ PWD=`pwd`
 cd $TUXONICEDIR
 tuxonice-git-clean > /dev/null 2> /dev/null
 git pull > /dev/null 2> /dev/null
-VERSION=`git tag -l TuxOnIce* | tail -n 1 | sed 's/TuxOnIce[- ]//'`
+#VERSION=`git tag -l TuxOnIce* | tail -n 1 | sed 's/TuxOnIce[- ]//'`
+VERSION=`git for-each-ref --sort='*authordate' --format='%(tag)' refs/tags | grep Tux | tail -n 1 | sed 's/TuxOnIce[- ]//'`
 if [ -z "$VERSION" ]; then
   VERSION=`tuxonice-git-log | grep -e "Bump version to" -e "TuxOnIce" | head -n 1 | sed -e 's/.*Bump version to //' -e 's/\.$//' -e 's/.*TuxOnIce \([0-9a-z.-]*\) .*/\1/'`
 fi

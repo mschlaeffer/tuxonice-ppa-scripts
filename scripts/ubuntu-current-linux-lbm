@@ -10,12 +10,20 @@ lynx -dump https://launchpad.net/ubuntu/$RELEASE/+source/linux-backports-modules
   awk '{print $2 " " $1}'
 
 lynx -dump http://launchpad.net/~tuxonice/+archive/ppa/+packages | \
-  grep -A 1 -i -e "\[package-source\] linux-backports-modules-$KERNEL" | \
-  grep -v "\[package-source\] linux-backports-modules-$KERNEL" | \
-  sed -e "s/.*\($KERNEL.[.~+0-9a-z-]*\) .*/\1 ppa:tuxonice\/ppa/"
+  grep -e "\[package-source\] linux-backports-modules-$KERNEL" | \
+  sed -e "s/.* - \($KERNEL.[.~+0-9a-z-]*\).*/\1 ppa:tuxonice\/tuxonice-testing/"
 
 lynx -dump http://launchpad.net/~tuxonice/+archive/tuxonice-testing/+packages | \
-  grep -A 1 -i -e "\[package-source\] linux-backports-modules-$KERNEL" | \
-  grep -v "\[package-source\] linux-backports-modules-$KERNEL" | \
-  sed -e "s/.*\($KERNEL.[.~+0-9a-z-]*\) .*/\1 ppa:tuxonice\/tuxonice-testing/"
+  grep -e "\[package-source\] linux-backports-modules-$KERNEL" | \
+  sed -e "s/.* - \($KERNEL.[.~+0-9a-z-]*\).*/\1 ppa:tuxonice\/tuxonice-testing/"
+
+#lynx -dump http://launchpad.net/~tuxonice/+archive/ppa/+packages | \
+#  grep -A 1 -i -e "\[package-source\] linux-backports-modules-$KERNEL" | \
+#  grep -v "\[package-source\] linux-backports-modules-$KERNEL" | \
+#  sed -e "s/.*\($KERNEL.[.~+0-9a-z-]*\) .*/\1 ppa:tuxonice\/ppa/"
+
+#lynx -dump http://launchpad.net/~tuxonice/+archive/tuxonice-testing/+packages | \
+#  grep -A 1 -i -e "\[package-source\] linux-backports-modules-$KERNEL" | \
+#  grep -v "\[package-source\] linux-backports-modules-$KERNEL" | \
+#  sed -e "s/.*\($KERNEL.[.~+0-9a-z-]*\) .*/\1 ppa:tuxonice\/tuxonice-testing/"
 
