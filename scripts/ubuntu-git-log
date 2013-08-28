@@ -2,7 +2,7 @@
 
 LOGS=1000
 
-git log -n $LOGS | \
-  grep -e ^commit -e "UBUNTU: Ubuntu-" | \
+git log -n $LOGS origin/master | \
+  grep -e "^commit" -e "UBUNTU: Ubuntu-" | \
   grep "UBUNTU: Ubuntu-" -B 1 | \
   grep -v "\-\-"

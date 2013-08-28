@@ -3,7 +3,7 @@
 VERSION=$1
 
 git checkout `ubuntu-git-log | \
-  grep $VERSION -B 1 | \
+  grep "\-$VERSION$" -B 1 | \
   grep commit | \
   head -n 1 | \
   cut -d\  -f2`

@@ -2,6 +2,22 @@
 
 RELEASE=$1
 
+if [ "$RELEASE" = raring ]; then
+  echo 3.8.0
+fi
+
+if [ "$RELEASE" = quantal ]; then
+  echo 3.5.0
+fi
+
+if [ "$RELEASE" = precise ]; then
+  echo 3.2.0
+fi
+
+if [ "$RELEASE" = oneiric ]; then
+  echo 3.0.0
+fi
+
 if [ "$RELEASE" = natty ]; then
   echo 2.6.38
 fi

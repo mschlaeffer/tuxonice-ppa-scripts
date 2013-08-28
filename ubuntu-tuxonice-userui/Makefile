@@ -9,15 +9,18 @@ OBJECTS = userui_core.o userui_text.o
 LIBS =
 
 # FBSPLASH
-OBJECTS += fbsplash fbsplash/userui_fbsplash.o
-LIBS += -lmng -lpng -ljpeg -lz -lfreetype -llcms -lm fbsplash/userui_fbsplash.o
+#ifdef USE_FBSPLASH
+#OBJECTS += fbsplash fbsplash/userui_fbsplash.o
+#LIBS += -lmng -lpng -ljpeg -lz -lfreetype -llcms -lm fbsplash/userui_fbsplash.o
+#CFLAGS += -DUSE_FBSPLASH
+#endif
 
 # USPLASH
-ifdef USE_USPLASH
-OBJECTS += usplash
-LIBS += -lusplash usplash/userui_usplash.o
-CFLAGS += -DUSE_USPLASH
-endif
+#ifdef USE_USPLASH
+#OBJECTS += usplash
+#LIBS += -lusplash usplash/userui_usplash.o
+#CFLAGS += -DUSE_USPLASH
+#endif
 
 default: tuxoniceui
 
@@ -28,7 +31,6 @@ usplash:
 	make -C $@
 
 tuxoniceui: $(OBJECTS)
-	echo USPLASH=$(USE_USPLASH)
 	$(CC) $(CFLAGS) userui_core.o userui_text.o $(LIBS) -o tuxoniceui
 
 clean:

@@ -3,11 +3,15 @@
 TOI=$1
 DEMO=$2
 
-for RELEASE in natty maverick lucid; do
+for RELEASE in raring quantal precise lucid; do
   echo "checking updates for UBUNTU $RELEASE:"
   ubuntu-current $RELEASE
   echo
-  ppa-rebuild-linux $RELEASE ppa:tuxonice/tuxonice-testing $TOI $DEMO
+  if [ "$RELEASE" == "raring" ] || [ "$RELEASE" == "quantal" ] || [ "$RELEASE" == "precise" ]; then
+    ppa-rebuild-linux $RELEASE ppa:tuxonice/tuxonice-testing $TOI $DEMO
+  else
+    ppa-rebuild-linux $RELEASE ppa:tuxonice/tuxonice-testing 3.2 $DEMO
+  fi
   ppa-rebuild-linux-meta $RELEASE ppa:tuxonice/tuxonice-testing $DEMO
   ppa-rebuild-linux-lbm $RELEASE ppa:tuxonice/tuxonice-testing $DEMO
   #if [ "$RELEASE" = jaunty ]; then ppa-rebuild-linux-lrm $RELEASE ppa:tuxonice/tuxonice-testing $DEMO; fi

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#set -x
+
 # usage: ppa-rebuild-linux lucid ppa:tuxonice/tuxonice-testing 3.2-rc2
 
 UBUNTU=$1
@@ -13,11 +15,11 @@ fi
 
 ubuntu-current-linux $UBUNTU > ~tmp
 TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | tail -n 1`
-PPATAG=`cat ~tmp | grep "$DPUT" | tail -n 1`
+PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`
 VERSION=`echo $TAG | awk '{print $1}'`
 PPAVERSION=`echo $PPATAG | awk '{print $1}'`
 PPATOI=`echo $PPATAG | awk '{print $3}'`
-rm ~tmp
+#rm ~tmp
 
 KERNEL=`echo $VERSION | sed "s/^\([0-9.]*\)-.*/\1/"`
 MAJOR=`echo $VERSION | sed "s/$KERNEL-\([0-9]*\)\.[0-9]*/\1/"`

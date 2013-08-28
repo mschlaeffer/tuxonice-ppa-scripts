@@ -15,25 +15,42 @@ DPUT=$6
 # clean, pull and checkout current Ubuntu kernel
 cd tuxonice-userui
 ubuntu-git-clean
-git pull
+git pull --rebase
+git checkout ubuntu
+#git rebase master
 
-cp -a ../tuxoniceppa/ubuntu-tuxonice-userui/* .
+#cp -a ../tuxoniceppa/ubuntu-tuxonice-userui/debian .
+#cp ../tuxoniceppa/ubuntu-tuxonice-userui/Makefile .
+#cp ../tuxoniceppa/ubuntu-tuxonice-userui/userui_core.c .
+#cp ../tuxoniceppa/ubuntu-tuxonice-userui/userui.h
 
-if [ "$UBUNTU" = jaunty ]; then
-  rm debian/patches/*
-fi
+#if [ "$UBUNTU" = jaunty ]; then
+#  rm debian/patches/*
+#fi
 
-if [ "$UBUNTU" = natty ]; then
-  cp debian/rules debian/rules.old
-  sed 's/USE_USPLASH=1//' debian/rules.old > debian/rules
-  rm debian/rules.old
-  cp debian/control debian/control.old
-  grep -v libusplash-dev debian/control.old > debian/control
-fi
+#if [ "$UBUNTU" = natty ]; then
+#if [ "$UBUNTU" = oneiric ]; then
+#  cp debian/rules debian/rules.old
+#  sed 's/USE_USPLASH=1//' debian/rules.old > debian/rules
+#  rm debian/rules.old
+#  cp debian/control debian/control.old
+#  grep -v libusplash-dev debian/control.old > debian/control
+#fi
+
+#if [ "$UBUNTU" = precise ]; then
+#  cp debian/rules debian/rules.old
+#  sed 's/USE_USPLASH=1//' debian/rules.old > debian/rules
+#  rm debian/rules.old
+#  cp debian/control debian/control.old
+#  grep -v libusplash-dev debian/control.old > debian/control
+#fi
+
+# remove hibernate from suggests since we do not need it
+sed '/Suggests/d' debian/control
 
 # edit changelog
 cp debian/changelog debian/changelog.old
-echo "tuxonice-userui ($MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER) $UBUNTU; urgency=low" > debian/changelog
+echo "tuxonice-userui ($MAJOR-${MINOR}ppa$PPA~$UBUNTU$UVER) $UBUNTU; urgency=low" > debian/changelog
 echo "" >> debian/changelog
 echo "  * New upstream GIT snapshot." >> debian/changelog
 echo "" >> debian/changelog
@@ -45,7 +62,7 @@ rm debian/changelog.old
 # build package and upload
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo tuxonice-userui_$MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER\_source.changes
-dput $DPUT ../tuxonice-userui_$MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER\_source.changes
+dput $DPUT ../tuxonice-userui_$MAJOR-${MINOR}ppa$PPA~$UBUNTU$UVER\_source.changes
 cd ..
 
 #ubuntu-git-clean

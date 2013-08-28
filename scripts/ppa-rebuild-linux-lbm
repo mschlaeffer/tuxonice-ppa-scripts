@@ -8,7 +8,7 @@ DEMO=$3
 
 ubuntu-current-linux-lbm $UBUNTU > ~tmp
 TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | tail -n 1`
-PPATAG=`cat ~tmp | grep "$DPUT" | tail -n 1`
+PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`
 VERSION=`echo $TAG | awk '{print $1}'`
 PPAVERSION=`echo $PPATAG | awk '{print $1}'`
 rm ~tmp

@@ -11,7 +11,7 @@ lynx -dump https://launchpad.net/ubuntu/$RELEASE/+source/linux-backports-modules
 
 lynx -dump http://launchpad.net/~tuxonice/+archive/ppa/+packages | \
   grep -e "\[package-source\] linux-backports-modules-$KERNEL" | \
-  sed -e "s/.* - \($KERNEL.[.~+0-9a-z-]*\).*/\1 ppa:tuxonice\/tuxonice-testing/"
+  sed -e "s/.* - \($KERNEL.[.~+0-9a-z-]*\).*/\1 ppa:tuxonice\/ppa/"
 
 lynx -dump http://launchpad.net/~tuxonice/+archive/tuxonice-testing/+packages | \
   grep -e "\[package-source\] linux-backports-modules-$KERNEL" | \

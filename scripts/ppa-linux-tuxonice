@@ -21,7 +21,7 @@ DEBIAN=debian.master
 # clean, pull and checkout current Ubuntu kernel
 cd ubuntu-$UBUNTU
 ubuntu-git-clean
-git pull
+git pull --rebase
 ubuntu-git-checkout $MAJOR.$MINOR
 
 KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2`
@@ -63,19 +63,32 @@ if [ "$UBUNTU" = natty ]; then
   rm debian.master/config/enforce.old
 fi
 
+#if [ "$UBUNTU" = quantal ]; then
+#  cp debian.master/config/config.common.ubuntu debian.master/config/config.common.ubuntu.old
+#  sed -i 's/CONFIG_ZRAM=m/# CONFIG_ZRAM is not set/g' debian.master/config/config.common.ubuntu
+#fi
+
 # add tuxonice to kernel-versions.in
 # file: debian.master/d-i/kernel-versions.in
 cp $DEBIAN/d-i/kernel-versions.in $DEBIAN/d-i/kernel-versions.in.tmp
 cat $DEBIAN/d-i/kernel-versions.in.tmp | \
-  grep -v ^$ | grep -v ^# | \
+  grep -v "^$" | grep -v "^#" | \
     awk '{ print $1 "\t" $2 "\t" $3"-tuxonice" "\t" $4"-tuxonice" "\t" $5 "\t" $6 "\t" $7 }' \
     > $DEBIAN/d-i/kernel-versions.in
 rm $DEBIAN/d-i/kernel-versions.in.tmp
+
+# disable udebs since they fail in oneiric and precise
+#sed -i 's/^\(.*5-udebs.mk.*\)/#\1/' debian/rules
+#sed -i -e 's/\texport SOURCEDIR/\t#export SOURCEDIR/' -e 's/\tdilist/\t#dilist/' debian/rules.d/5-udebs.mk
+sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
 
 # add tuxonice to vars.$FLAVOUR
 # files: debian.master/control.d/vars.$FLAVOUR
 for i in `find $DEBIAN | grep \/vars\.`; do
   mv $i $i-tuxonice;
+done
+for i in `find $DEBIAN | grep "inclusion-list"`; do
+  mv $i `echo $i | sed 's/\.inclusion-list/-tuxonice.inclusion-list/'`;
 done
 
 # add tuxonice to $FLAVOUR.mk
@@ -95,11 +108,14 @@ rm $DEBIAN/control.stub.in.old
 
 # add tuxonice to abi
 # files: debian.master/abi/*
-for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v modules`; do
+for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v fwinfo | grep -v modules`; do
   mv $i $i-tuxonice;
 done
-for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep modules`; do
-  mv $i `echo $i | sed 's/.modules/-tuxonice.modules/'`;
+for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep "\.modules"`; do
+  mv $i `echo $i | sed 's/\.modules/-tuxonice.modules/'`;
+done
+for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep "\.compiler"`; do
+  mv $i `echo $i | sed 's/\.compiler/-tuxonice.compiler/'`;
 done
 
 # fix abi
@@ -144,11 +160,31 @@ cp $DEBIAN/rules.d/0-common-vars.mk $DEBIAN/rules.d/0-common-vars.mk.old
 sed 's/^AUTOBUILD=/skipabi=true\nAUTOBUILD=/' $DEBIAN/rules.d/0-common-vars.mk.old > $DEBIAN/rules.d/0-common-vars.mk
 rm $DEBIAN/rules.d/0-common-vars.mk.old
 
+if [ "$UBUNTU" = oneiric ]; then
+  cp debian.master/config/enforce debian.master/config/enforce.old
+  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
+fi
+
+if [ "$UBUNTU" = precise ]; then
+  cp debian.master/config/enforce debian.master/config/enforce.old
+  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
+fi
+
+if [ "$UBUNTU" = quantal ]; then
+  cp debian.master/config/enforce debian.master/config/enforce.old
+  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
+fi
+
+if [ "$UBUNTU" = raring ]; then
+  cp debian.master/config/enforce debian.master/config/enforce.old
+  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
+fi
+
 # build package and upload
 fakeroot debian/rules clean
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
-ubuntu-git-clean
+#ubuntu-git-clean
 cd ..
 
