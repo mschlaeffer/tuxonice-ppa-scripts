@@ -19,7 +19,7 @@ PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`
 VERSION=`echo $TAG | awk '{print $1}'`
 PPAVERSION=`echo $PPATAG | awk '{print $1}'`
 PPATOI=`echo $PPATAG | awk '{print $3}'`
-#rm ~tmp
+rm ~tmp
 
 KERNEL=`echo $VERSION | sed "s/^\([0-9.]*\)-.*/\1/"`
 MAJOR=`echo $VERSION | sed "s/$KERNEL-\([0-9]*\)\.[0-9]*/\1/"`

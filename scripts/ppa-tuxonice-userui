@@ -10,40 +10,12 @@ DPUT=$6
 #DPUT="ppa:tuxonice/tuxonice-testing"
 #DPUT="ppa:tuxonice/ppa"
 
-#echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
-
-# clean, pull and checkout current Ubuntu kernel
+# clean, pull and checkout
 cd tuxonice-userui
 ubuntu-git-clean
 git pull --rebase
 git checkout ubuntu
 #git rebase master
-
-#cp -a ../tuxoniceppa/ubuntu-tuxonice-userui/debian .
-#cp ../tuxoniceppa/ubuntu-tuxonice-userui/Makefile .
-#cp ../tuxoniceppa/ubuntu-tuxonice-userui/userui_core.c .
-#cp ../tuxoniceppa/ubuntu-tuxonice-userui/userui.h
-
-#if [ "$UBUNTU" = jaunty ]; then
-#  rm debian/patches/*
-#fi
-
-#if [ "$UBUNTU" = natty ]; then
-#if [ "$UBUNTU" = oneiric ]; then
-#  cp debian/rules debian/rules.old
-#  sed 's/USE_USPLASH=1//' debian/rules.old > debian/rules
-#  rm debian/rules.old
-#  cp debian/control debian/control.old
-#  grep -v libusplash-dev debian/control.old > debian/control
-#fi
-
-#if [ "$UBUNTU" = precise ]; then
-#  cp debian/rules debian/rules.old
-#  sed 's/USE_USPLASH=1//' debian/rules.old > debian/rules
-#  rm debian/rules.old
-#  cp debian/control debian/control.old
-#  grep -v libusplash-dev debian/control.old > debian/control
-#fi
 
 # remove hibernate from suggests since we do not need it
 sed '/Suggests/d' debian/control

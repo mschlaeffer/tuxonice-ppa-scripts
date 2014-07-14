@@ -12,18 +12,6 @@ DEBIAN=debian
 
 echo "building $UBUNTU $MAJOR $MINOR $PPA $DPUT"
 
-if [ "$UBUNTU" = jaunty ]; then
-  CONTROL=control
-else
-  CONTROL=control.common
-fi
-
-if [ "$UBUNTU" = karmic ]; then
-  CONTROL=control
-else
-  CONTROL=control.common
-fi
-
 # clean, pull and checkout current Ubuntu kernel
 cd ubuntu-$UBUNTU-meta
 ubuntu-git-clean

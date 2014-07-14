@@ -10,12 +10,6 @@ DPUT=$6
 #DPUT="ppa:tuxonice/tuxonice-testing"
 #DPUT="ppa:tuxonice/ppa"
 
-#if [ "$UBUNTU" = jaunty ]; then
-#  DEBIAN=debian
-#else
-#  DEBIAN=debian.master
-#fi
-
 DEBIAN=debian.master
 
 # clean, pull and checkout current Ubuntu kernel
@@ -30,24 +24,18 @@ KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2`
 echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
 
 # prepare and apply tuxonice patches
-#make mrproper
-#git checkout ./debian
 echo ../tuxoniceppa/patches/tuxonice-$TOI-$UBUNTU.patch
+#git apply ../tuxonice-$TOI-$UBUNTU.patch
 patch -p1 < ../tuxoniceppa/patches/tuxonice-$TOI-$UBUNTU.patch
 if [ $? -ne 0 ]; then
   exit 1;
 fi
-#git apply ../tuxonice-$TOI-$UBUNTU.patch
 git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
 if [ $? -ne 0 ]; then
   exit 1;
 fi
 
-if [ "$UBUNTU" = jaunty ]; then
-  CONFIG="config\."
-else
-  CONFIG="config.flavour"
-fi
+CONFIG="config.flavour"
 
 # add tuxonice config
 # files: debian.master/config/$ARCH/config.flavour.$FLAVOUR
@@ -55,18 +43,6 @@ for i in `find $DEBIAN/config | grep "$CONFIG"`; do
   mv $i $i-tuxonice;
   cat ../tuxoniceppa/config/tuxonice-$UBUNTU.config >> $i-tuxonice;
 done
-
-# config tweaks for flavour virtual
-if [ "$UBUNTU" = natty ]; then
-  cp debian.master/config/enforce debian.master/config/enforce.old
-  sed 's/flavour virtual/flavour virtual-tuxonice/g' debian.master/config/enforce.old > debian.master/config/enforce
-  rm debian.master/config/enforce.old
-fi
-
-#if [ "$UBUNTU" = quantal ]; then
-#  cp debian.master/config/config.common.ubuntu debian.master/config/config.common.ubuntu.old
-#  sed -i 's/CONFIG_ZRAM=m/# CONFIG_ZRAM is not set/g' debian.master/config/config.common.ubuntu
-#fi
 
 # add tuxonice to kernel-versions.in
 # file: debian.master/d-i/kernel-versions.in
@@ -77,7 +53,7 @@ cat $DEBIAN/d-i/kernel-versions.in.tmp | \
     > $DEBIAN/d-i/kernel-versions.in
 rm $DEBIAN/d-i/kernel-versions.in.tmp
 
-# disable udebs since they fail in oneiric and precise
+# disable udebs since they fail in precise
 #sed -i 's/^\(.*5-udebs.mk.*\)/#\1/' debian/rules
 #sed -i -e 's/\texport SOURCEDIR/\t#export SOURCEDIR/' -e 's/\tdilist/\t#dilist/' debian/rules.d/5-udebs.mk
 sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
@@ -141,14 +117,6 @@ rm $DEBIAN/changelog.old
 
 DEBIAN=debian
 
-if [ "$UBUNTU" = jaunty ]; then
-  DEBIAN=debian.master
-fi
-
-if [ "$UBUNTU" = karmic ]; then
-  DEBIAN=debian.master
-fi
-
 # add tuxonice to getabis
 # file: debian.master/scripts/misc/getabis
 cp $DEBIAN/scripts/misc/getabis $DEBIAN/scripts/misc/getabis.tmp
@@ -160,32 +128,7 @@ cp $DEBIAN/rules.d/0-common-vars.mk $DEBIAN/rules.d/0-common-vars.mk.old
 sed 's/^AUTOBUILD=/skipabi=true\nAUTOBUILD=/' $DEBIAN/rules.d/0-common-vars.mk.old > $DEBIAN/rules.d/0-common-vars.mk
 rm $DEBIAN/rules.d/0-common-vars.mk.old
 
-if [ "$UBUNTU" = oneiric ]; then
-  cp debian.master/config/enforce debian.master/config/enforce.old
-  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
-fi
-
 if [ "$UBUNTU" = precise ]; then
-  cp debian.master/config/enforce debian.master/config/enforce.old
-  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
-fi
-
-if [ "$UBUNTU" = quantal ]; then
-  cp debian.master/config/enforce debian.master/config/enforce.old
-  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
-fi
-
-if [ "$UBUNTU" = raring ]; then
-  cp debian.master/config/enforce debian.master/config/enforce.old
-  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
-fi
-
-if [ "$UBUNTU" = saucy ]; then
-  cp debian.master/config/enforce debian.master/config/enforce.old
-  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
-fi
-
-if [ "$UBUNTU" = trusty ]; then
   cp debian.master/config/enforce debian.master/config/enforce.old
   grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
 fi

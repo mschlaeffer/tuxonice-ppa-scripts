@@ -14,7 +14,6 @@ for RELEASE in trusty saucy precise lucid; do
   fi
   ppa-rebuild-linux-meta $RELEASE ppa:tuxonice/tuxonice-testing $DEMO
   ppa-rebuild-linux-lbm $RELEASE ppa:tuxonice/tuxonice-testing $DEMO
-  #if [ "$RELEASE" = jaunty ]; then ppa-rebuild-linux-lrm $RELEASE ppa:tuxonice/tuxonice-testing $DEMO; fi
   echo
   echo
 done
