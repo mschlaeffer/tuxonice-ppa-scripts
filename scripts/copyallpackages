@@ -1,0 +1,7 @@
+#!/bin/sh
+
+for i in `lynx -dump http://launchpad.net/~tuxonice/+archive/tuxonice-testing/+packages | grep -i -e "\[package-source\] " | awk '{print $2 "§" $4}'`; do
+  echo copypackage `echo $i | sed 's/§/ /'`;
+  copypackage `echo $i | sed 's/§/ /'`;
+done
+

@@ -2,6 +2,14 @@
 
 RELEASE=$1
 
+if [ "$RELEASE" = trusty ]; then
+  echo 3.13.0
+fi
+
+if [ "$RELEASE" = saucy ]; then
+  echo 3.11.0
+fi
+
 if [ "$RELEASE" = raring ]; then
   echo 3.8.0
 fi

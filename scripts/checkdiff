@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#lynx -source $1 | \
+#  grep -v EXPORT | \
+#  grep -v "^\-[a-z0-9]" | \
+#  grep -v "^\+[a-z0-9]" | \
+#  grep -v "debian.master/abi" | \
+#  grep -v "only in patch2" | \
+#  grep -v "^@@" | \
+#  grep -v "^unchanged:" | \
+#  grep -v "^reverted:"
+
+lynx -source $1 | \
+  grep -i -e tuxonice -e TOI | \
+  grep -v toi | \
+  grep -v "\-tuxonice"

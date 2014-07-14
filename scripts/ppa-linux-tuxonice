@@ -32,8 +32,8 @@ echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
 # prepare and apply tuxonice patches
 #make mrproper
 #git checkout ./debian
-echo ../tuxonice-$TOI-$UBUNTU.patch
-patch -p1 < ../tuxonice-$TOI-$UBUNTU.patch
+echo ../tuxoniceppa/patches/tuxonice-$TOI-$UBUNTU.patch
+patch -p1 < ../tuxoniceppa/patches/tuxonice-$TOI-$UBUNTU.patch
 if [ $? -ne 0 ]; then
   exit 1;
 fi
@@ -176,6 +176,16 @@ if [ "$UBUNTU" = quantal ]; then
 fi
 
 if [ "$UBUNTU" = raring ]; then
+  cp debian.master/config/enforce debian.master/config/enforce.old
+  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
+fi
+
+if [ "$UBUNTU" = saucy ]; then
+  cp debian.master/config/enforce debian.master/config/enforce.old
+  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
+fi
+
+if [ "$UBUNTU" = trusty ]; then
   cp debian.master/config/enforce debian.master/config/enforce.old
   grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
 fi
