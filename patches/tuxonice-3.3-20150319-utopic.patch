@@ -1,8 +1,8 @@
 diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
-index 7f9d4f5..3673b66 100644
+index b7fa2f5..84fec6e 100644
 --- a/Documentation/kernel-parameters.txt
 +++ b/Documentation/kernel-parameters.txt
-@@ -3238,6 +3238,9 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
+@@ -3499,6 +3499,9 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
  					HIGHMEM regardless of setting
  					of CONFIG_HIGHPTE.
  
@@ -10,8 +10,8 @@ index 7f9d4f5..3673b66 100644
 +			uuid support.
 +
  	vdso=		[X86,SH]
- 			vdso=2: enable compat VDSO (default with COMPAT_VDSO)
- 			vdso=1: enable VDSO (default)
+ 			On X86_32, this is an alias for vdso32=.  Otherwise:
+ 
 diff --git a/Documentation/power/tuxonice-internals.txt b/Documentation/power/tuxonice-internals.txt
 new file mode 100644
 index 0000000..7a96186
@@ -1450,10 +1450,10 @@ index 0000000..3bf0575
 +   testing. His efforts have contributed as much to TuxOnIce as any of the
 +   names above.
 diff --git a/MAINTAINERS b/MAINTAINERS
-index b140c81..25dbac7 100644
+index c2066f4..b77fdcd 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -8458,6 +8458,13 @@ S:	Maintained
+@@ -9266,6 +9266,13 @@ S:	Maintained
  F:	drivers/tc/
  F:	include/linux/tc.h
  
@@ -1468,10 +1468,10 @@ index b140c81..25dbac7 100644
  M:	Dario Ballabio <ballabio_dario@emc.com>
  L:	linux-scsi@vger.kernel.org
 diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
-index 6c856fb..749ee94 100644
+index 343a87f..2df8093 100644
 --- a/arch/powerpc/mm/pgtable_32.c
 +++ b/arch/powerpc/mm/pgtable_32.c
-@@ -433,6 +433,7 @@ void kernel_map_pages(struct page *page, int numpages, int enable)
+@@ -437,6 +437,7 @@ void kernel_map_pages(struct page *page, int numpages, int enable)
  
  	change_page_attr(page, numpages, enable ? PAGE_KERNEL : __pgprot(0));
  }
@@ -1480,10 +1480,10 @@ index 6c856fb..749ee94 100644
  
  static int fixmaps;
 diff --git a/arch/powerpc/platforms/83xx/suspend.c b/arch/powerpc/platforms/83xx/suspend.c
-index 1d769a2..e2877cf 100644
+index 4b4c081..5667da2 100644
 --- a/arch/powerpc/platforms/83xx/suspend.c
 +++ b/arch/powerpc/platforms/83xx/suspend.c
-@@ -263,6 +263,8 @@ static int mpc83xx_suspend_begin(suspend_state_t state)
+@@ -264,6 +264,8 @@ static int mpc83xx_suspend_begin(suspend_state_t state)
  
  static int agent_thread_fn(void *data)
  {
@@ -1506,10 +1506,10 @@ index 3f175e8..b5d59c6 100644
  	do {
  		try_to_freeze();
 diff --git a/arch/x86/mm/pageattr.c b/arch/x86/mm/pageattr.c
-index bb32480..17fe8e1 100644
+index ae242a7..1f6f9b7 100644
 --- a/arch/x86/mm/pageattr.c
 +++ b/arch/x86/mm/pageattr.c
-@@ -1416,6 +1416,8 @@ void kernel_map_pages(struct page *page, int numpages, int enable)
+@@ -1829,6 +1829,8 @@ void kernel_map_pages(struct page *page, int numpages, int enable)
  	arch_flush_lazy_mmu_mode();
  }
  
@@ -1518,7 +1518,7 @@ index bb32480..17fe8e1 100644
  #ifdef CONFIG_HIBERNATION
  
  bool kernel_page_present(struct page *page)
-@@ -1429,7 +1431,7 @@ bool kernel_page_present(struct page *page)
+@@ -1842,7 +1844,7 @@ bool kernel_page_present(struct page *page)
  	pte = lookup_address((unsigned long)page_address(page), &level);
  	return (pte_val(*pte) & _PAGE_PRESENT);
  }
@@ -1528,7 +1528,7 @@ index bb32480..17fe8e1 100644
  
  #endif /* CONFIG_DEBUG_PAGEALLOC */
 diff --git a/arch/x86/power/cpu.c b/arch/x86/power/cpu.c
-index 1cf5b30..403db22 100644
+index 424f4c9..41f9004 100644
 --- a/arch/x86/power/cpu.c
 +++ b/arch/x86/power/cpu.c
 @@ -122,9 +122,7 @@ void save_processor_state(void)
@@ -1562,7 +1562,7 @@ index 7d28c88..4f1dd95 100644
  /*
   *	pfn_is_nosave - check if given pfn is in the 'nosave' section
 diff --git a/arch/x86/power/hibernate_64.c b/arch/x86/power/hibernate_64.c
-index a0fde91..5407729 100644
+index 35e2bb6..9f2545e 100644
 --- a/arch/x86/power/hibernate_64.c
 +++ b/arch/x86/power/hibernate_64.c
 @@ -11,8 +11,7 @@
@@ -1575,9 +1575,9 @@ index a0fde91..5407729 100644
  #include <asm/proto.h>
  #include <asm/page.h>
  #include <asm/pgtable.h>
-@@ -41,21 +40,41 @@ pgd_t *temp_level4_pgt;
+@@ -41,21 +40,41 @@ pgd_t *temp_level4_pgt __visible;
  
- void *relocated_restore_code;
+ void *relocated_restore_code __visible;
  
 -static void *alloc_pgt_page(void *context)
 +static int res_phys_pud_init(pud_t *pud, unsigned long address, unsigned long end)
@@ -1673,23 +1673,23 @@ index a0fde91..5407729 100644
  }
 +EXPORT_SYMBOL_GPL(arch_hibernation_header_restore);
 diff --git a/block/Makefile b/block/Makefile
-index 39b76ba..0a0125a 100644
+index a2ce6ac..aa6a169 100644
 --- a/block/Makefile
 +++ b/block/Makefile
-@@ -6,7 +6,7 @@ obj-$(CONFIG_BLOCK) := elevator.o blk-core.o blk-tag.o blk-sysfs.o \
- 			blk-flush.o blk-settings.o blk-ioc.o blk-map.o \
+@@ -7,7 +7,7 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-tag.o blk-sysfs.o \
  			blk-exec.o blk-merge.o blk-softirq.o blk-timeout.o \
- 			blk-iopoll.o blk-lib.o ioctl.o genhd.o scsi_ioctl.o \
--			partition-generic.o partitions/
-+			uuid.o partition-generic.o partitions/
+ 			blk-iopoll.o blk-lib.o blk-mq.o blk-mq-tag.o \
+ 			blk-mq-sysfs.o blk-mq-cpu.o blk-mq-cpumap.o ioctl.o \
+-			genhd.o scsi_ioctl.o partition-generic.o ioprio.o \
++			uuid.o genhd.o scsi_ioctl.o partition-generic.o ioprio.o \
+ 			partitions/
  
- obj-$(CONFIG_BLK_DEV_BSG)	+= bsg.o
- obj-$(CONFIG_BLK_DEV_BSGLIB)	+= bsg-lib.o
+ obj-$(CONFIG_BOUNCE)	+= bounce.o
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 93a18d1..b51ae16 100644
+index 6f8dba1..d6f15e4 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -45,6 +45,9 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(block_unplug);
+@@ -48,6 +48,9 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(block_unplug);
  
  DEFINE_IDA(blk_queue_ida);
  
@@ -1699,7 +1699,7 @@ index 93a18d1..b51ae16 100644
  /*
   * For the allocated request tables
   */
-@@ -1850,6 +1853,9 @@ void submit_bio(int rw, struct bio *bio)
+@@ -1931,6 +1934,9 @@ void submit_bio(int rw, struct bio *bio)
  {
  	bio->bi_rw |= rw;
  
@@ -1710,7 +1710,7 @@ index 93a18d1..b51ae16 100644
  	 * If it's a regular read/write or a barrier with data attached,
  	 * go through the normal accounting stuff before submission.
 diff --git a/block/genhd.c b/block/genhd.c
-index dadf42b..0fb20a1 100644
+index 791f419..97985a4 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
 @@ -17,6 +17,8 @@
@@ -1722,7 +1722,7 @@ index dadf42b..0fb20a1 100644
  #include <linux/log2.h>
  #include <linux/pm_runtime.h>
  
-@@ -1376,6 +1378,87 @@ int invalidate_partition(struct gendisk *disk, int partno)
+@@ -1375,6 +1377,87 @@ int invalidate_partition(struct gendisk *disk, int partno)
  
  EXPORT_SYMBOL(invalidate_partition);
  
@@ -1812,7 +1812,7 @@ index dadf42b..0fb20a1 100644
   */
 diff --git a/block/uuid.c b/block/uuid.c
 new file mode 100644
-index 0000000..72c5029
+index 0000000..6ab3f05
 --- /dev/null
 +++ b/block/uuid.c
 @@ -0,0 +1,511 @@
@@ -1994,7 +1994,7 @@ index 0000000..72c5029
 +
 +	bio = bio_alloc(GFP_NOFS, 1);
 +	bio->bi_bdev = dev;
-+	bio->bi_sector = page_num << 3;
++	bio->bi_iter.bi_sector = page_num << 3;
 +	bio->bi_end_io = uuid_end_bio;
 +	bio->bi_flags |= (1 << BIO_TOI);
 +
@@ -2328,10 +2328,10 @@ index 0000000..72c5029
 +
 +__setup("uuid_debug", uuid_debug_setup);
 diff --git a/drivers/acpi/acpi_pad.c b/drivers/acpi/acpi_pad.c
-index 27bb6a9..e40fcc3 100644
+index f148a05..067e39e 100644
 --- a/drivers/acpi/acpi_pad.c
 +++ b/drivers/acpi/acpi_pad.c
-@@ -154,6 +154,7 @@ static int power_saving_thread(void *data)
+@@ -153,6 +153,7 @@ static int power_saving_thread(void *data)
  	u64 last_jiffies = 0;
  
  	sched_setscheduler(current, SCHED_RR, &param);
@@ -2340,35 +2340,35 @@ index 27bb6a9..e40fcc3 100644
  	while (!kthread_should_stop()) {
  		int cpu;
 diff --git a/drivers/base/power/main.c b/drivers/base/power/main.c
-index 5a9b656..f913817 100644
+index bf41296..9a1166b 100644
 --- a/drivers/base/power/main.c
 +++ b/drivers/base/power/main.c
-@@ -714,6 +714,7 @@ void dpm_resume(pm_message_t state)
- 	async_synchronize_full();
- 	dpm_show_time(starttime, state, NULL);
+@@ -881,6 +881,7 @@ void dpm_resume(pm_message_t state)
+ 	cpufreq_resume();
+ 	trace_suspend_resume(TPS("dpm_resume"), state.event, false);
  }
 +EXPORT_SYMBOL_GPL(dpm_resume);
  
  /**
   * device_complete - Complete a PM transition for given device.
-@@ -790,6 +791,7 @@ void dpm_complete(pm_message_t state)
- 	list_splice(&list, &dpm_list);
+@@ -961,6 +962,7 @@ void dpm_complete(pm_message_t state)
  	mutex_unlock(&dpm_list_mtx);
+ 	trace_suspend_resume(TPS("dpm_complete"), state.event, false);
  }
 +EXPORT_SYMBOL_GPL(dpm_complete);
  
  /**
   * dpm_resume_end - Execute "resume" callbacks and complete system transition.
-@@ -1212,6 +1214,7 @@ int dpm_suspend(pm_message_t state)
- 		dpm_show_time(starttime, state, NULL);
+@@ -1517,6 +1519,7 @@ int dpm_suspend(pm_message_t state)
+ 	trace_suspend_resume(TPS("dpm_suspend"), state.event, false);
  	return error;
  }
 +EXPORT_SYMBOL_GPL(dpm_suspend);
  
  /**
   * device_prepare - Prepare a device for system power transition.
-@@ -1313,6 +1316,7 @@ int dpm_prepare(pm_message_t state)
- 	mutex_unlock(&dpm_list_mtx);
+@@ -1636,6 +1639,7 @@ int dpm_prepare(pm_message_t state)
+ 	trace_suspend_resume(TPS("dpm_prepare"), state.event, false);
  	return error;
  }
 +EXPORT_SYMBOL_GPL(dpm_prepare);
@@ -2376,7 +2376,7 @@ index 5a9b656..f913817 100644
  /**
   * dpm_suspend_start - Prepare devices for PM transition and suspend them.
 diff --git a/drivers/base/power/wakeup.c b/drivers/base/power/wakeup.c
-index 2d56f41..2f530c8 100644
+index eb1bd2e..4b6a80f 100644
 --- a/drivers/base/power/wakeup.c
 +++ b/drivers/base/power/wakeup.c
 @@ -23,6 +23,7 @@
@@ -2387,7 +2387,7 @@ index 2d56f41..2f530c8 100644
  
  /*
   * Combined counters of registered wakeup events and wakeup events in progress.
-@@ -715,6 +716,7 @@ bool pm_wakeup_pending(void)
+@@ -721,6 +722,7 @@ bool pm_wakeup_pending(void)
  
  	return ret;
  }
@@ -2396,10 +2396,10 @@ index 2d56f41..2f530c8 100644
  /**
   * pm_get_wakeup_count - Read the number of registered wakeup events.
 diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-index bf4b9d2..f7141bc 100644
+index 64c60ed..3ca69f3 100644
 --- a/drivers/block/xen-blkback/blkback.c
 +++ b/drivers/block/xen-blkback/blkback.c
-@@ -578,6 +578,7 @@ int xen_blkif_schedule(void *arg)
+@@ -577,6 +577,7 @@ int xen_blkif_schedule(void *arg)
  	int ret;
  
  	xen_blkif_get(blkif);
@@ -2408,24 +2408,23 @@ index bf4b9d2..f7141bc 100644
  	while (!kthread_should_stop()) {
  		if (try_to_freeze())
 diff --git a/drivers/gpu/drm/drm_gem.c b/drivers/gpu/drm/drm_gem.c
-index 603f256..15f5934 100644
+index f7d7119..cf96baf 100644
 --- a/drivers/gpu/drm/drm_gem.c
 +++ b/drivers/gpu/drm/drm_gem.c
-@@ -135,7 +135,8 @@ int drm_gem_object_init(struct drm_device *dev,
- 	BUG_ON((size & (PAGE_SIZE - 1)) != 0);
+@@ -135,7 +135,7 @@ int drm_gem_object_init(struct drm_device *dev,
  
- 	obj->dev = dev;
--	obj->filp = shmem_file_setup("drm mm object", size, VM_NORESERVE);
-+	obj->filp = shmem_file_setup("drm mm object", size,
-+			VM_NORESERVE, 1);
- 	if (IS_ERR(obj->filp))
- 		return PTR_ERR(obj->filp);
+ 	drm_gem_private_object_init(dev, obj, size);
+ 
+-	filp = shmem_file_setup("drm mm object", size, VM_NORESERVE);
++	filp = shmem_file_setup("drm mm object", size, VM_NORESERVE, 1);
+ 	if (IS_ERR(filp))
+ 		return PTR_ERR(filp);
  
 diff --git a/drivers/gpu/drm/ttm/ttm_tt.c b/drivers/gpu/drm/ttm/ttm_tt.c
-index 5e93a52..7f84852 100644
+index 75f3190..8f9b4c1 100644
 --- a/drivers/gpu/drm/ttm/ttm_tt.c
 +++ b/drivers/gpu/drm/ttm/ttm_tt.c
-@@ -337,7 +337,7 @@ int ttm_tt_swapout(struct ttm_tt *ttm, struct file *persistent_swap_storage)
+@@ -336,7 +336,7 @@ int ttm_tt_swapout(struct ttm_tt *ttm, struct file *persistent_swap_storage)
  	if (!persistent_swap_storage) {
  		swap_storage = shmem_file_setup("ttm swap",
  						ttm->num_pages << PAGE_SHIFT,
@@ -2435,7 +2434,7 @@ index 5e93a52..7f84852 100644
  			pr_err("Failed allocating swap storage\n");
  			return PTR_ERR(swap_storage);
 diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 9f13e13..915ef45 100644
+index 32fc19c..048a56e 100644
 --- a/drivers/md/md.c
 +++ b/drivers/md/md.c
 @@ -33,6 +33,7 @@
@@ -2446,7 +2445,7 @@ index 9f13e13..915ef45 100644
  #include <linux/blkdev.h>
  #include <linux/sysctl.h>
  #include <linux/seq_file.h>
-@@ -7379,11 +7380,14 @@ void md_do_sync(struct md_thread *thread)
+@@ -7428,6 +7429,8 @@ void md_do_sync(struct md_thread *thread)
  	 *
  	 */
  
@@ -2455,14 +2454,7 @@ index 9f13e13..915ef45 100644
  	do {
  		mddev->curr_resync = 2;
  
- 	try_again:
--		if (kthread_should_stop())
-+
-+		if (kthread_freezable_should_stop(NULL))
- 			set_bit(MD_RECOVERY_INTR, &mddev->recovery);
- 
- 		if (test_bit(MD_RECOVERY_INTR, &mddev->recovery))
-@@ -7405,6 +7409,9 @@ void md_do_sync(struct md_thread *thread)
+@@ -7451,6 +7454,9 @@ void md_do_sync(struct md_thread *thread)
  					 * time 'round when curr_resync == 2
  					 */
  					continue;
@@ -2472,7 +2464,7 @@ index 9f13e13..915ef45 100644
  				/* We need to wait 'interruptible' so as not to
  				 * contribute to the load average, and not to
  				 * be caught by 'softlockup'
-@@ -7417,6 +7424,7 @@ void md_do_sync(struct md_thread *thread)
+@@ -7463,6 +7469,7 @@ void md_do_sync(struct md_thread *thread)
  					       " share one or more physical units)\n",
  					       desc, mdname(mddev), mdname(mddev2));
  					mddev_put(mddev2);
@@ -2480,26 +2472,7 @@ index 9f13e13..915ef45 100644
  					if (signal_pending(current))
  						flush_signals(current);
  					schedule();
-@@ -7534,7 +7542,7 @@ void md_do_sync(struct md_thread *thread)
- 						 || kthread_should_stop());
- 		}
- 
--		if (kthread_should_stop())
-+		if (kthread_freezable_should_stop(NULL))
- 			goto interrupted;
- 
- 		sectors = mddev->pers->sync_request(mddev, j, &skipped,
-@@ -7578,8 +7586,7 @@ void md_do_sync(struct md_thread *thread)
- 			last_mark = next;
- 		}
- 
--
--		if (kthread_should_stop())
-+		if (kthread_freezable_should_stop(NULL))
- 			goto interrupted;
- 
- 
-@@ -7755,8 +7762,10 @@ no_add:
+@@ -7807,8 +7814,10 @@ no_add:
   */
  void md_check_recovery(struct mddev *mddev)
  {
@@ -2512,10 +2485,10 @@ index 9f13e13..915ef45 100644
  	if (mddev->bitmap)
  		bitmap_daemon_work(mddev);
 diff --git a/drivers/net/irda/stir4200.c b/drivers/net/irda/stir4200.c
-index 876e709..2b6bc28 100644
+index dd1bd10..9eb8719 100644
 --- a/drivers/net/irda/stir4200.c
 +++ b/drivers/net/irda/stir4200.c
-@@ -739,7 +739,9 @@ static int stir_transmit_thread(void *arg)
+@@ -738,7 +738,9 @@ static int stir_transmit_thread(void *arg)
  	struct net_device *dev = stir->netdev;
  	struct sk_buff *skb;
  
@@ -2527,10 +2500,10 @@ index 876e709..2b6bc28 100644
  		/* if suspending, then power off and wait */
  		if (unlikely(freezing(current))) {
 diff --git a/drivers/staging/android/ashmem.c b/drivers/staging/android/ashmem.c
-index 21a3f72..36ab3a6 100644
+index 713a972..f877e48 100644
 --- a/drivers/staging/android/ashmem.c
 +++ b/drivers/staging/android/ashmem.c
-@@ -308,7 +308,7 @@ static int ashmem_mmap(struct file *file, struct vm_area_struct *vma)
+@@ -387,7 +387,7 @@ static int ashmem_mmap(struct file *file, struct vm_area_struct *vma)
  			name = asma->name;
  
  		/* ... and allocate the backing shmem file */
@@ -2540,10 +2513,10 @@ index 21a3f72..36ab3a6 100644
  			ret = PTR_ERR(vmfile);
  			goto out;
 diff --git a/drivers/tty/vt/vt.c b/drivers/tty/vt/vt.c
-index c677829..ed2f7e7 100644
+index b33b00b..8e4ff8a 100644
 --- a/drivers/tty/vt/vt.c
 +++ b/drivers/tty/vt/vt.c
-@@ -2420,6 +2420,7 @@ int vt_kmsg_redirect(int new)
+@@ -2508,6 +2508,7 @@ int vt_kmsg_redirect(int new)
  	else
  		return kmsg_con;
  }
@@ -2563,75 +2536,11 @@ index bdcb13c..ce8fc9c 100644
  	while (1) {
  		wait_event_interruptible_timeout(
  			rc->uwbd.wq,
-diff --git a/drivers/w1/w1.c b/drivers/w1/w1.c
-index 0459df8..8f199e5 100644
---- a/drivers/w1/w1.c
-+++ b/drivers/w1/w1.c
-@@ -977,8 +977,9 @@ int w1_process(void *data)
- 	 * time can be calculated in jiffies once.
- 	 */
- 	const unsigned long jtime = msecs_to_jiffies(w1_timeout * 1000);
-+	set_freezable();
- 
--	while (!kthread_should_stop()) {
-+	while (!kthread_freezable_should_stop(NULL)) {
- 		if (dev->search_count) {
- 			mutex_lock(&dev->mutex);
- 			w1_search_process(dev, W1_SEARCH);
-diff --git a/fs/btrfs/async-thread.c b/fs/btrfs/async-thread.c
-index 58b7d14..cf22a14 100644
---- a/fs/btrfs/async-thread.c
-+++ b/fs/btrfs/async-thread.c
-@@ -307,6 +307,8 @@ static int worker_loop(void *arg)
- 	INIT_LIST_HEAD(&head);
- 	INIT_LIST_HEAD(&prio_head);
- 
-+	set_freezable();
-+
- 	do {
- again:
- 		while (1) {
-@@ -343,7 +345,7 @@ again:
- 			try_to_freeze();
- 		} else {
- 			spin_unlock_irq(&worker->lock);
--			if (!kthread_should_stop()) {
-+			if (!kthread_freezable_should_stop(NULL)) {
- 				cpu_relax();
- 				/*
- 				 * we've dropped the lock, did someone else
-@@ -368,7 +370,7 @@ again:
- 				    !list_empty(&worker->prio_pending))
- 					continue;
- 
--				if (kthread_should_stop())
-+				if (kthread_freezable_should_stop(NULL))
- 					break;
- 
- 				/* still no more work?, sleep for real */
-@@ -388,7 +390,7 @@ again:
- 				worker->working = 0;
- 				spin_unlock_irq(&worker->lock);
- 
--				if (!kthread_should_stop()) {
-+				if (!kthread_freezable_should_stop(NULL)) {
- 					schedule_timeout(HZ * 120);
- 					if (!worker->working &&
- 					    try_worker_shutdown(worker)) {
-@@ -398,7 +400,7 @@ again:
- 			}
- 			__set_current_state(TASK_RUNNING);
- 		}
--	} while (!kthread_should_stop());
-+	} while (!kthread_freezable_should_stop(NULL));
- 	return 0;
- }
- 
 diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 6b092a1..9e91f44 100644
+index 0229c37..d53657b 100644
 --- a/fs/btrfs/disk-io.c
 +++ b/fs/btrfs/disk-io.c
-@@ -1686,6 +1686,8 @@ static int cleaner_kthread(void *arg)
+@@ -1752,6 +1752,8 @@ static int cleaner_kthread(void *arg)
  	struct btrfs_root *root = arg;
  	int again;
  
@@ -2640,7 +2549,7 @@ index 6b092a1..9e91f44 100644
  	do {
  		again = 0;
  
-@@ -1717,11 +1719,11 @@ static int cleaner_kthread(void *arg)
+@@ -1783,11 +1785,11 @@ static int cleaner_kthread(void *arg)
  sleep:
  		if (!try_to_freeze() && !again) {
  			set_current_state(TASK_INTERRUPTIBLE);
@@ -2654,7 +2563,7 @@ index 6b092a1..9e91f44 100644
  	return 0;
  }
  
-@@ -1735,6 +1737,8 @@ static int transaction_kthread(void *arg)
+@@ -1801,6 +1803,8 @@ static int transaction_kthread(void *arg)
  	unsigned long delay;
  	bool cannot_commit;
  
@@ -2662,9 +2571,9 @@ index 6b092a1..9e91f44 100644
 +
  	do {
  		cannot_commit = false;
- 		delay = HZ * 30;
-@@ -1775,13 +1779,13 @@ sleep:
- 
+ 		delay = HZ * root->fs_info->commit_interval;
+@@ -1845,13 +1849,13 @@ sleep:
+ 			btrfs_cleanup_transaction(root);
  		if (!try_to_freeze()) {
  			set_current_state(TASK_INTERRUPTIBLE);
 -			if (!kthread_should_stop() &&
@@ -2680,7 +2589,7 @@ index 6b092a1..9e91f44 100644
  }
  
 diff --git a/fs/drop_caches.c b/fs/drop_caches.c
-index c00e055..d023de0 100644
+index 1de7294..ce2f220 100644
 --- a/fs/drop_caches.c
 +++ b/fs/drop_caches.c
 @@ -8,6 +8,7 @@
@@ -2691,7 +2600,7 @@ index c00e055..d023de0 100644
  #include "internal.h"
  
  /* A global variable is a bit ugly, but it keeps the code simple */
-@@ -49,6 +50,13 @@ static void drop_slab(void)
+@@ -50,6 +51,13 @@ static void drop_slab(void)
  	} while (nr_objects > 10);
  }
  
@@ -2702,14 +2611,14 @@ index c00e055..d023de0 100644
 +}
 +EXPORT_SYMBOL_GPL(drop_pagecache);
 +
- int drop_caches_sysctl_handler(ctl_table *table, int write,
+ int drop_caches_sysctl_handler(struct ctl_table *table, int write,
  	void __user *buffer, size_t *length, loff_t *ppos)
  {
 diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index b59373b..607b63f 100644
+index beeb5c4..df7964e 100644
 --- a/fs/ext4/super.c
 +++ b/fs/ext4/super.c
-@@ -2853,6 +2853,7 @@ static int ext4_lazyinit_thread(void *arg)
+@@ -2936,6 +2936,7 @@ static int ext4_lazyinit_thread(void *arg)
  	unsigned long next_wakeup, cur;
  
  	BUG_ON(NULL == eli);
@@ -2717,7 +2626,7 @@ index b59373b..607b63f 100644
  
  cont_thread:
  	while (true) {
-@@ -2892,7 +2893,7 @@ cont_thread:
+@@ -2975,7 +2976,7 @@ cont_thread:
  
  		schedule_timeout_interruptible(next_wakeup - cur);
  
@@ -2727,10 +2636,10 @@ index b59373b..607b63f 100644
  			goto exit_thread;
  		}
 diff --git a/fs/gfs2/log.c b/fs/gfs2/log.c
-index 610613f..14d8c3b 100644
+index 3966fad..c0e520c 100644
 --- a/fs/gfs2/log.c
 +++ b/fs/gfs2/log.c
-@@ -872,7 +872,9 @@ int gfs2_logd(void *data)
+@@ -911,7 +911,9 @@ int gfs2_logd(void *data)
  	unsigned long t = 1;
  	DEFINE_WAIT(wait);
  
@@ -2741,7 +2650,7 @@ index 610613f..14d8c3b 100644
  
  		if (gfs2_jrnl_flush_reqd(sdp) || t == 0) {
  			gfs2_ail1_empty(sdp);
-@@ -898,11 +900,11 @@ int gfs2_logd(void *data)
+@@ -937,11 +939,11 @@ int gfs2_logd(void *data)
  					TASK_INTERRUPTIBLE);
  			if (!gfs2_ail_flush_reqd(sdp) &&
  			    !gfs2_jrnl_flush_reqd(sdp) &&
@@ -2756,10 +2665,10 @@ index 610613f..14d8c3b 100644
  	}
  
 diff --git a/fs/gfs2/quota.c b/fs/gfs2/quota.c
-index 3768c2f..e705d94 100644
+index 64b29f7..fccafe6 100644
 --- a/fs/gfs2/quota.c
 +++ b/fs/gfs2/quota.c
-@@ -1395,7 +1395,9 @@ int gfs2_quotad(void *data)
+@@ -1434,7 +1434,9 @@ int gfs2_quotad(void *data)
  	DEFINE_WAIT(wait);
  	int empty;
  
@@ -2771,7 +2680,7 @@ index 3768c2f..e705d94 100644
  		/* Update the master statfs file */
  		if (sdp->sd_statfs_force_sync) {
 diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
-index 360d27c..eb29b79 100644
+index 0acddf6..1dd772e 100644
 --- a/fs/jfs/jfs_logmgr.c
 +++ b/fs/jfs/jfs_logmgr.c
 @@ -2342,6 +2342,8 @@ int jfsIOWait(void *arg)
@@ -2833,10 +2742,10 @@ index 564c4f2..0a622bc 100644
  	jfs_info("jfs_sync being killed");
  	return 0;
 diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
-index bd88a74..b6c4475 100644
+index a1a1916..7bb1322 100644
 --- a/fs/nilfs2/segment.c
 +++ b/fs/nilfs2/segment.c
-@@ -2440,6 +2440,8 @@ static int nilfs_segctor_thread(void *arg)
+@@ -2449,6 +2449,8 @@ static int nilfs_segctor_thread(void *arg)
  	struct the_nilfs *nilfs = sci->sc_super->s_fs_info;
  	int timeout = 0;
  
@@ -2846,7 +2755,7 @@ index bd88a74..b6c4475 100644
  	sci->sc_timer.function = nilfs_construction_timeout;
  
 diff --git a/fs/super.c b/fs/super.c
-index 68307c0..810dbec 100644
+index d20d5b1..54610de 100644
 --- a/fs/super.c
 +++ b/fs/super.c
 @@ -38,6 +38,8 @@
@@ -2859,10 +2768,10 @@ index 68307c0..810dbec 100644
  
  static char *sb_writers_name[SB_FREEZE_LEVELS] = {
 diff --git a/fs/xfs/xfs_trans_ail.c b/fs/xfs/xfs_trans_ail.c
-index 0eda725..1f2b515 100644
+index cb0f3a8..8530eaf 100644
 --- a/fs/xfs/xfs_trans_ail.c
 +++ b/fs/xfs/xfs_trans_ail.c
-@@ -511,9 +511,10 @@ xfsaild(
+@@ -497,9 +497,10 @@ xfsaild(
  	struct xfs_ail	*ailp = data;
  	long		tout = 0;	/* milliseconds */
  
@@ -2874,7 +2783,7 @@ index 0eda725..1f2b515 100644
  		if (tout && tout <= 20)
  			__set_current_state(TASK_KILLABLE);
  		else
-@@ -535,6 +536,7 @@ xfsaild(
+@@ -521,6 +522,7 @@ xfsaild(
  		    ailp->xa_target == ailp->xa_target_prev) {
  			spin_unlock(&ailp->xa_lock);
  			schedule();
@@ -2883,7 +2792,7 @@ index 0eda725..1f2b515 100644
  			continue;
  		}
 diff --git a/include/linux/bio.h b/include/linux/bio.h
-index ec48bac..6d792a6 100644
+index d2633ee..c5c3100 100644
 --- a/include/linux/bio.h
 +++ b/include/linux/bio.h
 @@ -32,6 +32,8 @@
@@ -2896,10 +2805,10 @@ index ec48bac..6d792a6 100644
  
  #ifdef BIO_DEBUG
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index fa1abeb..4632195 100644
+index 66c2167..7219c59 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -112,13 +112,14 @@ struct bio {
+@@ -122,13 +122,14 @@ struct bio {
  #define BIO_QUIET	10	/* Make BIO Quiet */
  #define BIO_MAPPED_INTEGRITY 11/* integrity metadata has been remapped */
  #define BIO_SNAP_STABLE	12	/* bio data must be snapshotted during write */
@@ -2917,10 +2826,10 @@ index fa1abeb..4632195 100644
  #define bio_flagged(bio, flag)	((bio)->bi_flags & (1 << (flag)))
  
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 9818747..d621419 100644
+index e11d60c..fc647c0 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -1646,6 +1646,8 @@ struct super_operations {
+@@ -1579,6 +1579,8 @@ struct super_operations {
  #define S_IMA		1024	/* Inode has an associated IMA struct */
  #define S_AUTOMOUNT	2048	/* Automount/referral quasi-directory */
  #define S_NOSEC		4096	/* no suid or xattr security attributes */
@@ -2929,7 +2838,7 @@ index 9818747..d621419 100644
  
  /*
   * Note that nosuid etc flags are inode-specific: setting some file-system
-@@ -2070,6 +2072,13 @@ extern struct super_block *freeze_bdev(struct block_device *);
+@@ -2082,6 +2084,13 @@ extern struct super_block *freeze_bdev(struct block_device *);
  extern void emergency_thaw_all(void);
  extern int thaw_bdev(struct block_device *bdev, struct super_block *sb);
  extern int fsync_bdev(struct block_device *);
@@ -2940,9 +2849,9 @@ index 9818747..d621419 100644
 +#define FS_FREEZER_ALL (FS_FREEZER_FUSE | FS_FREEZER_NORMAL)
 +void freeze_filesystems(int which);
 +void thaw_filesystems(int which);
+ extern int sb_is_blkdev_sb(struct super_block *sb);
  #else
  static inline void bd_forget(struct inode *inode) {}
- static inline int sync_blockdev(struct block_device *bdev) { return 0; }
 diff --git a/include/linux/fs_uuid.h b/include/linux/fs_uuid.h
 new file mode 100644
 index 0000000..3234135
@@ -2969,10 +2878,10 @@ index 0000000..3234135
 +struct block_device *next_bdev_of_type(struct block_device *last,
 +	const char *key);
 diff --git a/include/linux/mm.h b/include/linux/mm.h
-index f022460..6af438b 100644
+index e03dd29..e1c8e8b 100644
 --- a/include/linux/mm.h
 +++ b/include/linux/mm.h
-@@ -1760,6 +1760,7 @@ int drop_caches_sysctl_handler(struct ctl_table *, int,
+@@ -2032,6 +2032,7 @@ int drop_caches_sysctl_handler(struct ctl_table *, int,
  unsigned long shrink_slab(struct shrink_control *shrink,
  			  unsigned long nr_pages_scanned,
  			  unsigned long lru_pages);
@@ -2980,25 +2889,58 @@ index f022460..6af438b 100644
  
  #ifndef CONFIG_MMU
  #define randomize_va_space 0
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index 8304959..5c2f56c 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -109,6 +109,12 @@ enum pageflags {
+ #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+ 	PG_compound_lock,
+ #endif
++#ifdef CONFIG_TOI_INCREMENTAL
++	PG_toi_ignore,		/* Ignore this page */
++	PG_toi_ro,		/* Page was made RO by TOI */
++	PG_toi_cbw,		/* Copy the page before it is written to */
++	PG_toi_dirty,		/* Page has been modified */
++#endif
+ 	__NR_PAGEFLAGS,
+ 
+ 	/* Filesystems */
+@@ -276,6 +282,12 @@ TESTSCFLAG(HWPoison, hwpoison)
+ PAGEFLAG_FALSE(HWPoison)
+ #define __PG_HWPOISON 0
+ #endif
++#ifdef CONFIG_TOI_INCREMENTAL
++PAGEFLAG(TOI_RO, toi_ro)
++PAGEFLAG(TOI_Dirty, toi_dirty)
++PAGEFLAG(TOI_Ignore, toi_ignore)
++PAGEFLAG(TOI_CBW, toi_cbw)
++#endif
+ 
+ u64 stable_page_flags(struct page *page);
+ 
 diff --git a/include/linux/shmem_fs.h b/include/linux/shmem_fs.h
-index 30aa0dc..b7ea3d4 100644
+index 4d1771c..20ab982 100644
 --- a/include/linux/shmem_fs.h
 +++ b/include/linux/shmem_fs.h
-@@ -46,7 +46,8 @@ static inline struct shmem_inode_info *SHMEM_I(struct inode *inode)
+@@ -46,9 +46,10 @@ static inline struct shmem_inode_info *SHMEM_I(struct inode *inode)
  extern int shmem_init(void);
  extern int shmem_fill_super(struct super_block *sb, void *data, int silent);
  extern struct file *shmem_file_setup(const char *name,
 -					loff_t size, unsigned long flags);
 +					loff_t size, unsigned long flags,
 +					int atomic_copy);
+ extern struct file *shmem_kernel_file_setup(const char *name, loff_t size,
+-					    unsigned long flags);
++					    unsigned long flags, int atomic_copy);
  extern int shmem_zero_setup(struct vm_area_struct *);
  extern int shmem_lock(struct file *file, int lock, struct user_struct *user);
- extern void shmem_unlock_mapping(struct address_space *mapping);
+ extern bool shmem_mapping(struct address_space *mapping);
 diff --git a/include/linux/suspend.h b/include/linux/suspend.h
-index f73cabf..d25dc56 100644
+index 519064e..88c2ccb 100644
 --- a/include/linux/suspend.h
 +++ b/include/linux/suspend.h
-@@ -419,6 +419,73 @@ extern bool pm_print_times_enabled;
+@@ -430,6 +430,74 @@ extern bool pm_print_times_enabled;
  #define pm_print_times_enabled	(false)
  #endif
  
@@ -3020,6 +2962,7 @@ index f73cabf..d25dc56 100644
 +	TOI_NOTIFIERS_PREPARE,
 +	TOI_CLUSTER_MODE,
 +	TOI_BOOT_KERNEL,
++	TOI_DEVICE_HOTPLUG_LOCKED,
 +};
 +
 +#ifdef CONFIG_TOI
@@ -3073,10 +3016,10 @@ index f73cabf..d25dc56 100644
  
  /* kernel/power/autosleep.c */
 diff --git a/include/linux/swap.h b/include/linux/swap.h
-index d95cde5..91d2904 100644
+index 4bdbee8..b71660f 100644
 --- a/include/linux/swap.h
 +++ b/include/linux/swap.h
-@@ -232,6 +232,7 @@ extern unsigned long totalram_pages;
+@@ -297,6 +297,7 @@ extern unsigned long totalram_pages;
  extern unsigned long totalreserve_pages;
  extern unsigned long dirty_balance_reserve;
  extern unsigned long nr_free_buffer_pages(void);
@@ -3084,7 +3027,7 @@ index d95cde5..91d2904 100644
  extern unsigned long nr_free_pagecache_pages(void);
  
  /* Definition of global_page_state not available yet */
-@@ -281,6 +282,8 @@ extern unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *mem,
+@@ -332,6 +333,8 @@ extern unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *mem,
  						struct zone *zone,
  						unsigned long *nr_scanned);
  extern unsigned long shrink_all_memory(unsigned long nr_pages);
@@ -3093,7 +3036,7 @@ index d95cde5..91d2904 100644
  extern int vm_swappiness;
  extern int remove_mapping(struct address_space *mapping, struct page *page);
  extern unsigned long vm_total_pages;
-@@ -394,13 +397,17 @@ extern void swapcache_free(swp_entry_t, struct page *page);
+@@ -445,13 +448,17 @@ extern void swapcache_free(swp_entry_t, struct page *page);
  extern int free_swap_and_cache(swp_entry_t);
  extern int swap_type_of(dev_t, sector_t, struct block_device **);
  extern unsigned int count_swap_pages(int, int);
@@ -3125,10 +3068,10 @@ index 1a85940..3025606 100644
  #define NETLINK_INET_DIAG	NETLINK_SOCK_DIAG
  
 diff --git a/init/do_mounts.c b/init/do_mounts.c
-index 816014c..40b9c9f 100644
+index 82f2288..e35fb52 100644
 --- a/init/do_mounts.c
 +++ b/init/do_mounts.c
-@@ -281,6 +281,7 @@ fail:
+@@ -285,6 +285,7 @@ fail:
  done:
  	return res;
  }
@@ -3136,7 +3079,7 @@ index 816014c..40b9c9f 100644
  
  static int __init root_dev_setup(char *line)
  {
-@@ -582,6 +583,8 @@ void __init prepare_namespace(void)
+@@ -586,6 +587,8 @@ void __init prepare_namespace(void)
  	if (is_floppy && rd_doload && rd_load_disk(0))
  		ROOT_DEV = Root_RAM0;
  
@@ -3170,22 +3113,22 @@ index 3e0878e..a49c596 100644
  	sys_mount("..", ".", NULL, MS_MOVE, NULL);
  	/* switch root and cwd back to / of rootfs */
 diff --git a/init/main.c b/init/main.c
-index d03d2ec..9feffd1 100644
+index e8ae1fe..1508980 100644
 --- a/init/main.c
 +++ b/init/main.c
-@@ -128,6 +128,7 @@ extern void softirq_init(void);
+@@ -124,6 +124,7 @@ void (*__initdata late_time_init)(void);
  char __initdata boot_command_line[COMMAND_LINE_SIZE];
  /* Untouched saved command line (eg. for /proc) */
  char *saved_command_line;
 +EXPORT_SYMBOL_GPL(saved_command_line);
  /* Command line for parameter parsing */
  static char *static_command_line;
- 
+ /* Command line for per-initcall parameter parsing */
 diff --git a/ipc/shm.c b/ipc/shm.c
-index c6b4ad5..38a0fee 100644
+index 89fc354..ebc48e9 100644
 --- a/ipc/shm.c
 +++ b/ipc/shm.c
-@@ -515,7 +515,7 @@ static int newseg(struct ipc_namespace *ns, struct ipc_params *params)
+@@ -541,7 +541,7 @@ static int newseg(struct ipc_namespace *ns, struct ipc_params *params)
  		if  ((shmflg & SHM_NORESERVE) &&
  				sysctl_overcommit_memory != OVERCOMMIT_NEVER)
  			acctflag = VM_NORESERVE;
@@ -3195,10 +3138,10 @@ index c6b4ad5..38a0fee 100644
  	error = PTR_ERR(file);
  	if (IS_ERR(file))
 diff --git a/kernel/cpu.c b/kernel/cpu.c
-index b2b227b..d2b736b 100644
+index a343bde..2da660d 100644
 --- a/kernel/cpu.c
 +++ b/kernel/cpu.c
-@@ -514,6 +514,7 @@ int disable_nonboot_cpus(void)
+@@ -542,6 +542,7 @@ int disable_nonboot_cpus(void)
  	cpu_maps_update_done();
  	return error;
  }
@@ -3206,7 +3149,7 @@ index b2b227b..d2b736b 100644
  
  void __weak arch_enable_nonboot_cpus_begin(void)
  {
-@@ -552,6 +553,7 @@ void __ref enable_nonboot_cpus(void)
+@@ -582,6 +583,7 @@ void __ref enable_nonboot_cpus(void)
  out:
  	cpu_maps_update_done();
  }
@@ -3215,10 +3158,10 @@ index b2b227b..d2b736b 100644
  static int __init alloc_frozen_cpus(void)
  {
 diff --git a/kernel/kmod.c b/kernel/kmod.c
-index fb32636..bd18c58 100644
+index 8637e04..e132eb5 100644
 --- a/kernel/kmod.c
 +++ b/kernel/kmod.c
-@@ -461,6 +461,7 @@ void __usermodehelper_set_disable_depth(enum umh_disable_depth depth)
+@@ -458,6 +458,7 @@ void __usermodehelper_set_disable_depth(enum umh_disable_depth depth)
  	wake_up(&usermodehelper_disabled_waitq);
  	up_write(&umhelper_sem);
  }
@@ -3226,7 +3169,7 @@ index fb32636..bd18c58 100644
  
  /**
   * __usermodehelper_disable - Prevent new helpers from being started.
-@@ -494,6 +495,7 @@ int __usermodehelper_disable(enum umh_disable_depth depth)
+@@ -491,6 +492,7 @@ int __usermodehelper_disable(enum umh_disable_depth depth)
  	__usermodehelper_set_disable_depth(UMH_ENABLED);
  	return -EAGAIN;
  }
@@ -3235,10 +3178,10 @@ index fb32636..bd18c58 100644
  static void helper_lock(void)
  {
 diff --git a/kernel/kthread.c b/kernel/kthread.c
-index 760e86d..845059c 100644
+index c2390f4..f155df01 100644
 --- a/kernel/kthread.c
 +++ b/kernel/kthread.c
-@@ -513,6 +513,8 @@ int kthread_worker_fn(void *worker_ptr)
+@@ -550,6 +550,8 @@ int kthread_worker_fn(void *worker_ptr)
  
  	WARN_ON(worker->task);
  	worker->task = current;
@@ -3248,10 +3191,10 @@ index 760e86d..845059c 100644
  	set_current_state(TASK_INTERRUPTIBLE);	/* mb paired w/ kthread_stop */
  
 diff --git a/kernel/pid.c b/kernel/pid.c
-index 66505c1..0332fdc 100644
+index 9b9a266..ad91ea4 100644
 --- a/kernel/pid.c
 +++ b/kernel/pid.c
-@@ -444,6 +444,7 @@ struct task_struct *find_task_by_pid_ns(pid_t nr, struct pid_namespace *ns)
+@@ -450,6 +450,7 @@ struct task_struct *find_task_by_pid_ns(pid_t nr, struct pid_namespace *ns)
  			   " protection");
  	return pid_task(find_pid_ns(nr, ns), PIDTYPE_PID);
  }
@@ -3260,10 +3203,10 @@ index 66505c1..0332fdc 100644
  struct task_struct *find_task_by_vpid(pid_t vnr)
  {
 diff --git a/kernel/power/Kconfig b/kernel/power/Kconfig
-index d444c4e..03e987b 100644
+index 9a83d78..0da3edb 100644
 --- a/kernel/power/Kconfig
 +++ b/kernel/power/Kconfig
-@@ -91,6 +91,286 @@ config PM_STD_PARTITION
+@@ -91,6 +91,291 @@ config PM_STD_PARTITION
  	  suspended image to. It will simply pick the first available swap 
  	  device.
  
@@ -3300,25 +3243,6 @@ index d444c4e..03e987b 100644
 +
 +	comment "General Options"
 +		depends on TOI_CORE
-+
-+	config TOI_INCREMENTAL
-+		tristate "Incremental Image Support"
-+		depends on TOI_CORE && CRYPTO && BROKEN
-+		select CRYPTO_SHA1
-+		default y
-+		---help---
-+		  This option adds initial support for using hashing algorithms
-+		  (a quick, internal implementation of Fletcher16 and SHA1 via
-+		  cryptoapi) to discover the number of pages which are
-+		  unchanged since the image was last written. It is hoped that
-+		  this will be an initial step toward implementing storing just
-+		  the differences between consecutive images, which will
-+		  increase the amount of storage needed for the image, but also
-+		  increase the speed at which writing an image occurs and
-+		  reduce the wear and tear on drives.
-+
-+	comment "No increemntal image support available without Cryptoapi support."
-+		depends on TOI_CORE && !CRYPTO
 +
 +	config TOI_PRUNE
 +		tristate "Image pruning support"
@@ -3391,6 +3315,30 @@ index d444c4e..03e987b 100644
 +		  kernel command line parameter suspend_act= to turn off the keep image
 +		  bit. Keep image mode is a little less user friendly on purpose - it
 +		  should not be used without thought!
++
++	config TOI_INCREMENTAL
++		bool "Incremental Image Support"
++		depends on TOI_CORE && 64BIT
++		default n
++		---help---
++		  This option enables the work in progress toward using the dirty page
++		  tracking to record changes to pages. It is hoped that
++		  this will be an initial step toward implementing storing just
++		  the differences between consecutive images, which will
++		  increase the amount of storage needed for the image, but also
++		  increase the speed at which writing an image occurs and
++		  reduce the wear and tear on drives.
++
++		  At the moment, all that is implemented is the first step of keeping
++		  an existing image and then comparing it to the contents in memory
++		  (by setting /sys/power/tuxonice/verify_image to 1 and triggering a
++		  (fake) resume) to see what the page change tracking should find to be
++		  different. If you have verify_image set to 1, TuxOnIce will automatically
++		  invalidate the old image when you next try to hibernate, so there's no
++		  greater chance of disk corruption than normal.
++
++	comment "No incremental image support available without Keep Image support."
++		depends on TOI_CORE && !TOI_KEEP_IMAGE
 +
 +	config TOI_REPLACE_SWSUSP
 +		bool "Replace swsusp by default"
@@ -3593,10 +3541,10 @@ index 29472bf..dd5d4f2 100644
  obj-$(CONFIG_PM)		+= main.o
  obj-$(CONFIG_VT_CONSOLE_SLEEP)	+= console.o
 diff --git a/kernel/power/console.c b/kernel/power/console.c
-index 463aa673..3077298 100644
+index aba9c54..856fe7f 100644
 --- a/kernel/power/console.c
 +++ b/kernel/power/console.c
-@@ -136,6 +136,7 @@ int pm_prepare_console(void)
+@@ -138,6 +138,7 @@ int pm_prepare_console(void)
  	orig_kmsg = vt_kmsg_redirect(SUSPEND_CONSOLE);
  	return 0;
  }
@@ -3604,34 +3552,35 @@ index 463aa673..3077298 100644
  
  void pm_restore_console(void)
  {
-@@ -147,3 +148,4 @@ void pm_restore_console(void)
+@@ -149,3 +150,4 @@ void pm_restore_console(void)
  		vt_kmsg_redirect(orig_kmsg);
  	}
  }
 +EXPORT_SYMBOL_GPL(pm_restore_console);
 diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-index b26f5f1..9c04c3e 100644
+index fcc2611..c751688 100644
 --- a/kernel/power/hibernate.c
 +++ b/kernel/power/hibernate.c
-@@ -29,14 +29,15 @@
- #include <linux/ctype.h>
+@@ -30,7 +30,7 @@
  #include <linux/genhd.h>
+ #include <trace/events/power.h>
  
 -#include "power.h"
 +#include "tuxonice.h"
  
  
  static int nocompress;
- static int noresume;
+@@ -38,7 +38,8 @@ static int noresume;
+ static int nohibernate;
  static int resume_wait;
- static int resume_delay;
+ static unsigned int resume_delay;
 -static char resume_file[256] = CONFIG_PM_STD_PARTITION;
 +char resume_file[256] = CONFIG_PM_STD_PARTITION;
 +EXPORT_SYMBOL_GPL(resume_file);
  dev_t swsusp_resume_device;
  sector_t swsusp_resume_block;
- int in_suspend __nosavedata;
-@@ -114,21 +115,23 @@ static int hibernation_test(int level) { return 0; }
+ __visible int in_suspend __nosavedata;
+@@ -122,21 +123,23 @@ static int hibernation_test(int level) { return 0; }
   * platform_begin - Call platform to start hibernation.
   * @platform_mode: Whether or not to use the platform driver.
   */
@@ -3657,7 +3606,7 @@ index b26f5f1..9c04c3e 100644
  
  /**
   * platform_pre_snapshot - Call platform to prepare the machine for hibernation.
-@@ -138,11 +141,12 @@ static void platform_end(int platform_mode)
+@@ -146,11 +149,12 @@ static void platform_end(int platform_mode)
   * if so configured, and return an error code if that fails.
   */
  
@@ -3671,7 +3620,7 @@ index b26f5f1..9c04c3e 100644
  
  /**
   * platform_leave - Call platform to prepare a transition to the working state.
-@@ -153,11 +157,12 @@ static int platform_pre_snapshot(int platform_mode)
+@@ -161,11 +165,12 @@ static int platform_pre_snapshot(int platform_mode)
   *
   * This routine is called on one CPU with interrupts disabled.
   */
@@ -3685,7 +3634,7 @@ index b26f5f1..9c04c3e 100644
  
  /**
   * platform_finish - Call platform to switch the system to the working state.
-@@ -168,11 +173,12 @@ static void platform_leave(int platform_mode)
+@@ -176,11 +181,12 @@ static void platform_leave(int platform_mode)
   *
   * This routine must be called after platform_prepare().
   */
@@ -3699,7 +3648,7 @@ index b26f5f1..9c04c3e 100644
  
  /**
   * platform_pre_restore - Prepare for hibernate image restoration.
-@@ -184,11 +190,12 @@ static void platform_finish(int platform_mode)
+@@ -192,11 +198,12 @@ static void platform_finish(int platform_mode)
   * If the restore fails after this function has been called,
   * platform_restore_cleanup() must be called.
   */
@@ -3713,7 +3662,7 @@ index b26f5f1..9c04c3e 100644
  
  /**
   * platform_restore_cleanup - Switch to the working state after failing restore.
-@@ -201,21 +208,23 @@ static int platform_pre_restore(int platform_mode)
+@@ -209,21 +216,23 @@ static int platform_pre_restore(int platform_mode)
   * function must be called too, regardless of the result of
   * platform_pre_restore().
   */
@@ -3739,7 +3688,7 @@ index b26f5f1..9c04c3e 100644
  
  /**
   * swsusp_show_speed - Print time elapsed between two events during hibernation.
-@@ -573,6 +582,7 @@ int hibernation_platform_enter(void)
+@@ -587,6 +596,7 @@ int hibernation_platform_enter(void)
  
  	return error;
  }
@@ -3747,17 +3696,17 @@ index b26f5f1..9c04c3e 100644
  
  /**
   * power_down - Shut the machine down for hibernation.
-@@ -632,6 +642,9 @@ int hibernate(void)
+@@ -648,6 +658,9 @@ int hibernate(void)
  {
  	int error;
  
 +	if (test_action_state(TOI_REPLACE_SWSUSP))
 +		return try_tuxonice_hibernate();
 +
- 	lock_system_sleep();
- 	/* The snapshot device should not be opened while we're running */
- 	if (!atomic_add_unless(&snapshot_device_available, -1, 0)) {
-@@ -715,11 +728,19 @@ int hibernate(void)
+ 	if (!hibernation_available()) {
+ 		pr_debug("PM: Hibernation not available.\n");
+ 		return -EPERM;
+@@ -737,11 +750,19 @@ int hibernate(void)
   * attempts to recover gracefully and make the kernel return to the normal mode
   * of operation.
   */
@@ -3778,7 +3727,7 @@ index b26f5f1..9c04c3e 100644
  	/*
  	 * If the user said "noresume".. bail out early.
  	 */
-@@ -1094,6 +1115,7 @@ static int __init hibernate_setup(char *str)
+@@ -1128,6 +1149,7 @@ static int __init hibernate_setup(char *str)
  static int __init noresume_setup(char *str)
  {
  	noresume = 1;
@@ -3787,7 +3736,7 @@ index b26f5f1..9c04c3e 100644
  }
  
 diff --git a/kernel/power/main.c b/kernel/power/main.c
-index 1d1bf63..d16f971 100644
+index 8e90f33..c2031d9 100644
 --- a/kernel/power/main.c
 +++ b/kernel/power/main.c
 @@ -19,12 +19,14 @@
@@ -3821,12 +3770,12 @@ index 1d1bf63..d16f971 100644
 +EXPORT_SYMBOL_GPL(power_kobj);
  
  /**
-  *	state - control system power state.
+  * state - control system sleep states.
 diff --git a/kernel/power/power.h b/kernel/power/power.h
-index 7d4b7ff..98b9660 100644
+index c60f13b..faa42ab 100644
 --- a/kernel/power/power.h
 +++ b/kernel/power/power.h
-@@ -35,8 +35,12 @@ static inline char *check_image_kernel(struct swsusp_info *info)
+@@ -36,8 +36,12 @@ static inline char *check_image_kernel(struct swsusp_info *info)
  	return arch_hibernation_header_restore(info) ?
  			"architecture specific data" : NULL;
  }
@@ -3839,7 +3788,7 @@ index 7d4b7ff..98b9660 100644
  /*
   * Keep some memory free so that I/O operations can succeed without paging
   * [Might this be more than 4 MB?]
-@@ -55,6 +59,7 @@ extern bool freezer_test_done;
+@@ -58,6 +62,7 @@ extern bool freezer_test_done;
  extern int hibernation_snapshot(int platform_mode);
  extern int hibernation_restore(int platform_mode);
  extern int hibernation_platform_enter(void);
@@ -3847,7 +3796,7 @@ index 7d4b7ff..98b9660 100644
  
  #else /* !CONFIG_HIBERNATION */
  
-@@ -74,6 +79,8 @@ static struct kobj_attribute _name##_attr = {	\
+@@ -77,6 +82,8 @@ static struct kobj_attribute _name##_attr = {	\
  	.store	= _name##_store,		\
  }
  
@@ -3856,7 +3805,7 @@ index 7d4b7ff..98b9660 100644
  /* Preferred image size in bytes (default 500 MB) */
  extern unsigned long image_size;
  /* Size of memory reserved for drivers (default SPARE_PAGES x PAGE_SIZE) */
-@@ -268,6 +275,90 @@ static inline void suspend_thaw_processes(void)
+@@ -274,6 +281,90 @@ static inline void suspend_thaw_processes(void)
  }
  #endif
  
@@ -3948,10 +3897,10 @@ index 7d4b7ff..98b9660 100644
  
  /* kernel/power/autosleep.c */
 diff --git a/kernel/power/process.c b/kernel/power/process.c
-index 06ec886..4004a83 100644
+index 4ee194e..257f960 100644
 --- a/kernel/power/process.c
 +++ b/kernel/power/process.c
-@@ -143,6 +143,7 @@ int freeze_processes(void)
+@@ -144,6 +144,7 @@ int freeze_processes(void)
  		thaw_processes();
  	return error;
  }
@@ -3959,7 +3908,7 @@ index 06ec886..4004a83 100644
  
  /**
   * freeze_kernel_threads - Make freezable kernel threads go to the refrigerator.
-@@ -169,6 +170,7 @@ int freeze_kernel_threads(void)
+@@ -170,6 +171,7 @@ int freeze_kernel_threads(void)
  		thaw_kernel_threads();
  	return error;
  }
@@ -3967,24 +3916,24 @@ index 06ec886..4004a83 100644
  
  void thaw_processes(void)
  {
-@@ -202,6 +204,7 @@ void thaw_processes(void)
- 	schedule();
+@@ -206,6 +208,7 @@ void thaw_processes(void)
  	printk("done.\n");
+ 	trace_suspend_resume(TPS("thaw_processes"), 0, false);
  }
 +EXPORT_SYMBOL_GPL(thaw_processes);
  
  void thaw_kernel_threads(void)
  {
-@@ -222,3 +225,4 @@ void thaw_kernel_threads(void)
+@@ -226,3 +229,4 @@ void thaw_kernel_threads(void)
  	schedule();
  	printk("done.\n");
  }
 +EXPORT_SYMBOL_GPL(thaw_kernel_threads);
 diff --git a/kernel/power/snapshot.c b/kernel/power/snapshot.c
-index 349587b..8403352 100644
+index 1ea328a..7314819 100644
 --- a/kernel/power/snapshot.c
 +++ b/kernel/power/snapshot.c
-@@ -35,6 +35,8 @@
+@@ -36,6 +36,8 @@
  #include <asm/io.h>
  
  #include "power.h"
@@ -3993,7 +3942,7 @@ index 349587b..8403352 100644
  
  static int swsusp_page_is_free(struct page *);
  static void swsusp_set_page_forbidden(struct page *);
-@@ -71,6 +73,10 @@ void __init hibernate_image_size_init(void)
+@@ -72,6 +74,10 @@ void __init hibernate_image_size_init(void)
   * directly to their "original" page frames.
   */
  struct pbe *restore_pblist;
@@ -4004,7 +3953,7 @@ index 349587b..8403352 100644
  
  /* Pointer to an auxiliary buffer (1 page) */
  static void *buffer;
-@@ -113,6 +119,9 @@ static void *get_image_page(gfp_t gfp_mask, int safe_needed)
+@@ -114,6 +120,9 @@ static void *get_image_page(gfp_t gfp_mask, int safe_needed)
  
  unsigned long get_safe_page(gfp_t gfp_mask)
  {
@@ -4014,7 +3963,7 @@ index 349587b..8403352 100644
  	return (unsigned long)get_image_page(gfp_mask, PG_SAFE);
  }
  
-@@ -249,47 +258,53 @@ static void *chain_alloc(struct chain_allocator *ca, unsigned int size)
+@@ -250,47 +259,53 @@ static void *chain_alloc(struct chain_allocator *ca, unsigned int size)
   *	the represented memory area.
   */
  
@@ -4098,7 +4047,7 @@ index 349587b..8403352 100644
  
  /**
   *	create_bm_block_list - create a list of block bitmap objects
-@@ -397,8 +412,8 @@ static int create_mem_extents(struct list_head *list, gfp_t gfp_mask)
+@@ -398,8 +413,8 @@ static int create_mem_extents(struct list_head *list, gfp_t gfp_mask)
  /**
    *	memory_bm_create - allocate memory for a memory bitmap
    */
@@ -4109,7 +4058,7 @@ index 349587b..8403352 100644
  {
  	struct chain_allocator ca;
  	struct list_head mem_extents;
-@@ -442,6 +457,9 @@ memory_bm_create(struct memory_bitmap *bm, gfp_t gfp_mask, int safe_needed)
+@@ -443,6 +458,9 @@ memory_bm_create(struct memory_bitmap *bm, gfp_t gfp_mask, int safe_needed)
  		}
  	}
  
@@ -4119,7 +4068,7 @@ index 349587b..8403352 100644
  	bm->p_list = ca.chain;
  	memory_bm_position_reset(bm);
   Exit:
-@@ -453,11 +471,18 @@ memory_bm_create(struct memory_bitmap *bm, gfp_t gfp_mask, int safe_needed)
+@@ -454,11 +472,18 @@ memory_bm_create(struct memory_bitmap *bm, gfp_t gfp_mask, int safe_needed)
  	memory_bm_free(bm, PG_UNSAFE_CLEAR);
  	goto Exit;
  }
@@ -4139,7 +4088,7 @@ index 349587b..8403352 100644
  {
  	struct bm_block *bb;
  
-@@ -468,15 +493,22 @@ static void memory_bm_free(struct memory_bitmap *bm, int clear_nosave_free)
+@@ -469,15 +494,22 @@ static void memory_bm_free(struct memory_bitmap *bm, int clear_nosave_free)
  	free_list_of_pages(bm->p_list, clear_nosave_free);
  
  	INIT_LIST_HEAD(&bm->blocks);
@@ -4165,7 +4114,7 @@ index 349587b..8403352 100644
  {
  	struct bm_block *bb;
  
-@@ -484,7 +516,7 @@ static int memory_bm_find_bit(struct memory_bitmap *bm, unsigned long pfn,
+@@ -485,7 +517,7 @@ static int memory_bm_find_bit(struct memory_bitmap *bm, unsigned long pfn,
  	 * Check if the pfn corresponds to the current bitmap block and find
  	 * the block where it fits if this is not the case.
  	 */
@@ -4174,7 +4123,7 @@ index 349587b..8403352 100644
  	if (pfn < bb->start_pfn)
  		list_for_each_entry_continue_reverse(bb, &bm->blocks, hook)
  			if (pfn >= bb->start_pfn)
-@@ -499,15 +531,21 @@ static int memory_bm_find_bit(struct memory_bitmap *bm, unsigned long pfn,
+@@ -500,15 +532,21 @@ static int memory_bm_find_bit(struct memory_bitmap *bm, unsigned long pfn,
  		return -EFAULT;
  
  	/* The block has been found */
@@ -4199,7 +4148,7 @@ index 349587b..8403352 100644
  {
  	void *addr;
  	unsigned int bit;
-@@ -517,6 +555,7 @@ static void memory_bm_set_bit(struct memory_bitmap *bm, unsigned long pfn)
+@@ -518,6 +556,7 @@ static void memory_bm_set_bit(struct memory_bitmap *bm, unsigned long pfn)
  	BUG_ON(error);
  	set_bit(bit, addr);
  }
@@ -4207,7 +4156,7 @@ index 349587b..8403352 100644
  
  static int mem_bm_set_bit_check(struct memory_bitmap *bm, unsigned long pfn)
  {
-@@ -530,27 +569,43 @@ static int mem_bm_set_bit_check(struct memory_bitmap *bm, unsigned long pfn)
+@@ -531,27 +570,43 @@ static int mem_bm_set_bit_check(struct memory_bitmap *bm, unsigned long pfn)
  	return error;
  }
  
@@ -4255,7 +4204,7 @@ index 349587b..8403352 100644
  
  static bool memory_bm_pfn_present(struct memory_bitmap *bm, unsigned long pfn)
  {
-@@ -569,43 +624,184 @@ static bool memory_bm_pfn_present(struct memory_bitmap *bm, unsigned long pfn)
+@@ -570,43 +625,185 @@ static bool memory_bm_pfn_present(struct memory_bitmap *bm, unsigned long pfn)
   *	this function.
   */
  
@@ -4353,6 +4302,7 @@ index 349587b..8403352 100644
 +DEFINE_MEMORY_BITMAP(io_map);
 +DEFINE_MEMORY_BITMAP(nosave_map);
 +DEFINE_MEMORY_BITMAP(free_map);
++DEFINE_MEMORY_BITMAP(compare_map);
 +
 +int memory_bm_write(struct memory_bitmap *bm, int (*rw_chunk)
 +	(int rw, struct toi_module_ops *owner, char *buffer, int buffer_size))
@@ -4457,7 +4407,7 @@ index 349587b..8403352 100644
  
  /**
   *	register_nosave_region - register a range of page frames the contents
-@@ -844,7 +1040,7 @@ static unsigned int count_free_highmem_pages(void)
+@@ -849,7 +1046,7 @@ static unsigned int count_free_highmem_pages(void)
   *	We should save the page if it isn't Nosave or NosaveFree, or Reserved,
   *	and it isn't a part of a free chunk of pages.
   */
@@ -4466,7 +4416,7 @@ index 349587b..8403352 100644
  {
  	struct page *page;
  
-@@ -866,6 +1062,7 @@ static struct page *saveable_highmem_page(struct zone *zone, unsigned long pfn)
+@@ -871,6 +1068,7 @@ static struct page *saveable_highmem_page(struct zone *zone, unsigned long pfn)
  
  	return page;
  }
@@ -4474,7 +4424,7 @@ index 349587b..8403352 100644
  
  /**
   *	count_highmem_pages - compute the total number of saveable highmem
-@@ -891,11 +1088,6 @@ static unsigned int count_highmem_pages(void)
+@@ -896,11 +1094,6 @@ static unsigned int count_highmem_pages(void)
  	}
  	return n;
  }
@@ -4486,7 +4436,7 @@ index 349587b..8403352 100644
  #endif /* CONFIG_HIGHMEM */
  
  /**
-@@ -906,7 +1098,7 @@ static inline void *saveable_highmem_page(struct zone *z, unsigned long p)
+@@ -911,7 +1104,7 @@ static inline void *saveable_highmem_page(struct zone *z, unsigned long p)
   *	of pages statically defined as 'unsaveable', and it isn't a part of
   *	a free chunk of pages.
   */
@@ -4495,7 +4445,7 @@ index 349587b..8403352 100644
  {
  	struct page *page;
  
-@@ -931,6 +1123,7 @@ static struct page *saveable_page(struct zone *zone, unsigned long pfn)
+@@ -936,6 +1129,7 @@ static struct page *saveable_page(struct zone *zone, unsigned long pfn)
  
  	return page;
  }
@@ -4503,7 +4453,7 @@ index 349587b..8403352 100644
  
  /**
   *	count_data_pages - compute the total number of saveable non-highmem
-@@ -1581,6 +1774,9 @@ asmlinkage int swsusp_save(void)
+@@ -1590,6 +1784,9 @@ asmlinkage __visible int swsusp_save(void)
  {
  	unsigned int nr_pages, nr_highmem;
  
@@ -4513,7 +4463,7 @@ index 349587b..8403352 100644
  	printk(KERN_INFO "PM: Creating hibernation image:\n");
  
  	drain_local_pages(NULL);
-@@ -1621,14 +1817,14 @@ asmlinkage int swsusp_save(void)
+@@ -1630,14 +1827,14 @@ asmlinkage __visible int swsusp_save(void)
  }
  
  #ifndef CONFIG_ARCH_HIBERNATION_HEADER
@@ -4530,7 +4480,7 @@ index 349587b..8403352 100644
  {
  	if (info->version_code != LINUX_VERSION_CODE)
  		return "kernel version";
-@@ -1642,6 +1838,7 @@ static char *check_image_kernel(struct swsusp_info *info)
+@@ -1651,6 +1848,7 @@ static char *check_image_kernel(struct swsusp_info *info)
  		return "machine";
  	return NULL;
  }
@@ -4538,7 +4488,7 @@ index 349587b..8403352 100644
  #endif /* CONFIG_ARCH_HIBERNATION_HEADER */
  
  unsigned long snapshot_get_image_size(void)
-@@ -1649,7 +1846,7 @@ unsigned long snapshot_get_image_size(void)
+@@ -1658,7 +1856,7 @@ unsigned long snapshot_get_image_size(void)
  	return nr_copy_pages + nr_meta_pages + 1;
  }
  
@@ -4547,7 +4497,7 @@ index 349587b..8403352 100644
  {
  	memset(info, 0, sizeof(struct swsusp_info));
  	info->num_physpages = get_num_physpages();
-@@ -1659,6 +1856,7 @@ static int init_header(struct swsusp_info *info)
+@@ -1668,6 +1866,7 @@ static int init_header(struct swsusp_info *info)
  	info->size <<= PAGE_SHIFT;
  	return init_header_complete(info);
  }
@@ -4556,10 +4506,10 @@ index 349587b..8403352 100644
  /**
   *	pack_pfns - pfns corresponding to the set bits found in the bitmap @bm
 diff --git a/kernel/power/suspend.c b/kernel/power/suspend.c
-index ece0422..7568381 100644
+index ed35a47..2ea02f7 100644
 --- a/kernel/power/suspend.c
 +++ b/kernel/power/suspend.c
-@@ -298,6 +298,7 @@ int suspend_devices_and_enter(suspend_state_t state)
+@@ -345,6 +345,7 @@ int suspend_devices_and_enter(suspend_state_t state)
  		suspend_ops->recover();
  	goto Resume_devices;
  }
@@ -4569,14 +4519,14 @@ index ece0422..7568381 100644
   * suspend_finish - Clean up before finishing the suspend sequence.
 diff --git a/kernel/power/tuxonice.h b/kernel/power/tuxonice.h
 new file mode 100644
-index 0000000..6f8d127
+index 0000000..0a511cb
 --- /dev/null
 +++ b/kernel/power/tuxonice.h
 @@ -0,0 +1,227 @@
 +/*
 + * kernel/power/tuxonice.h
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -4802,14 +4752,14 @@ index 0000000..6f8d127
 +#endif
 diff --git a/kernel/power/tuxonice_alloc.c b/kernel/power/tuxonice_alloc.c
 new file mode 100644
-index 0000000..675f2b5
+index 0000000..fa44532
 --- /dev/null
 +++ b/kernel/power/tuxonice_alloc.c
 @@ -0,0 +1,314 @@
 +/*
 + * kernel/power/tuxonice_alloc.c
 + *
-+ * Copyright (C) 2008-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2008-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -5122,14 +5072,14 @@ index 0000000..675f2b5
 +#endif
 diff --git a/kernel/power/tuxonice_alloc.h b/kernel/power/tuxonice_alloc.h
 new file mode 100644
-index 0000000..099ee51
+index 0000000..6e8167e
 --- /dev/null
 +++ b/kernel/power/tuxonice_alloc.h
 @@ -0,0 +1,54 @@
 +/*
 + * kernel/power/tuxonice_alloc.h
 + *
-+ * Copyright (C) 2008-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2008-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -5182,14 +5132,14 @@ index 0000000..099ee51
 +extern int toi_trace_allocs;
 diff --git a/kernel/power/tuxonice_atomic_copy.c b/kernel/power/tuxonice_atomic_copy.c
 new file mode 100644
-index 0000000..c524acb
+index 0000000..7b7b1cd
 --- /dev/null
 +++ b/kernel/power/tuxonice_atomic_copy.c
 @@ -0,0 +1,473 @@
 +/*
 + * kernel/power/tuxonice_atomic_copy.c
 + *
-+ * Copyright 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -5628,8 +5578,8 @@ index 0000000..c524acb
 +	case ATOMIC_ALL_STEPS:
 +		if (!suspend_time) {
 +			events_check_enabled = false;
-+			platform_leave(1);
 +		}
++		platform_leave(1);
 +	case ATOMIC_STEP_SYSCORE_RESUME:
 +		syscore_resume();
 +	case ATOMIC_STEP_IRQS:
@@ -5661,14 +5611,14 @@ index 0000000..c524acb
 +}
 diff --git a/kernel/power/tuxonice_atomic_copy.h b/kernel/power/tuxonice_atomic_copy.h
 new file mode 100644
-index 0000000..6a989c1
+index 0000000..86aaae3
 --- /dev/null
 +++ b/kernel/power/tuxonice_atomic_copy.h
 @@ -0,0 +1,23 @@
 +/*
 + * kernel/power/tuxonice_atomic_copy.h
 + *
-+ * Copyright 2008-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright 2008-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -5690,14 +5640,14 @@ index 0000000..6a989c1
 +void toi_end_atomic(int stage, int toi_time, int error);
 diff --git a/kernel/power/tuxonice_bio.h b/kernel/power/tuxonice_bio.h
 new file mode 100644
-index 0000000..9627ccc
+index 0000000..65130c8
 --- /dev/null
 +++ b/kernel/power/tuxonice_bio.h
 @@ -0,0 +1,77 @@
 +/*
 + * kernel/power/tuxonice_bio.h
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -5773,14 +5723,14 @@ index 0000000..9627ccc
 +};
 diff --git a/kernel/power/tuxonice_bio_chains.c b/kernel/power/tuxonice_bio_chains.c
 new file mode 100644
-index 0000000..c214d18
+index 0000000..73dbcf2
 --- /dev/null
 +++ b/kernel/power/tuxonice_bio_chains.c
 @@ -0,0 +1,1048 @@
 +/*
 + * kernel/power/tuxonice_bio_devinfo.c
 + *
-+ * Copyright (C) 2009-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2009-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -6827,14 +6777,14 @@ index 0000000..c214d18
 +}
 diff --git a/kernel/power/tuxonice_bio_core.c b/kernel/power/tuxonice_bio_core.c
 new file mode 100644
-index 0000000..4edea73
+index 0000000..41d3505
 --- /dev/null
 +++ b/kernel/power/tuxonice_bio_core.c
 @@ -0,0 +1,1839 @@
 +/*
 + * kernel/power/tuxonice_bio.c
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -7209,7 +7159,7 @@ index 0000000..4edea73
 +	}
 +
 +	bio->bi_bdev = dev;
-+	bio->bi_sector = first_block;
++	bio->bi_iter.bi_sector = first_block;
 +	bio->bi_private = (void *) ((unsigned long) free_group);
 +	bio->bi_end_io = toi_end_bio;
 +	bio->bi_flags |= (1 << BIO_TOI);
@@ -8672,14 +8622,14 @@ index 0000000..4edea73
 +#endif
 diff --git a/kernel/power/tuxonice_bio_internal.h b/kernel/power/tuxonice_bio_internal.h
 new file mode 100644
-index 0000000..58c2481
+index 0000000..b09e176
 --- /dev/null
 +++ b/kernel/power/tuxonice_bio_internal.h
 @@ -0,0 +1,86 @@
 +/*
 + * kernel/power/tuxonice_bio_internal.h
 + *
-+ * Copyright (C) 2009-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2009-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -8764,14 +8714,14 @@ index 0000000..58c2481
 +int open_resume_dev_t(int force, int quiet);
 diff --git a/kernel/power/tuxonice_bio_signature.c b/kernel/power/tuxonice_bio_signature.c
 new file mode 100644
-index 0000000..2ebee7e
+index 0000000..9985385
 --- /dev/null
 +++ b/kernel/power/tuxonice_bio_signature.c
-@@ -0,0 +1,404 @@
+@@ -0,0 +1,403 @@
 +/*
 + * kernel/power/tuxonice_bio_signature.c
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -8927,7 +8877,7 @@ index 0000000..2ebee7e
 +int remove_old_signature(void)
 +{
 +	union p_diskpage swap_header_page = (union p_diskpage) toi_cur_sig_page;
-+	char *orig_sig, *no_image_signature_contents;
++	char *orig_sig;
 +	char *header_start = (char *) toi_get_zeroed_page(38, TOI_ATOMIC_GFP);
 +	int result;
 +	struct block_device *header_bdev;
@@ -8951,8 +8901,7 @@ index 0000000..2ebee7e
 +		orig_sig = "SWAPSPACE2";
 +
 +	memcpy(swap_header_page.pointer->swh.magic.magic, orig_sig, 10);
-+	memcpy(swap_header_page.ptr, header_start,
-+			sizeof(no_image_signature_contents));
++	memcpy(swap_header_page.ptr, header_start, 10);
 +
 +	result = toi_bio_ops.bdev_page_io(WRITE, resume_block_device,
 +		resume_firstblock, virt_to_page(swap_header_page.ptr));
@@ -9174,12 +9123,12 @@ index 0000000..2ebee7e
 +}
 diff --git a/kernel/power/tuxonice_builtin.c b/kernel/power/tuxonice_builtin.c
 new file mode 100644
-index 0000000..62b5d14
+index 0000000..b6d9b69
 --- /dev/null
 +++ b/kernel/power/tuxonice_builtin.c
-@@ -0,0 +1,445 @@
+@@ -0,0 +1,448 @@
 +/*
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + */
@@ -9418,6 +9367,9 @@ index 0000000..62b5d14
 +
 +void try_tuxonice_resume(void)
 +{
++        if (!hibernation_available())
++                return;
++
 +	/* Don't let it wrap around eventually */
 +	if (num_resume_calls < 2)
 +		num_resume_calls++;
@@ -9625,12 +9577,12 @@ index 0000000..62b5d14
 +__setup("toi_no_readahead", toi_disable_readahead_setup);
 diff --git a/kernel/power/tuxonice_builtin.h b/kernel/power/tuxonice_builtin.h
 new file mode 100644
-index 0000000..eea0155
+index 0000000..6a1fd41
 --- /dev/null
 +++ b/kernel/power/tuxonice_builtin.h
 @@ -0,0 +1,39 @@
 +/*
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + */
@@ -9670,14 +9622,14 @@ index 0000000..eea0155
 +#endif
 diff --git a/kernel/power/tuxonice_checksum.c b/kernel/power/tuxonice_checksum.c
 new file mode 100644
-index 0000000..006e68b
+index 0000000..305475c
 --- /dev/null
 +++ b/kernel/power/tuxonice_checksum.c
 @@ -0,0 +1,384 @@
 +/*
 + * kernel/power/tuxonice_checksum.c
 + *
-+ * Copyright (C) 2006-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2006-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -10060,14 +10012,14 @@ index 0000000..006e68b
 +}
 diff --git a/kernel/power/tuxonice_checksum.h b/kernel/power/tuxonice_checksum.h
 new file mode 100644
-index 0000000..0f2812e
+index 0000000..08d3e7a
 --- /dev/null
 +++ b/kernel/power/tuxonice_checksum.h
 @@ -0,0 +1,31 @@
 +/*
 + * kernel/power/tuxonice_checksum.h
 + *
-+ * Copyright (C) 2006-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2006-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -10097,14 +10049,14 @@ index 0000000..0f2812e
 +
 diff --git a/kernel/power/tuxonice_cluster.c b/kernel/power/tuxonice_cluster.c
 new file mode 100644
-index 0000000..0e5a262
+index 0000000..c504227
 --- /dev/null
 +++ b/kernel/power/tuxonice_cluster.c
 @@ -0,0 +1,1069 @@
 +/*
 + * kernel/power/tuxonice_cluster.c
 + *
-+ * Copyright (C) 2006-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2006-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -11172,14 +11124,14 @@ index 0000000..0e5a262
 +#endif
 diff --git a/kernel/power/tuxonice_cluster.h b/kernel/power/tuxonice_cluster.h
 new file mode 100644
-index 0000000..051feb3
+index 0000000..5c46acc
 --- /dev/null
 +++ b/kernel/power/tuxonice_cluster.h
 @@ -0,0 +1,18 @@
 +/*
 + * kernel/power/tuxonice_cluster.h
 + *
-+ * Copyright (C) 2006-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2006-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + */
@@ -11196,14 +11148,14 @@ index 0000000..051feb3
 +
 diff --git a/kernel/power/tuxonice_compress.c b/kernel/power/tuxonice_compress.c
 new file mode 100644
-index 0000000..2d89c4c
+index 0000000..362f8fb
 --- /dev/null
 +++ b/kernel/power/tuxonice_compress.c
 @@ -0,0 +1,465 @@
 +/*
 + * kernel/power/compression.c
 + *
-+ * Copyright (C) 2003-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2003-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -11667,14 +11619,14 @@ index 0000000..2d89c4c
 +#endif
 diff --git a/kernel/power/tuxonice_extent.c b/kernel/power/tuxonice_extent.c
 new file mode 100644
-index 0000000..e84572c
+index 0000000..cf111c1
 --- /dev/null
 +++ b/kernel/power/tuxonice_extent.c
 @@ -0,0 +1,123 @@
 +/*
 + * kernel/power/tuxonice_extent.c
 + *
-+ * Copyright (C) 2003-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2003-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -11796,14 +11748,14 @@ index 0000000..e84572c
 +EXPORT_SYMBOL_GPL(toi_add_to_extent_chain);
 diff --git a/kernel/power/tuxonice_extent.h b/kernel/power/tuxonice_extent.h
 new file mode 100644
-index 0000000..157446cf
+index 0000000..3c9a737
 --- /dev/null
 +++ b/kernel/power/tuxonice_extent.h
 @@ -0,0 +1,44 @@
 +/*
 + * kernel/power/tuxonice_extent.h
 + *
-+ * Copyright (C) 2003-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2003-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -11846,14 +11798,14 @@ index 0000000..157446cf
 +#endif
 diff --git a/kernel/power/tuxonice_file.c b/kernel/power/tuxonice_file.c
 new file mode 100644
-index 0000000..4b817c4
+index 0000000..b425767
 --- /dev/null
 +++ b/kernel/power/tuxonice_file.c
 @@ -0,0 +1,497 @@
 +/*
 + * kernel/power/tuxonice_file.c
 + *
-+ * Copyright (C) 2005-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2005-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -12349,10 +12301,10 @@ index 0000000..4b817c4
 +#endif
 diff --git a/kernel/power/tuxonice_highlevel.c b/kernel/power/tuxonice_highlevel.c
 new file mode 100644
-index 0000000..4e8f4b6
+index 0000000..c6b2a6b
 --- /dev/null
 +++ b/kernel/power/tuxonice_highlevel.c
-@@ -0,0 +1,1343 @@
+@@ -0,0 +1,1357 @@
 +/*
 + * kernel/power/tuxonice_highlevel.c
 + */
@@ -12380,7 +12332,7 @@ index 0000000..4e8f4b6
 + * Copyright (C) 1998-2001 Gabor Kuti <seasons@fornax.hu><BR>
 + * Copyright (C) 1998,2001,2002 Pavel Machek <pavel@suse.cz><BR>
 + * Copyright (C) 2002-2003 Florent Chabaud <fchabaud@free.fr><BR>
-+ * Copyright (C) 2002-2010 Nigel Cunningham (nigel at tuxonice net)<BR>
++ * Copyright (C) 2002-2014 Nigel Cunningham (nigel at tuxonice net)<BR>
 + *
 + * \section Credits
 + *
@@ -12645,6 +12597,7 @@ index 0000000..4e8f4b6
 +	    toi_alloc_bitmap(&io_map) ||
 +	    toi_alloc_bitmap(&nosave_map) ||
 +	    toi_alloc_bitmap(&free_map) ||
++	    toi_alloc_bitmap(&compare_map) ||
 +	    toi_alloc_bitmap(&page_resave_map))
 +		return 1;
 +
@@ -12675,6 +12628,7 @@ index 0000000..4e8f4b6
 +	toi_free_bitmap(&io_map);
 +	toi_free_bitmap(&nosave_map);
 +	toi_free_bitmap(&free_map);
++	toi_free_bitmap(&compare_map);
 +	toi_free_bitmap(&page_resave_map);
 +}
 +
@@ -12801,8 +12755,14 @@ index 0000000..4e8f4b6
 +		boot_kernel_data_buffer = 0;
 +	}
 +
++	if (test_toi_state(TOI_DEVICE_HOTPLUG_LOCKED)) {
++		unlock_device_hotplug();
++		clear_toi_state(TOI_DEVICE_HOTPLUG_LOCKED);
++	}
++
 +	clear_toi_state(TOI_BOOT_KERNEL);
-+	thaw_processes();
++	if (current->flags & PF_SUSPEND_TASK)
++		thaw_processes();
 +
 +	if (!restarting)
 +		toi_stop_other_threads();
@@ -13643,6 +13603,12 @@ index 0000000..4e8f4b6
 +	printk(KERN_INFO "TuxOnIce " TOI_CORE_VERSION
 +			" (http://tuxonice.net)\n");
 +
++        if (!hibernation_available()) {
++          printk(KERN_INFO "TuxOnIce disabled due to request for hibernation"
++              " to be disabled in this kernel.\n");
++          return 1;
++        }
++
 +	if (toi_sysfs_init())
 +		return 1;
 +
@@ -13698,14 +13664,14 @@ index 0000000..4e8f4b6
 +#endif
 diff --git a/kernel/power/tuxonice_incremental.c b/kernel/power/tuxonice_incremental.c
 new file mode 100644
-index 0000000..16d58fb
+index 0000000..5870fdd
 --- /dev/null
 +++ b/kernel/power/tuxonice_incremental.c
-@@ -0,0 +1,383 @@
+@@ -0,0 +1,12 @@
 +/*
-+ * kernel/power/incremental.c
++ * kernel/power/tuxonice_incremental.c
 + *
-+ * Copyright (C) 2012 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -13714,380 +13680,9 @@ index 0000000..16d58fb
 + * changes on subsequent hibernations.
 + */
 +
-+#include <linux/suspend.h>
-+#include <linux/highmem.h>
-+#include <linux/vmalloc.h>
-+#include <linux/crypto.h>
-+#include <linux/scatterlist.h>
-+
-+#include "tuxonice_builtin.h"
-+#include "tuxonice.h"
-+#include "tuxonice_modules.h"
-+#include "tuxonice_sysfs.h"
-+#include "tuxonice_io.h"
-+#include "tuxonice_ui.h"
-+#include "tuxonice_alloc.h"
-+
-+static struct toi_module_ops toi_incremental_ops;
-+static struct toi_module_ops *next_driver;
-+static unsigned long toi_incremental_bytes_in, toi_incremental_bytes_out;
-+
-+static char toi_incremental_slow_cmp_name[32] = "sha1";
-+static int toi_incremental_digestsize;
-+
-+static DEFINE_MUTEX(stats_lock);
-+
-+struct cpu_context {
-+	u8 *buffer_start;
-+	struct hash_desc desc;
-+	struct scatterlist sg[1];
-+	unsigned char *digest;
-+};
-+
-+#define OUT_BUF_SIZE (2 * PAGE_SIZE)
-+
-+static DEFINE_PER_CPU(struct cpu_context, contexts);
-+
-+/*
-+ * toi_crypto_prepare
-+ *
-+ * Prepare to do some work by allocating buffers and transforms.
-+ */
-+static int toi_incremental_crypto_prepare(void)
-+{
-+	int cpu, digestsize = toi_incremental_digestsize;
-+
-+	if (!*toi_incremental_slow_cmp_name) {
-+		printk(KERN_INFO "TuxOnIce: Incremental image support enabled but no "
-+				"hash algorithm set.\n");
-+		return 1;
-+	}
-+
-+	for_each_online_cpu(cpu) {
-+		struct cpu_context *this = &per_cpu(contexts, cpu);
-+		this->desc.tfm = crypto_alloc_hash(toi_incremental_slow_cmp_name, 0, 0);
-+		if (IS_ERR(this->desc.tfm)) {
-+			printk(KERN_INFO "TuxOnIce: Failed to initialise the "
-+					"%s hashing transform.\n",
-+					toi_incremental_slow_cmp_name);
-+			this->desc.tfm = NULL;
-+			return 1;
-+		}
-+
-+		if (!digestsize) {
-+			digestsize = crypto_hash_digestsize(this->desc.tfm);
-+			toi_incremental_digestsize = digestsize;
-+		}
-+
-+		this->digest = toi_kzalloc(16, digestsize, GFP_KERNEL);
-+		if (!this->digest)
-+			return -ENOMEM;
-+
-+		this->desc.flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-+	}
-+
-+	return 0;
-+}
-+
-+static int toi_incremental_rw_cleanup(int writing)
-+{
-+	int cpu;
-+
-+	for_each_online_cpu(cpu) {
-+		struct cpu_context *this = &per_cpu(contexts, cpu);
-+		if (this->desc.tfm) {
-+			crypto_free_hash(this->desc.tfm);
-+			this->desc.tfm = NULL;
-+		}
-+
-+		if (this->digest) {
-+			toi_kfree(16, this->digest, toi_incremental_digestsize);
-+			this->digest = NULL;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * toi_incremental_init
-+ */
-+
-+static int toi_incremental_init(int hibernate_or_resume)
-+{
-+	if (!hibernate_or_resume)
-+		return 0;
-+
-+	next_driver = toi_get_next_filter(&toi_incremental_ops);
-+
-+	return next_driver ? 0 : -ECHILD;
-+}
-+
-+/*
-+ * toi_incremental_rw_init()
-+ */
-+
-+static int toi_incremental_rw_init(int rw, int stream_number)
-+{
-+	if (rw == WRITE && toi_incremental_crypto_prepare()) {
-+		printk(KERN_ERR "Failed to initialise hashing "
-+				"algorithm.\n");
-+		if (rw == READ) {
-+			printk(KERN_INFO "Unable to read the image.\n");
-+			return -ENODEV;
-+		} else {
-+			printk(KERN_INFO "Continuing without "
-+				" calculating an incremental image.\n");
-+			toi_incremental_ops.enabled = 0;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * toi_incremental_write_page()
-+ *
-+ * Decide whether to write a page to the image. Calculate the SHA1 (or something
-+ * else if the user changes the hashing algo) of the page and compare it to the
-+ * previous value (if any). If there was no previous value or the values are
-+ * different, write the page. Otherwise, skip the write.
-+ *
-+ * @TODO: Clear hashes for pages that are no longer in the image!
-+ *
-+ * Buffer_page:	Pointer to a buffer of size PAGE_SIZE, containing
-+ * data to be written.
-+ *
-+ * Returns:	0 on success. Otherwise the error is that returned by later
-+ * 		modules, -ECHILD if we have a broken pipeline or -EIO if
-+ * 		zlib errs.
-+ */
-+static int toi_incremental_write_page(unsigned long index, int buf_type,
-+		void *buffer_page, unsigned int buf_size)
-+{
-+	int ret = 0, cpu = smp_processor_id();
-+	struct cpu_context *ctx = &per_cpu(contexts, cpu);
-+	int to_write = true;
-+
-+	if (ctx->desc.tfm) {
-+		// char *old_hash;
-+
-+		ctx->buffer_start = TOI_MAP(buf_type, buffer_page);
-+
-+		sg_init_one(&ctx->sg[0], ctx->buffer_start, buf_size);
-+
-+		ret = crypto_hash_digest(&ctx->desc, &ctx->sg[0], ctx->sg[0].length, ctx->digest);
-+		// old_hash = get_old_hash(index);
-+
-+		TOI_UNMAP(buf_type, buffer_page);
-+
-+#if 0
-+		if (!ret && new_hash == old_hash) {
-+			to_write = false;	
-+		} else
-+			store_hash(ctx, index, new_hash);
-+#endif
-+	}
-+
-+	mutex_lock(&stats_lock);
-+
-+	toi_incremental_bytes_in += buf_size;
-+	if (ret || to_write)
-+		toi_incremental_bytes_out += buf_size;
-+
-+	mutex_unlock(&stats_lock);
-+
-+	if (ret || to_write) {
-+		int ret2 = next_driver->write_page(index, buf_type,
-+				buffer_page, buf_size);
-+		if (!ret)
-+			ret = ret2;
-+	}
-+
-+	return ret;
-+}
-+
-+/*
-+ * toi_incremental_read_page()
-+ * @buffer_page: struct page *. Pointer to a buffer of size PAGE_SIZE.
-+ *
-+ * Nothing extra to do here.
-+ */
-+static int toi_incremental_read_page(unsigned long *index, int buf_type,
-+		void *buffer_page, unsigned int *buf_size)
-+{
-+	return next_driver->read_page(index, TOI_PAGE, buffer_page, buf_size);
-+}
-+
-+/*
-+ * toi_incremental_print_debug_stats
-+ * @buffer: Pointer to a buffer into which the debug info will be printed.
-+ * @size: Size of the buffer.
-+ *
-+ * Print information to be recorded for debugging purposes into a buffer.
-+ * Returns: Number of characters written to the buffer.
-+ */
-+
-+static int toi_incremental_print_debug_stats(char *buffer, int size)
-+{
-+	unsigned long pages_in = toi_incremental_bytes_in >> PAGE_SHIFT,
-+		      pages_out = toi_incremental_bytes_out >> PAGE_SHIFT;
-+	int len;
-+
-+	/* Output the size of the incremental image. */
-+	if (*toi_incremental_slow_cmp_name)
-+		len = scnprintf(buffer, size, "- Hash algorithm is '%s'.\n",
-+				toi_incremental_slow_cmp_name);
-+	else
-+		len = scnprintf(buffer, size, "- Hash algorithm is not set.\n");
-+
-+	if (pages_in)
-+		len += scnprintf(buffer+len, size - len, "  Incremental image "
-+			"%lu of %lu bytes (%ld percent).\n",
-+		  toi_incremental_bytes_out,
-+		  toi_incremental_bytes_in,
-+		  pages_out * 100 / pages_in);
-+	return len;
-+}
-+
-+/*
-+ * toi_incremental_memory_needed
-+ *
-+ * Tell the caller how much memory we need to operate during hibernate/resume.
-+ * Returns: Unsigned long. Maximum number of bytes of memory required for
-+ * operation.
-+ */
-+static int toi_incremental_memory_needed(void)
-+{
-+	return 2 * PAGE_SIZE;
-+}
-+
-+static int toi_incremental_storage_needed(void)
-+{
-+	return 2 * sizeof(unsigned long) + sizeof(int) +
-+		strlen(toi_incremental_slow_cmp_name) + 1;
-+}
-+
-+/*
-+ * toi_incremental_save_config_info
-+ * @buffer: Pointer to a buffer of size PAGE_SIZE.
-+ *
-+ * Save informaton needed when reloading the image at resume time.
-+ * Returns: Number of bytes used for saving our data.
-+ */
-+static int toi_incremental_save_config_info(char *buffer)
-+{
-+	int len = strlen(toi_incremental_slow_cmp_name) + 1, offset = 0;
-+
-+	*((unsigned long *) buffer) = toi_incremental_bytes_in;
-+	offset += sizeof(unsigned long);
-+	*((unsigned long *) (buffer + offset)) = toi_incremental_bytes_out;
-+	offset += sizeof(unsigned long);
-+	*((int *) (buffer + offset)) = len;
-+	offset += sizeof(int);
-+	strncpy(buffer + offset, toi_incremental_slow_cmp_name, len);
-+	return offset + len;
-+}
-+
-+/* toi_incremental_load_config_info
-+ * @buffer: Pointer to the start of the data.
-+ * @size: Number of bytes that were saved.
-+ *
-+ * Description:	Reload information to be retained for debugging info.
-+ */
-+static void toi_incremental_load_config_info(char *buffer, int size)
-+{
-+	int len, offset = 0;
-+
-+	toi_incremental_bytes_in = *((unsigned long *) buffer);
-+	offset += sizeof(unsigned long);
-+	toi_incremental_bytes_out = *((unsigned long *) (buffer + offset));
-+	offset += sizeof(unsigned long);
-+	len = *((int *) (buffer + offset));
-+	offset += sizeof(int);
-+	strncpy(toi_incremental_slow_cmp_name, buffer + offset, len);
-+}
-+
-+static void toi_incremental_pre_atomic_restore(struct toi_boot_kernel_data *bkd)
-+{
-+	bkd->incremental_bytes_in = toi_incremental_bytes_in;
-+	bkd->incremental_bytes_out = toi_incremental_bytes_out;
-+}
-+
-+static void toi_incremental_post_atomic_restore(struct toi_boot_kernel_data *bkd)
-+{
-+	toi_incremental_bytes_in = bkd->incremental_bytes_in;
-+	toi_incremental_bytes_out = bkd->incremental_bytes_out;
-+}
-+
-+static void toi_incremental_algo_change(void)
-+{
-+	/* Reset so it's gotten from crypto_hash_digestsize afresh */
-+	toi_incremental_digestsize = 0;
-+}
-+
-+/*
-+ * data for our sysfs entries.
-+ */
-+static struct toi_sysfs_data sysfs_params[] = {
-+	SYSFS_INT("enabled", SYSFS_RW, &toi_incremental_ops.enabled, 0, 1, 0,
-+			NULL),
-+	SYSFS_STRING("algorithm", SYSFS_RW, toi_incremental_slow_cmp_name, 31, 0, toi_incremental_algo_change),
-+};
-+
-+/*
-+ * Ops structure.
-+ */
-+static struct toi_module_ops toi_incremental_ops = {
-+	.type			= FILTER_MODULE,
-+	.name			= "incremental",
-+	.directory		= "incremental",
-+	.module			= THIS_MODULE,
-+	.initialise		= toi_incremental_init,
-+	.memory_needed 		= toi_incremental_memory_needed,
-+	.print_debug_info	= toi_incremental_print_debug_stats,
-+	.save_config_info	= toi_incremental_save_config_info,
-+	.load_config_info	= toi_incremental_load_config_info,
-+	.storage_needed		= toi_incremental_storage_needed,
-+
-+	.pre_atomic_restore	= toi_incremental_pre_atomic_restore,
-+	.post_atomic_restore	= toi_incremental_post_atomic_restore,
-+
-+	.rw_init		= toi_incremental_rw_init,
-+	.rw_cleanup		= toi_incremental_rw_cleanup,
-+
-+	.write_page		= toi_incremental_write_page,
-+	.read_page		= toi_incremental_read_page,
-+
-+	.sysfs_data		= sysfs_params,
-+	.num_sysfs_entries	= sizeof(sysfs_params) /
-+		sizeof(struct toi_sysfs_data),
-+};
-+
-+/* ---- Registration ---- */
-+
-+static __init int toi_incremental_load(void)
-+{
-+	return toi_register_module(&toi_incremental_ops);
-+}
-+
-+#ifdef MODULE
-+static __exit void toi_incremental_unload(void)
-+{
-+	toi_unregister_module(&toi_incremental_ops);
-+}
-+
-+module_init(toi_incremental_load);
-+module_exit(toi_incremental_unload);
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Nigel Cunningham");
-+MODULE_DESCRIPTION("Incremental Image Support for TuxOnIce");
-+#else
-+late_initcall(toi_incremental_load);
-+#endif
 diff --git a/kernel/power/tuxonice_io.c b/kernel/power/tuxonice_io.c
 new file mode 100644
-index 0000000..901f1c9
+index 0000000..00577e1
 --- /dev/null
 +++ b/kernel/power/tuxonice_io.c
 @@ -0,0 +1,1936 @@
@@ -14097,7 +13692,7 @@ index 0000000..901f1c9
 + * Copyright (C) 1998-2001 Gabor Kuti <seasons@fornax.hu>
 + * Copyright (C) 1998,2001,2002 Pavel Machek <pavel@suse.cz>
 + * Copyright (C) 2002-2003 Florent Chabaud <fchabaud@free.fr>
-+ * Copyright (C) 2002-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2002-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -15030,14 +14625,14 @@ index 0000000..901f1c9
 +
 +	start_time = jiffies;
 +
-+	if (rw_init_modules(1, pagedir->id)) {
++	if (rw_init_modules(WRITE, pagedir->id)) {
 +		abort_hibernate(TOI_FAILED_MODULE_INIT,
 +				"Failed to initialise modules for writing.");
 +		error = 1;
 +	}
 +
 +	if (!error)
-+		error = do_rw_loop(1, finish_at, pageflags, base, barmax,
++		error = do_rw_loop(WRITE, finish_at, pageflags, base, barmax,
 +				pagedir->id);
 +
 +	if (rw_cleanup_modules(WRITE) && !error) {
@@ -15089,11 +14684,11 @@ index 0000000..901f1c9
 +
 +	start_time = jiffies;
 +
-+	if (rw_init_modules(0, pagedir->id)) {
++	if (rw_init_modules(READ, pagedir->id)) {
 +		toiActiveAllocator->remove_image();
 +		result = 1;
 +	} else
-+		result = do_rw_loop(0, finish_at, pageflags, base, barmax,
++		result = do_rw_loop(READ, finish_at, pageflags, base, barmax,
 +				pagedir->id);
 +
 +	if (rw_cleanup_modules(READ) && !result) {
@@ -16029,14 +15624,14 @@ index 0000000..901f1c9
 +}
 diff --git a/kernel/power/tuxonice_io.h b/kernel/power/tuxonice_io.h
 new file mode 100644
-index 0000000..fe37713
+index 0000000..6f740ca
 --- /dev/null
 +++ b/kernel/power/tuxonice_io.h
 @@ -0,0 +1,74 @@
 +/*
 + * kernel/power/tuxonice_io.h
 + *
-+ * Copyright (C) 2005-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2005-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -16109,14 +15704,14 @@ index 0000000..fe37713
 +extern int toi_max_workers;
 diff --git a/kernel/power/tuxonice_modules.c b/kernel/power/tuxonice_modules.c
 new file mode 100644
-index 0000000..4cc24a9
+index 0000000..b93d176
 --- /dev/null
 +++ b/kernel/power/tuxonice_modules.c
-@@ -0,0 +1,522 @@
+@@ -0,0 +1,525 @@
 +/*
 + * kernel/power/tuxonice_modules.c
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + */
 +
@@ -16331,6 +15926,9 @@ index 0000000..4cc24a9
 +{
 +	int i;
 +	struct kobject *kobj;
++
++        if (!hibernation_available())
++          return -ENODEV;
 +
 +	module->enabled = 1;
 +
@@ -16637,14 +16235,14 @@ index 0000000..4cc24a9
 +}
 diff --git a/kernel/power/tuxonice_modules.h b/kernel/power/tuxonice_modules.h
 new file mode 100644
-index 0000000..bf5d749
+index 0000000..d488572
 --- /dev/null
 +++ b/kernel/power/tuxonice_modules.h
 @@ -0,0 +1,211 @@
 +/*
 + * kernel/power/tuxonice_modules.h
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -16854,14 +16452,14 @@ index 0000000..bf5d749
 +#endif
 diff --git a/kernel/power/tuxonice_netlink.c b/kernel/power/tuxonice_netlink.c
 new file mode 100644
-index 0000000..75b4aa9
+index 0000000..0a40aa8
 --- /dev/null
 +++ b/kernel/power/tuxonice_netlink.c
 @@ -0,0 +1,329 @@
 +/*
 + * kernel/power/tuxonice_netlink.c
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -17189,14 +16787,14 @@ index 0000000..75b4aa9
 +EXPORT_SYMBOL_GPL(toi_netlink_setup);
 diff --git a/kernel/power/tuxonice_netlink.h b/kernel/power/tuxonice_netlink.h
 new file mode 100644
-index 0000000..b8ef06e
+index 0000000..952f67b
 --- /dev/null
 +++ b/kernel/power/tuxonice_netlink.h
 @@ -0,0 +1,62 @@
 +/*
 + * kernel/power/tuxonice_netlink.h
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -17257,7 +16855,7 @@ index 0000000..b8ef06e
 +#endif
 diff --git a/kernel/power/tuxonice_pagedir.c b/kernel/power/tuxonice_pagedir.c
 new file mode 100644
-index 0000000..ce0d38c
+index 0000000..6934114
 --- /dev/null
 +++ b/kernel/power/tuxonice_pagedir.c
 @@ -0,0 +1,346 @@
@@ -17267,7 +16865,7 @@ index 0000000..ce0d38c
 + * Copyright (C) 1998-2001 Gabor Kuti <seasons@fornax.hu>
 + * Copyright (C) 1998,2001,2002 Pavel Machek <pavel@suse.cz>
 + * Copyright (C) 2002-2003 Florent Chabaud <fchabaud@free.fr>
-+ * Copyright (C) 2006-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2006-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -17609,14 +17207,14 @@ index 0000000..ce0d38c
 +}
 diff --git a/kernel/power/tuxonice_pagedir.h b/kernel/power/tuxonice_pagedir.h
 new file mode 100644
-index 0000000..d08e4b1
+index 0000000..0c7321e
 --- /dev/null
 +++ b/kernel/power/tuxonice_pagedir.h
 @@ -0,0 +1,50 @@
 +/*
 + * kernel/power/tuxonice_pagedir.h
 + *
-+ * Copyright (C) 2006-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2006-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -17665,14 +17263,14 @@ index 0000000..d08e4b1
 +#endif
 diff --git a/kernel/power/tuxonice_pageflags.c b/kernel/power/tuxonice_pageflags.c
 new file mode 100644
-index 0000000..77fab4f
+index 0000000..a3780e5
 --- /dev/null
 +++ b/kernel/power/tuxonice_pageflags.c
 @@ -0,0 +1,29 @@
 +/*
 + * kernel/power/tuxonice_pageflags.c
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -17700,14 +17298,14 @@ index 0000000..77fab4f
 +EXPORT_SYMBOL_GPL(toi_pageflags_space_needed);
 diff --git a/kernel/power/tuxonice_pageflags.h b/kernel/power/tuxonice_pageflags.h
 new file mode 100644
-index 0000000..d5aa7b1
+index 0000000..3d6d471
 --- /dev/null
 +++ b/kernel/power/tuxonice_pageflags.h
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,80 @@
 +/*
 + * kernel/power/tuxonice_pageflags.h
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + */
@@ -17722,6 +17320,7 @@ index 0000000..d5aa7b1
 +extern struct memory_bitmap *io_map;
 +extern struct memory_bitmap *nosave_map;
 +extern struct memory_bitmap *free_map;
++extern struct memory_bitmap *compare_map;
 +
 +#define PagePageset1(page) \
 +	(memory_bm_test_bit(pageset1_map, page_to_pfn(page)))
@@ -17772,20 +17371,27 @@ index 0000000..d5aa7b1
 +#define ClearPageNosaveFree(page) \
 +	(memory_bm_clear_bit(free_map, page_to_pfn(page)))
 +
++#define PageCompareChanged(page) (compare_map ? \
++		memory_bm_test_bit(compare_map, page_to_pfn(page)) : 0)
++#define SetPageCompareChanged(page) \
++	(memory_bm_set_bit(compare_map, page_to_pfn(page)))
++#define ClearPageCompareChanged(page) \
++	(memory_bm_clear_bit(compare_map, page_to_pfn(page)))
++
 +extern void save_pageflags(struct memory_bitmap *pagemap);
 +extern int load_pageflags(struct memory_bitmap *pagemap);
 +extern int toi_pageflags_space_needed(void);
 +#endif
 diff --git a/kernel/power/tuxonice_power_off.c b/kernel/power/tuxonice_power_off.c
 new file mode 100644
-index 0000000..1604a95
+index 0000000..6ac5ea71
 --- /dev/null
 +++ b/kernel/power/tuxonice_power_off.c
 @@ -0,0 +1,287 @@
 +/*
 + * kernel/power/tuxonice_power_off.c
 + *
-+ * Copyright (C) 2006-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2006-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -18071,14 +17677,14 @@ index 0000000..1604a95
 +}
 diff --git a/kernel/power/tuxonice_power_off.h b/kernel/power/tuxonice_power_off.h
 new file mode 100644
-index 0000000..9aa0ea8
+index 0000000..804293d
 --- /dev/null
 +++ b/kernel/power/tuxonice_power_off.h
 @@ -0,0 +1,24 @@
 +/*
 + * kernel/power/tuxonice_power_off.h
 + *
-+ * Copyright (C) 2006-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2006-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -18101,14 +17707,14 @@ index 0000000..9aa0ea8
 +extern void platform_restore_cleanup(int platform_mode);
 diff --git a/kernel/power/tuxonice_prepare_image.c b/kernel/power/tuxonice_prepare_image.c
 new file mode 100644
-index 0000000..a2d4259
+index 0000000..64c71c0
 --- /dev/null
 +++ b/kernel/power/tuxonice_prepare_image.c
-@@ -0,0 +1,1115 @@
+@@ -0,0 +1,1118 @@
 +/*
 + * kernel/power/tuxonice_prepare_image.c
 + *
-+ * Copyright (C) 2003-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2003-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -18822,9 +18428,9 @@ index 0000000..a2d4259
 +static int size_of_free_region(struct zone *zone, unsigned long start_pfn)
 +{
 +	unsigned long this_pfn = start_pfn,
-+		      end_pfn = zone->zone_start_pfn + zone->spanned_pages - 1;
++		      end_pfn = zone_end_pfn(zone);
 +
-+	while (pfn_valid(this_pfn) && this_pfn <= end_pfn && PageNosaveFree(pfn_to_page(this_pfn)))
++	while (pfn_valid(this_pfn) && this_pfn < end_pfn && PageNosaveFree(pfn_to_page(this_pfn)))
 +		this_pfn++;
 +
 +	return this_pfn - start_pfn;
@@ -19160,6 +18766,9 @@ index 0000000..a2d4259
 +	if (attempt_to_freeze())
 +		return 1;
 +
++	lock_device_hotplug();
++	set_toi_state(TOI_DEVICE_HOTPLUG_LOCKED);
++
 +	if (!extra_pd1_pages_allowance)
 +		get_extra_pd1_allowance();
 +
@@ -19222,14 +18831,14 @@ index 0000000..a2d4259
 +}
 diff --git a/kernel/power/tuxonice_prepare_image.h b/kernel/power/tuxonice_prepare_image.h
 new file mode 100644
-index 0000000..2a2ca0b
+index 0000000..73e8bf2
 --- /dev/null
 +++ b/kernel/power/tuxonice_prepare_image.h
 @@ -0,0 +1,38 @@
 +/*
 + * kernel/power/tuxonice_prepare_image.h
 + *
-+ * Copyright (C) 2003-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2003-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -19691,14 +19300,14 @@ index 0000000..9a9444d
 +#endif
 diff --git a/kernel/power/tuxonice_storage.c b/kernel/power/tuxonice_storage.c
 new file mode 100644
-index 0000000..dcf83f4
+index 0000000..8a1f1eb
 --- /dev/null
 +++ b/kernel/power/tuxonice_storage.c
 @@ -0,0 +1,283 @@
 +/*
 + * kernel/power/tuxonice_storage.c
 + *
-+ * Copyright (C) 2005-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2005-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -19980,14 +19589,14 @@ index 0000000..dcf83f4
 +}
 diff --git a/kernel/power/tuxonice_storage.h b/kernel/power/tuxonice_storage.h
 new file mode 100644
-index 0000000..8c6b5a7
+index 0000000..e43a603
 --- /dev/null
 +++ b/kernel/power/tuxonice_storage.h
 @@ -0,0 +1,45 @@
 +/*
 + * kernel/power/tuxonice_storage.h
 + *
-+ * Copyright (C) 2005-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2005-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + */
@@ -20031,14 +19640,14 @@ index 0000000..8c6b5a7
 +};
 diff --git a/kernel/power/tuxonice_swap.c b/kernel/power/tuxonice_swap.c
 new file mode 100644
-index 0000000..a6c0d76
+index 0000000..298cb81
 --- /dev/null
 +++ b/kernel/power/tuxonice_swap.c
 @@ -0,0 +1,463 @@
 +/*
 + * kernel/power/tuxonice_swap.c
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * Distributed under GPLv2.
 + *
@@ -20500,14 +20109,14 @@ index 0000000..a6c0d76
 +#endif
 diff --git a/kernel/power/tuxonice_sysfs.c b/kernel/power/tuxonice_sysfs.c
 new file mode 100644
-index 0000000..0088409
+index 0000000..fd3ed29
 --- /dev/null
 +++ b/kernel/power/tuxonice_sysfs.c
 @@ -0,0 +1,335 @@
 +/*
 + * kernel/power/tuxonice_sysfs.c
 + *
-+ * Copyright (C) 2002-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2002-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -20841,14 +20450,14 @@ index 0000000..0088409
 +}
 diff --git a/kernel/power/tuxonice_sysfs.h b/kernel/power/tuxonice_sysfs.h
 new file mode 100644
-index 0000000..4185c6d
+index 0000000..7ac9e64
 --- /dev/null
 +++ b/kernel/power/tuxonice_sysfs.h
 @@ -0,0 +1,137 @@
 +/*
 + * kernel/power/tuxonice_sysfs.h
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + */
@@ -20984,7 +20593,7 @@ index 0000000..4185c6d
 +extern void toi_sysfs_exit(void);
 diff --git a/kernel/power/tuxonice_ui.c b/kernel/power/tuxonice_ui.c
 new file mode 100644
-index 0000000..452b3db
+index 0000000..ae962a7
 --- /dev/null
 +++ b/kernel/power/tuxonice_ui.c
 @@ -0,0 +1,250 @@
@@ -20994,7 +20603,7 @@ index 0000000..452b3db
 + * Copyright (C) 1998-2001 Gabor Kuti <seasons@fornax.hu>
 + * Copyright (C) 1998,2001,2002 Pavel Machek <pavel@suse.cz>
 + * Copyright (C) 2002-2003 Florent Chabaud <fchabaud@free.fr>
-+ * Copyright (C) 2002-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2002-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -21240,14 +20849,14 @@ index 0000000..452b3db
 +}
 diff --git a/kernel/power/tuxonice_ui.h b/kernel/power/tuxonice_ui.h
 new file mode 100644
-index 0000000..4ced165
+index 0000000..64ffc67
 --- /dev/null
 +++ b/kernel/power/tuxonice_ui.h
 @@ -0,0 +1,97 @@
 +/*
 + * kernel/power/tuxonice_ui.h
 + *
-+ * Copyright (C) 2004-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2004-2014 Nigel Cunningham (nigel at tuxonice net)
 + */
 +
 +enum {
@@ -21343,15 +20952,15 @@ index 0000000..4ced165
 +extern void toi_remove_ui_ops(struct ui_ops *this_ui);
 diff --git a/kernel/power/tuxonice_userui.c b/kernel/power/tuxonice_userui.c
 new file mode 100644
-index 0000000..bc74672
+index 0000000..2753138
 --- /dev/null
 +++ b/kernel/power/tuxonice_userui.c
-@@ -0,0 +1,667 @@
+@@ -0,0 +1,676 @@
 +/*
 + * kernel/power/user_ui.c
 + *
 + * Copyright (C) 2005-2007 Bernard Blackham
-+ * Copyright (C) 2002-2010 Nigel Cunningham (nigel at tuxonice net)
++ * Copyright (C) 2002-2014 Nigel Cunningham (nigel at tuxonice net)
 + *
 + * This file is released under the GPLv2.
 + *
@@ -21404,6 +21013,13 @@ index 0000000..bc74672
 +static int progress_granularity = 30;
 +
 +static DECLARE_WAIT_QUEUE_HEAD(userui_wait_for_key);
++static int userui_wait_should_wake;
++
++#define toi_stop_waiting_for_userui_key() \
++{ \
++	userui_wait_should_wake = true; \
++	wake_up_interruptible(&userui_wait_for_key); \
++}
 +
 +/**
 + * ui_nl_set_state - Update toi_action based on a message from userui.
@@ -21429,7 +21045,7 @@ index 0000000..bc74672
 +
 +	if (!test_action_state(TOI_PAUSE) &&
 +			!test_action_state(TOI_SINGLESTEP))
-+		wake_up_interruptible(&userui_wait_for_key);
++		toi_stop_waiting_for_userui_key();
 +}
 +
 +/**
@@ -21636,7 +21252,8 @@ index 0000000..bc74672
 +	add_wait_queue(&userui_wait_for_key, &wait);
 +	set_current_state(TASK_INTERRUPTIBLE);
 +
-+	interruptible_sleep_on(&userui_wait_for_key);
++	wait_event_interruptible(userui_wait_for_key, userui_wait_should_wake);
++	userui_wait_should_wake = false;
 +
 +	set_current_state(TASK_RUNNING);
 +	remove_wait_queue(&userui_wait_for_key, &wait);
@@ -21755,7 +21372,7 @@ index 0000000..bc74672
 +	toi_prepare_status(CLEAR_BAR, "--- ESCAPE PRESSED :"
 +					" ABORTING HIBERNATION ---");
 +	set_abort_result(TOI_ABORT_REQUESTED);
-+	wake_up_interruptible(&userui_wait_for_key);
++	toi_stop_waiting_for_userui_key();
 +}
 +
 +/**
@@ -21818,7 +21435,7 @@ index 0000000..bc74672
 +		toi_bkd.toi_debug_state = (*data);
 +		return 0;
 +	case USERUI_MSG_SPACE:
-+		wake_up_interruptible(&userui_wait_for_key);
++		toi_stop_waiting_for_userui_key();
 +		return 0;
 +	case USERUI_MSG_GET_POWERDOWN_METHOD:
 +		toi_send_netlink_message(&ui_helper_data,
@@ -21987,10 +21604,11 @@ index 0000000..bc74672
 +	ui_helper_data.not_ready = userui_cleanup_console;
 +	init_completion(&ui_helper_data.wait_for_process);
 +	result = toi_register_module(&userui_ops);
-+	if (!result)
-+		result = toi_register_ui_ops(&my_ui_ops);
-+	if (result)
-+		toi_unregister_module(&userui_ops);
++        if (!result) {
++          result = toi_register_ui_ops(&my_ui_ops);
++          if (result)
++            toi_unregister_module(&userui_ops);
++        }
 +
 +	return result;
 +}
@@ -22015,7 +21633,7 @@ index 0000000..bc74672
 +late_initcall(toi_user_ui_init);
 +#endif
 diff --git a/kernel/power/user.c b/kernel/power/user.c
-index 4ed81e7..793144d 100644
+index 526e891..ca9566a 100644
 --- a/kernel/power/user.c
 +++ b/kernel/power/user.c
 @@ -12,6 +12,7 @@
@@ -22026,7 +21644,7 @@ index 4ed81e7..793144d 100644
  #include <linux/string.h>
  #include <linux/device.h>
  #include <linux/miscdevice.h>
-@@ -42,6 +43,7 @@ static struct snapshot_data {
+@@ -43,6 +44,7 @@ static struct snapshot_data {
  } snapshot_state;
  
  atomic_t snapshot_device_available = ATOMIC_INIT(1);
@@ -22035,7 +21653,7 @@ index 4ed81e7..793144d 100644
  static int snapshot_open(struct inode *inode, struct file *filp)
  {
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 5b5a708..ba8837b 100644
+index 13e839d..63007ec 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -34,6 +34,7 @@
@@ -22046,23 +21664,23 @@ index 5b5a708..ba8837b 100644
  #include <linux/kexec.h>
  #include <linux/kdb.h>
  #include <linux/ratelimit.h>
-@@ -67,6 +68,7 @@ int console_printk[4] = {
- 	MINIMUM_CONSOLE_LOGLEVEL,	/* minimum_console_loglevel */
- 	DEFAULT_CONSOLE_LOGLEVEL,	/* default_console_loglevel */
+@@ -60,6 +61,7 @@ int console_printk[4] = {
+ 	CONSOLE_LOGLEVEL_MIN,		/* minimum_console_loglevel */
+ 	CONSOLE_LOGLEVEL_DEFAULT,	/* default_console_loglevel */
  };
 +EXPORT_SYMBOL_GPL(console_printk);
  
- /*
-  * Low level drivers may need that to know if they can schedule in
-@@ -1883,6 +1885,7 @@ void suspend_console(void)
+ /* Deferred messaged from sched code are marked by this special level */
+ #define SCHED_MESSAGE_LOGLEVEL -2
+@@ -1987,6 +1989,7 @@ void suspend_console(void)
  	console_suspended = 1;
- 	up(&console_sem);
+ 	up_console_sem();
  }
 +EXPORT_SYMBOL_GPL(suspend_console);
  
  void resume_console(void)
  {
-@@ -1892,6 +1895,7 @@ void resume_console(void)
+@@ -1996,6 +1999,7 @@ void resume_console(void)
  	console_suspended = 0;
  	console_unlock();
  }
@@ -22082,20 +21700,8 @@ index b32b70c..db3d6ea 100644
  
  static int pkmap_count[LAST_PKMAP];
  static unsigned int last_pkmap_nr;
-diff --git a/mm/memory.c b/mm/memory.c
-index af84bc0..9f8b84b5 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -1644,6 +1644,7 @@ no_page_table:
- 		return ERR_PTR(-EFAULT);
- 	return page;
- }
-+EXPORT_SYMBOL_GPL(follow_page_mask);
- 
- static inline int stack_guard_page(struct vm_area_struct *vma, unsigned long addr)
- {
 diff --git a/mm/mmzone.c b/mm/mmzone.c
-index 2ac0afb..d31ec6a 100644
+index bf34fb8..0990dd2 100644
 --- a/mm/mmzone.c
 +++ b/mm/mmzone.c
 @@ -8,11 +8,13 @@
@@ -22129,10 +21735,10 @@ index 2ac0afb..d31ec6a 100644
  static inline int zref_in_nodemask(struct zoneref *zref, nodemask_t *nodes)
  {
 diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 3f0c895..e2d7909 100644
+index e0c9430..113800b 100644
 --- a/mm/page-writeback.c
 +++ b/mm/page-writeback.c
-@@ -108,6 +108,7 @@ unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
+@@ -111,6 +111,7 @@ unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
   * Flag that makes the machine dump writes/reads and block dirtyings.
   */
  int block_dump;
@@ -22141,10 +21747,10 @@ index 3f0c895..e2d7909 100644
  /*
   * Flag that puts the machine in "laptop mode". Doubles as a timeout in jiffies:
 diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index b100255..bfdc130 100644
+index ef44ad7..23c730e 100644
 --- a/mm/page_alloc.c
 +++ b/mm/page_alloc.c
-@@ -140,6 +140,7 @@ void pm_restore_gfp_mask(void)
+@@ -142,6 +142,7 @@ void pm_restore_gfp_mask(void)
  		saved_gfp_mask = 0;
  	}
  }
@@ -22152,7 +21758,7 @@ index b100255..bfdc130 100644
  
  void pm_restrict_gfp_mask(void)
  {
-@@ -148,6 +149,7 @@ void pm_restrict_gfp_mask(void)
+@@ -150,6 +151,7 @@ void pm_restrict_gfp_mask(void)
  	saved_gfp_mask = gfp_allowed_mask;
  	gfp_allowed_mask &= ~GFP_IOFS;
  }
@@ -22160,11 +21766,24 @@ index b100255..bfdc130 100644
  
  bool pm_suspended_storage(void)
  {
+@@ -6587,6 +6589,12 @@ static const struct trace_print_flags pageflag_names[] = {
+ #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+ 	{1UL << PG_compound_lock,	"compound_lock"	},
+ #endif
++#ifdef CONFIG_TOI_INCREMENTAL
++	{1UL << PG_toi_ignore,		"toi_ignore"	},
++	{1UL << PG_toi_ro,		"toi_ro"	},
++	{1UL << PG_toi_cbw,		"toi_cbw"	},
++	{1UL << PG_toi_dirty,		"toi_dirty"	},
++#endif
+ };
+ 
+ static void dump_page_flags(unsigned long flags)
 diff --git a/mm/shmem.c b/mm/shmem.c
-index e43dc55..12f9a1f 100644
+index af68b15..917de57 100644
 --- a/mm/shmem.c
 +++ b/mm/shmem.c
-@@ -1362,7 +1362,7 @@ static int shmem_mmap(struct file *file, struct vm_area_struct *vma)
+@@ -1370,7 +1370,7 @@ static int shmem_mmap(struct file *file, struct vm_area_struct *vma)
  }
  
  static struct inode *shmem_get_inode(struct super_block *sb, const struct inode *dir,
@@ -22173,7 +21792,7 @@ index e43dc55..12f9a1f 100644
  {
  	struct inode *inode;
  	struct shmem_inode_info *info;
-@@ -1383,6 +1383,8 @@ static struct inode *shmem_get_inode(struct super_block *sb, const struct inode
+@@ -1391,6 +1391,8 @@ static struct inode *shmem_get_inode(struct super_block *sb, const struct inode
  		memset(info, 0, (char *)inode - (char *)info);
  		spin_lock_init(&info->lock);
  		info->flags = flags & VM_NORESERVE;
@@ -22182,16 +21801,16 @@ index e43dc55..12f9a1f 100644
  		INIT_LIST_HEAD(&info->swaplist);
  		simple_xattrs_init(&info->xattrs);
  		cache_no_acl(inode);
-@@ -1935,7 +1937,7 @@ shmem_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
+@@ -1934,7 +1936,7 @@ shmem_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
  	struct inode *inode;
  	int error = -ENOSPC;
  
 -	inode = shmem_get_inode(dir->i_sb, dir, mode, dev, VM_NORESERVE);
 +	inode = shmem_get_inode(dir->i_sb, dir, mode, dev, VM_NORESERVE, 0);
  	if (inode) {
- #ifdef CONFIG_TMPFS_POSIX_ACL
- 		error = generic_acl_init(inode, dir);
-@@ -1969,7 +1971,7 @@ shmem_tmpfile(struct inode *dir, struct dentry *dentry, umode_t mode)
+ 		error = simple_acl_create(dir, inode);
+ 		if (error)
+@@ -1963,7 +1965,7 @@ shmem_tmpfile(struct inode *dir, struct dentry *dentry, umode_t mode)
  	struct inode *inode;
  	int error = -ENOSPC;
  
@@ -22200,7 +21819,7 @@ index e43dc55..12f9a1f 100644
  	if (inode) {
  		error = security_inode_init_security(inode, dir,
  						     NULL,
-@@ -2105,7 +2107,7 @@ static int shmem_symlink(struct inode *dir, struct dentry *dentry, const char *s
+@@ -2092,7 +2094,7 @@ static int shmem_symlink(struct inode *dir, struct dentry *dentry, const char *s
  	if (len > PAGE_CACHE_SIZE)
  		return -ENAMETOOLONG;
  
@@ -22209,7 +21828,7 @@ index e43dc55..12f9a1f 100644
  	if (!inode)
  		return -ENOSPC;
  
-@@ -2647,7 +2649,7 @@ int shmem_fill_super(struct super_block *sb, void *data, int silent)
+@@ -2636,7 +2638,7 @@ int shmem_fill_super(struct super_block *sb, void *data, int silent)
  	sb->s_flags |= MS_POSIXACL;
  #endif
  
@@ -22218,7 +21837,7 @@ index e43dc55..12f9a1f 100644
  	if (!inode)
  		goto failed;
  	inode->i_uid = sbinfo->uid;
-@@ -2901,7 +2903,7 @@ EXPORT_SYMBOL_GPL(shmem_truncate_range);
+@@ -2897,7 +2899,7 @@ EXPORT_SYMBOL_GPL(shmem_truncate_range);
  
  #define shmem_vm_ops				generic_file_vm_ops
  #define shmem_file_operations			ramfs_file_operations
@@ -22227,19 +21846,17 @@ index e43dc55..12f9a1f 100644
  #define shmem_acct_size(flags, size)		0
  #define shmem_unacct_size(flags, size)		do {} while (0)
  
-@@ -2918,8 +2920,10 @@ static struct dentry_operations anon_ops = {
-  * @name: name for dentry (to be seen in /proc/<pid>/maps
-  * @size: size to be set for the file
-  * @flags: VM_NORESERVE suppresses pre-accounting of the entire object size
-+ * @atomic_copy: Atomically copy the area when hibernating?
-  */
--struct file *shmem_file_setup(const char *name, loff_t size, unsigned long flags)
-+struct file *shmem_file_setup(const char *name, loff_t size, unsigned long flags,
-+		int atomic_copy)
+@@ -2910,7 +2912,8 @@ static struct dentry_operations anon_ops = {
+ };
+ 
+ static struct file *__shmem_file_setup(const char *name, loff_t size,
+-				       unsigned long flags, unsigned int i_flags)
++				       unsigned long flags, unsigned int i_flags,
++				       int atomic_copy)
  {
  	struct file *res;
  	struct inode *inode;
-@@ -2948,7 +2952,7 @@ struct file *shmem_file_setup(const char *name, loff_t size, unsigned long flags
+@@ -2939,7 +2942,7 @@ static struct file *__shmem_file_setup(const char *name, loff_t size,
  	path.mnt = mntget(shm_mnt);
  
  	res = ERR_PTR(-ENOSPC);
@@ -22248,7 +21865,31 @@ index e43dc55..12f9a1f 100644
  	if (!inode)
  		goto put_dentry;
  
-@@ -2983,7 +2987,7 @@ int shmem_zero_setup(struct vm_area_struct *vma)
+@@ -2975,9 +2978,9 @@ put_memory:
+  * @size: size to be set for the file
+  * @flags: VM_NORESERVE suppresses pre-accounting of the entire object size
+  */
+-struct file *shmem_kernel_file_setup(const char *name, loff_t size, unsigned long flags)
++struct file *shmem_kernel_file_setup(const char *name, loff_t size, unsigned long flags, int atomic_copy)
+ {
+-	return __shmem_file_setup(name, size, flags, S_PRIVATE);
++	return __shmem_file_setup(name, size, flags, S_PRIVATE, atomic_copy);
+ }
+ 
+ /**
+@@ -2986,9 +2989,9 @@ struct file *shmem_kernel_file_setup(const char *name, loff_t size, unsigned lon
+  * @size: size to be set for the file
+  * @flags: VM_NORESERVE suppresses pre-accounting of the entire object size
+  */
+-struct file *shmem_file_setup(const char *name, loff_t size, unsigned long flags)
++struct file *shmem_file_setup(const char *name, loff_t size, unsigned long flags, int atomic_copy)
+ {
+-	return __shmem_file_setup(name, size, flags, 0);
++	return __shmem_file_setup(name, size, flags, 0, atomic_copy);
+ }
+ EXPORT_SYMBOL_GPL(shmem_file_setup);
+ 
+@@ -3001,7 +3004,7 @@ int shmem_zero_setup(struct vm_area_struct *vma)
  	struct file *file;
  	loff_t size = vma->vm_end - vma->vm_start;
  
@@ -22258,7 +21899,7 @@ index e43dc55..12f9a1f 100644
  		return PTR_ERR(file);
  
 diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 6cf2e60..8e51bcf 100644
+index 4c524f7..ab5de7b 100644
 --- a/mm/swapfile.c
 +++ b/mm/swapfile.c
 @@ -9,6 +9,7 @@
@@ -22277,7 +21918,7 @@ index 6cf2e60..8e51bcf 100644
  
  DEFINE_SPINLOCK(swap_lock);
  static unsigned int nr_swapfiles;
-@@ -504,6 +504,56 @@ swp_entry_t get_swap_page_of_type(int type)
+@@ -721,6 +721,62 @@ swp_entry_t get_swap_page_of_type(int type)
  	spin_unlock(&si->lock);
  	return (swp_entry_t) {0};
  }
@@ -22298,6 +21939,7 @@ index 6cf2e60..8e51bcf 100644
 +	si = swap_info[type];
 +	spin_lock(&si->lock);
 +	if (si && (si->flags & SWP_WRITEOK)) {
++		atomic_long_dec(&nr_swap_pages);
 +		/* This is called for allocating swap entry, not cache */
 +		start_at = scan_swap_map(si, 1);
 +		if (start_at) {
@@ -22316,17 +21958,22 @@ index 6cf2e60..8e51bcf 100644
 +			/* first page already done above */
 +			si->inuse_pages += stop_at - start_at;
 +
-+			atomic_long_sub(stop_at - start_at + 1, &nr_swap_pages);
-+			if (start_at + 1 == si->lowest_bit)
++			atomic_long_sub(stop_at - start_at, &nr_swap_pages);
++			if (start_at == si->lowest_bit)
 +				si->lowest_bit = stop_at + 1;
++			if (stop_at == si->highest_bit)
++				si->highest_bit = start_at - 1;
 +			if (si->inuse_pages == si->pages) {
 +				si->lowest_bit = si->max;
 +				si->highest_bit = 0;
 +			}
++			for (i = start_at + 1; i <= stop_at; i++)
++				inc_cluster_info_page(si, si->cluster_info, i);
 +			si->cluster_next = stop_at + 1;
 +			*start = swp_entry(type, start_at);
 +			*end = swp_entry(type, stop_at);
-+		}
++		} else
++			atomic_long_inc(&nr_swap_pages);
 +	}
 +	spin_unlock(&si->lock);
 +}
@@ -22334,7 +21981,7 @@ index 6cf2e60..8e51bcf 100644
  
  static struct swap_info_struct *swap_info_get(swp_entry_t entry)
  {
-@@ -650,6 +700,7 @@ void swapcache_free(swp_entry_t entry, struct page *page)
+@@ -856,6 +912,7 @@ void swapcache_free(swp_entry_t entry, struct page *page)
  		spin_unlock(&p->lock);
  	}
  }
@@ -22342,7 +21989,7 @@ index 6cf2e60..8e51bcf 100644
  
  /*
   * How many references to page are currently swapped out?
-@@ -1359,7 +1410,7 @@ static void drain_mmlist(void)
+@@ -1577,7 +1634,7 @@ static void drain_mmlist(void)
   * Note that the type of this function is sector_t, but it returns page offset
   * into the bdev, not sector offset.
   */
@@ -22351,7 +21998,7 @@ index 6cf2e60..8e51bcf 100644
  {
  	struct swap_info_struct *sis;
  	struct swap_extent *start_se;
-@@ -1386,6 +1437,7 @@ static sector_t map_swap_entry(swp_entry_t entry, struct block_device **bdev)
+@@ -1604,6 +1661,7 @@ static sector_t map_swap_entry(swp_entry_t entry, struct block_device **bdev)
  		BUG_ON(se == start_se);		/* It *must* be present */
  	}
  }
@@ -22359,7 +22006,7 @@ index 6cf2e60..8e51bcf 100644
  
  /*
   * Returns the page offset into bdev for the specified page's swap entry.
-@@ -1708,6 +1760,7 @@ out:
+@@ -1954,6 +2012,7 @@ out:
  	putname(pathname);
  	return err;
  }
@@ -22367,7 +22014,7 @@ index 6cf2e60..8e51bcf 100644
  
  #ifdef CONFIG_PROC_FS
  static unsigned swaps_poll(struct file *file, poll_table *wait)
-@@ -2240,6 +2293,7 @@ out:
+@@ -2561,6 +2620,7 @@ out:
  		mutex_unlock(&inode->i_mutex);
  	return error;
  }
@@ -22375,7 +22022,7 @@ index 6cf2e60..8e51bcf 100644
  
  void si_swapinfo(struct sysinfo *val)
  {
-@@ -2257,6 +2311,7 @@ void si_swapinfo(struct sysinfo *val)
+@@ -2578,6 +2638,7 @@ void si_swapinfo(struct sysinfo *val)
  	val->totalswap = total_swap_pages + nr_to_be_unused;
  	spin_unlock(&swap_lock);
  }
@@ -22383,8 +22030,8 @@ index 6cf2e60..8e51bcf 100644
  
  /*
   * Verify that a swap entry is valid and increment its swap map count.
-@@ -2391,8 +2446,15 @@ pgoff_t __page_file_index(struct page *page)
- 	VM_BUG_ON(!PageSwapCache(page));
+@@ -2722,8 +2783,15 @@ pgoff_t __page_file_index(struct page *page)
+ 	VM_BUG_ON_PAGE(!PageSwapCache(page), page);
  	return swp_offset(swap);
  }
 +
@@ -22400,22 +22047,22 @@ index 6cf2e60..8e51bcf 100644
   * add_swap_count_continuation - called when a swap count is duplicated
   * beyond SWAP_MAP_MAX, it allocates a new page and links that to the entry's
 diff --git a/mm/util.c b/mm/util.c
-index 7441c41..e8f2729 100644
+index 33e9f44..297c5ce 100644
 --- a/mm/util.c
 +++ b/mm/util.c
-@@ -400,6 +400,7 @@ struct address_space *page_mapping(struct page *page)
+@@ -411,6 +411,7 @@ struct address_space *page_mapping(struct page *page)
  		mapping = NULL;
  	return mapping;
  }
 +EXPORT_SYMBOL_GPL(page_mapping);
  
- /* Tracepoints definitions. */
- EXPORT_TRACEPOINT_SYMBOL(kmalloc);
+ int overcommit_ratio_handler(struct ctl_table *table, int write,
+ 			     void __user *buffer, size_t *lenp,
 diff --git a/mm/vmscan.c b/mm/vmscan.c
-index 2cff0d4..a179491 100644
+index 0f16ffe..cf60fc5 100644
 --- a/mm/vmscan.c
 +++ b/mm/vmscan.c
-@@ -1271,7 +1271,7 @@ static int too_many_isolated(struct zone *zone, int file,
+@@ -1365,7 +1365,7 @@ static int too_many_isolated(struct zone *zone, int file,
  {
  	unsigned long inactive, isolated;
  
@@ -22424,7 +22071,7 @@ index 2cff0d4..a179491 100644
  		return 0;
  
  	if (!global_reclaim(sc))
-@@ -2062,6 +2062,9 @@ static inline bool should_continue_reclaim(struct zone *zone,
+@@ -2192,6 +2192,9 @@ static inline bool should_continue_reclaim(struct zone *zone,
  	unsigned long pages_for_compaction;
  	unsigned long inactive_lru_pages;
  
@@ -22434,16 +22081,16 @@ index 2cff0d4..a179491 100644
  	/* If not in reclaim/compaction mode, stop */
  	if (!in_reclaim_compaction(sc))
  		return false;
-@@ -2247,7 +2250,7 @@ static bool shrink_zones(struct zonelist *zonelist, struct scan_control *sc)
- 			if (zone->all_unreclaimable &&
- 					sc->priority != DEF_PRIORITY)
+@@ -2391,7 +2394,7 @@ static bool shrink_zones(struct zonelist *zonelist, struct scan_control *sc)
+ 			if (sc->priority != DEF_PRIORITY &&
+ 			    !zone_reclaimable(zone))
  				continue;	/* Let kswapd poll it */
 -			if (IS_ENABLED(CONFIG_COMPACTION)) {
 +			if (IS_ENABLED(CONFIG_COMPACTION) && !sc->hibernation_mode) {
  				/*
  				 * If we already have plenty of memory free for
  				 * compaction in this zone, don't free any more.
-@@ -2335,6 +2338,11 @@ static unsigned long do_try_to_free_pages(struct zonelist *zonelist,
+@@ -2491,6 +2494,11 @@ static unsigned long do_try_to_free_pages(struct zonelist *zonelist,
  	unsigned long writeback_threshold;
  	bool aborted_reclaim;
  
@@ -22455,7 +22102,7 @@ index 2cff0d4..a179491 100644
  	delayacct_freepages_start();
  
  	if (global_reclaim(sc))
-@@ -3228,6 +3236,11 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
+@@ -3388,6 +3396,11 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
  	if (!populated_zone(zone))
  		return;
  
@@ -22467,7 +22114,7 @@ index 2cff0d4..a179491 100644
  	if (!cpuset_zone_allowed_hardwall(zone, GFP_KERNEL))
  		return;
  	pgdat = zone->zone_pgdat;
-@@ -3288,11 +3301,11 @@ unsigned long zone_reclaimable_pages(struct zone *zone)
+@@ -3413,11 +3426,11 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
   * LRU order by reclaiming preferentially
   * inactive > active > active referenced > active mapped
   */
@@ -22481,7 +22128,7 @@ index 2cff0d4..a179491 100644
  		.may_swap = 1,
  		.may_unmap = 1,
  		.may_writepage = 1,
-@@ -3321,6 +3334,13 @@ unsigned long shrink_all_memory(unsigned long nr_to_reclaim)
+@@ -3443,6 +3456,13 @@ unsigned long shrink_all_memory(unsigned long nr_to_reclaim)
  
  	return nr_reclaimed;
  }
@@ -22495,3 +22142,16 @@ index 2cff0d4..a179491 100644
  #endif /* CONFIG_HIBERNATION */
  
  /* It's optimal to keep kswapds on the same CPUs as their memory, but
+diff --git a/security/keys/big_key.c b/security/keys/big_key.c
+index 8137b27..e2436f9 100644
+--- a/security/keys/big_key.c
++++ b/security/keys/big_key.c
+@@ -70,7 +70,7 @@ int big_key_instantiate(struct key *key, struct key_preparsed_payload *prep)
+ 		 *
+ 		 * TODO: Encrypt the stored data with a temporary key.
+ 		 */
+-		file = shmem_kernel_file_setup("", datalen, 0);
++		file = shmem_kernel_file_setup("", datalen, 0, 0);
+ 		if (IS_ERR(file)) {
+ 			ret = PTR_ERR(file);
+ 			goto err_quota;

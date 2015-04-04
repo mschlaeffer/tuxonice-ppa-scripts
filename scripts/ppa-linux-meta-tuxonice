@@ -8,7 +8,9 @@ PPA=$4
 DPUT=$5
 #DPUT="ppa:tuxonice/tuxonice-testing"
 #DPUT="ppa:tuxonice/ppa"
+
 DEBIAN=debian
+CONTROL=control.common
 
 echo "building $UBUNTU $MAJOR $MINOR $PPA $DPUT"
 
