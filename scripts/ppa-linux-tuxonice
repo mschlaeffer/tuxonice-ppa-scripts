@@ -17,32 +17,45 @@ cd ubuntu-$UBUNTU
 ubuntu-git-clean
 git pull --rebase
 ubuntu-git-checkout $MAJOR.$MINOR
+git branch -D tuxonice
+git checkout -b tuxonice
 
 KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2`
 #KERNEL="2.6.35"
 
 echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
 
-# prepare and apply tuxonice patches
+# prepare and apply tuxonice patche
 echo ../tuxoniceppa/patches/tuxonice-$TOI-$UBUNTU.patch
 #git apply ../tuxonice-$TOI-$UBUNTU.patch
 patch -p1 < ../tuxoniceppa/patches/tuxonice-$TOI-$UBUNTU.patch
 if [ $? -ne 0 ]; then
   exit 1;
 fi
+git add -A
+git commit -m "TuxOnIce: apply tuxonice patch"
+
+# apply initramfs patch
 git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
 if [ $? -ne 0 ]; then
   exit 1;
 fi
+git commit -a -m "TuxOnIce: add tuxonice to initramfs"
 
 CONFIG="config.flavour"
 
-# add tuxonice config
+# rename flavours
 # files: debian.master/config/$ARCH/config.flavour.$FLAVOUR
 for i in `find $DEBIAN/config | grep "$CONFIG"`; do
-  mv $i $i-tuxonice;
-  cat ../tuxoniceppa/config/tuxonice-$UBUNTU.config >> $i-tuxonice;
+  git mv $i $i-tuxonice;
 done
+git commit -m "TuxOnIce: rename config.flavour.* to config.flavour.*-tuxonice"
+
+# add tuxonice config
+for i in `find $DEBIAN/config | grep "$CONFIG"`; do
+  cat ../tuxoniceppa/config/tuxonice-$UBUNTU.config >> $i;
+done
+git commit -a -m "TuxOnIce: add tuxonice config to flavours"
 
 # add tuxonice to kernel-versions.in
 # file: debian.master/d-i/kernel-versions.in
@@ -52,53 +65,55 @@ cat $DEBIAN/d-i/kernel-versions.in.tmp | \
     awk '{ print $1 "\t" $2 "\t" $3"-tuxonice" "\t" $4"-tuxonice" "\t" $5 "\t" $6 "\t" $7 }' \
     > $DEBIAN/d-i/kernel-versions.in
 rm $DEBIAN/d-i/kernel-versions.in.tmp
+git commit -a -m "TuxOnIce: add tuxonice to kernel-versions.in"
 
 # disable udebs since they fail in precise
 #sed -i 's/^\(.*5-udebs.mk.*\)/#\1/' debian/rules
 #sed -i -e 's/\texport SOURCEDIR/\t#export SOURCEDIR/' -e 's/\tdilist/\t#dilist/' debian/rules.d/5-udebs.mk
 sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
+git commit -a -m "TuxOnIce: disable udebs since they fail in precise"
 
 # add tuxonice to vars.$FLAVOUR
 # files: debian.master/control.d/vars.$FLAVOUR
 for i in `find $DEBIAN | grep \/vars\.`; do
-  mv $i $i-tuxonice;
+  git mv $i $i-tuxonice;
 done
 for i in `find $DEBIAN | grep "inclusion-list"`; do
-  mv $i `echo $i | sed 's/\.inclusion-list/-tuxonice.inclusion-list/'`;
+  git mv $i `echo $i | sed 's/\.inclusion-list/-tuxonice.inclusion-list/'`;
 done
+git commit -m "TuxOnIce: add tuxonice to vars.* and generic.inclusion-list"
 
 # add tuxonice to $FLAVOUR.mk
 # files: debian.master/rules.d/$FLAVOUR.mk
-cp -a $DEBIAN/rules.d/ $DEBIAN/rules.d.tmp
-for i in $DEBIAN/rules.d.tmp/*; do
-  sed '/^flavours/s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $i \
-    > `echo $i | sed 's/.tmp//g'`
+for i in $DEBIAN/rules.d/*; do
+  sed -i '/^flavours/s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $i
 done
-rm -rf $DEBIAN/rules.d.tmp
+git commit -a -m "TuxOnIce: add tuxonice to *.mk"
 
 # fix modules.dep
 # (error: lzo not found in initrd)
-cp $DEBIAN/control.stub.in $DEBIAN/control.stub.in.old
-sed '/Build-Depends-Indep/s/$/, cpio/' $DEBIAN/control.stub.in.old > $DEBIAN/control.stub.in
-rm $DEBIAN/control.stub.in.old
+sed -i '/Build-Depends-Indep/s/$/, cpio/' $DEBIAN/control.stub.in
+git commit -a -m "TuxOnIce: fix error that lzo module is not found in initrd"
 
 # add tuxonice to abi
 # files: debian.master/abi/*
-for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v fwinfo | grep -v modules`; do
-  mv $i $i-tuxonice;
+for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v fwinfo | grep -v ignore | grep -v modules`; do
+  git mv $i $i-tuxonice;
 done
-for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep "\.modules"`; do
-  mv $i `echo $i | sed 's/\.modules/-tuxonice.modules/'`;
+for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v ignore | grep "\.modules"`; do
+  git mv $i `echo $i | sed 's/\.modules/-tuxonice.modules/'`;
 done
-for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep "\.compiler"`; do
-  mv $i `echo $i | sed 's/\.compiler/-tuxonice.compiler/'`;
+for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v ignore | grep "\.compiler"`; do
+  git mv $i `echo $i | sed 's/\.compiler/-tuxonice.compiler/'`;
 done
+git commit -m "TuxOnIce: add tuxonice to abi flavors"
 
 # fix abi
 # (error: abi missing while building)
 LAST=`ls -1 $DEBIAN/abi/ | grep $KERNEL | tail -n 1`
-cp -a $DEBIAN/abi/$LAST $DEBIAN/abi/$KERNEL-$MAJOR.$MINOR
+git mv $DEBIAN/abi/$LAST $DEBIAN/abi/$KERNEL-$MAJOR.$MINOR
 echo $MAJOR > $DEBIAN/abi/$KERNEL-$MAJOR.$MINOR/abiname
+git commit -a -m "TuxOnIce: fix abi"
 
 # manual corrections for some builds:
 #cp -a $DEBIAN/abi/$LAST $DEBIAN/abi/$KERNEL-$MAJOR.34
@@ -114,27 +129,29 @@ echo " -- "`bzr whoami`"  "`date -R` >> $DEBIAN/changelog
 echo "" >> $DEBIAN/changelog
 cat $DEBIAN/changelog.old >> $DEBIAN/changelog
 rm $DEBIAN/changelog.old
+git commit -a -m "TuxOnIce: add tuxonice to debian/changelog"
 
 DEBIAN=debian
 
 # add tuxonice to getabis
 # file: debian.master/scripts/misc/getabis
-cp $DEBIAN/scripts/misc/getabis $DEBIAN/scripts/misc/getabis.tmp
-sed '/getall /s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $DEBIAN/scripts/misc/getabis.tmp > $DEBIAN/scripts/misc/getabis
-rm $DEBIAN/scripts/misc/getabis.tmp
+sed -i '/getall /s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $DEBIAN/scripts/misc/getabis
+git commit -a -m "TuxOnIce: add tuxonice to getabis file"
 
 # add skipabi
-cp $DEBIAN/rules.d/0-common-vars.mk $DEBIAN/rules.d/0-common-vars.mk.old
-sed 's/^AUTOBUILD=/skipabi=true\nAUTOBUILD=/' $DEBIAN/rules.d/0-common-vars.mk.old > $DEBIAN/rules.d/0-common-vars.mk
-rm $DEBIAN/rules.d/0-common-vars.mk.old
+sed -i 's/^AUTOBUILD=/skipabi=true\nAUTOBUILD=/' $DEBIAN/rules.d/0-common-vars.mk
+git commit -a -m "TuxOnIce: add skipabi=true option"
 
 if [ "$UBUNTU" = precise ]; then
   cp debian.master/config/enforce debian.master/config/enforce.old
   grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
+  git commit -a -m "TuxOnIce: removing CONFIG_INTEL_IDLE from debian/config/enforce in precise"
 fi
 
 # build package and upload
 fakeroot debian/rules clean
+git add -A
+git commit -m "TuxOnIce: run fakeroot"
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
