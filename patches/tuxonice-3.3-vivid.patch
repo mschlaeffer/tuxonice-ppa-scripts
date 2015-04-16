@@ -1,8 +1,8 @@
 diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
-index f4c71d4..456ccd1 100644
+index 33fca34..1d7f8fc 100644
 --- a/Documentation/kernel-parameters.txt
 +++ b/Documentation/kernel-parameters.txt
-@@ -3687,6 +3687,9 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
+@@ -3764,6 +3764,9 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
  					HIGHMEM regardless of setting
  					of CONFIG_HIGHPTE.
  
@@ -1450,10 +1450,10 @@ index 0000000..3bf0575
 +   testing. His efforts have contributed as much to TuxOnIce as any of the
 +   names above.
 diff --git a/MAINTAINERS b/MAINTAINERS
-index c721042..49968a6 100644
+index 1c113a4..7367494 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -9568,6 +9568,13 @@ S:	Maintained
+@@ -9836,6 +9836,13 @@ S:	Maintained
  F:	drivers/tc/
  F:	include/linux/tc.h
  
@@ -1468,10 +1468,10 @@ index c721042..49968a6 100644
  M:	Dario Ballabio <ballabio_dario@emc.com>
  L:	linux-scsi@vger.kernel.org
 diff --git a/arch/powerpc/mm/pgtable_32.c b/arch/powerpc/mm/pgtable_32.c
-index cf11342..aa273d2 100644
+index 50fad38..505eeec 100644
 --- a/arch/powerpc/mm/pgtable_32.c
 +++ b/arch/powerpc/mm/pgtable_32.c
-@@ -437,6 +437,7 @@ void kernel_map_pages(struct page *page, int numpages, int enable)
+@@ -436,6 +436,7 @@ void __kernel_map_pages(struct page *page, int numpages, int enable)
  
  	change_page_attr(page, numpages, enable ? PAGE_KERNEL : __pgprot(0));
  }
@@ -1480,10 +1480,10 @@ index cf11342..aa273d2 100644
  
  static int fixmaps;
 diff --git a/arch/x86/mm/pageattr.c b/arch/x86/mm/pageattr.c
-index 36de293..12cf340 100644
+index 536ea2f..9c0221a 100644
 --- a/arch/x86/mm/pageattr.c
 +++ b/arch/x86/mm/pageattr.c
-@@ -1829,6 +1829,8 @@ void kernel_map_pages(struct page *page, int numpages, int enable)
+@@ -1865,6 +1865,8 @@ void __kernel_map_pages(struct page *page, int numpages, int enable)
  	arch_flush_lazy_mmu_mode();
  }
  
@@ -1492,7 +1492,7 @@ index 36de293..12cf340 100644
  #ifdef CONFIG_HIBERNATION
  
  bool kernel_page_present(struct page *page)
-@@ -1842,7 +1844,7 @@ bool kernel_page_present(struct page *page)
+@@ -1878,7 +1880,7 @@ bool kernel_page_present(struct page *page)
  	pte = lookup_address((unsigned long)page_address(page), &level);
  	return (pte_val(*pte) & _PAGE_PRESENT);
  }
@@ -1574,7 +1574,7 @@ index 00ecc97..91d2ea4 100644
  
  obj-$(CONFIG_BOUNCE)	+= bounce.o
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 93f9152..962f4bb 100644
+index 3ad4055..532b461 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
 @@ -48,6 +48,9 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(block_unplug);
@@ -1587,7 +1587,7 @@ index 93f9152..962f4bb 100644
  /*
   * For the allocated request tables
   */
-@@ -1931,6 +1934,9 @@ void submit_bio(int rw, struct bio *bio)
+@@ -1950,6 +1953,9 @@ void submit_bio(int rw, struct bio *bio)
  {
  	bio->bi_rw |= rw;
  
@@ -2272,7 +2272,7 @@ index c2744b3..680b7d0 100644
  /**
   * pm_get_wakeup_count - Read the number of registered wakeup events.
 diff --git a/drivers/gpu/drm/drm_gem.c b/drivers/gpu/drm/drm_gem.c
-index f6ca512..0c5fe7e 100644
+index 16a1647..e10dcfa 100644
 --- a/drivers/gpu/drm/drm_gem.c
 +++ b/drivers/gpu/drm/drm_gem.c
 @@ -137,7 +137,7 @@ int drm_gem_object_init(struct drm_device *dev,
@@ -2298,7 +2298,7 @@ index bf080ab..1179f6b 100644
  			pr_err("Failed allocating swap storage\n");
  			return PTR_ERR(swap_storage);
 diff --git a/drivers/staging/android/ashmem.c b/drivers/staging/android/ashmem.c
-index ad4f579..d8de73e 100644
+index 8c78527..8fd5394 100644
 --- a/drivers/staging/android/ashmem.c
 +++ b/drivers/staging/android/ashmem.c
 @@ -387,7 +387,7 @@ static int ashmem_mmap(struct file *file, struct vm_area_struct *vma)
@@ -2311,10 +2311,10 @@ index ad4f579..d8de73e 100644
  			ret = PTR_ERR(vmfile);
  			goto out;
 diff --git a/drivers/tty/vt/vt.c b/drivers/tty/vt/vt.c
-index 53c25bc..13c2ccf 100644
+index 3c8d295..31ce9c8 100644
 --- a/drivers/tty/vt/vt.c
 +++ b/drivers/tty/vt/vt.c
-@@ -2510,6 +2510,7 @@ int vt_kmsg_redirect(int new)
+@@ -2527,6 +2527,7 @@ int vt_kmsg_redirect(int new)
  	else
  		return kmsg_con;
  }
@@ -2323,7 +2323,7 @@ index 53c25bc..13c2ccf 100644
  /*
   *	Console on virtual terminal
 diff --git a/fs/drop_caches.c b/fs/drop_caches.c
-index 1de7294..ce2f220 100644
+index 2bc2c87..6710cb6 100644
 --- a/fs/drop_caches.c
 +++ b/fs/drop_caches.c
 @@ -8,6 +8,7 @@
@@ -2334,7 +2334,7 @@ index 1de7294..ce2f220 100644
  #include "internal.h"
  
  /* A global variable is a bit ugly, but it keeps the code simple */
-@@ -50,6 +51,13 @@ static void drop_slab(void)
+@@ -51,6 +52,13 @@ static void drop_slab(void)
  	} while (nr_objects > 10);
  }
  
@@ -2362,7 +2362,7 @@ index eae088f..6abd31b 100644
  
  static char *sb_writers_name[SB_FREEZE_LEVELS] = {
 diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 7347f48..9d3b127 100644
+index efead0b..95a201f 100644
 --- a/include/linux/bio.h
 +++ b/include/linux/bio.h
 @@ -32,6 +32,8 @@
@@ -2375,7 +2375,7 @@ index 7347f48..9d3b127 100644
  
  #ifdef BIO_DEBUG
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 445d592..7503358 100644
+index c294e3e..b2efefd 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
 @@ -120,15 +120,18 @@ struct bio {
@@ -2402,10 +2402,10 @@ index 445d592..7503358 100644
  #define bio_flagged(bio, flag)	((bio)->bi_flags & (1 << (flag)))
  
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 9ab779e..ba67ac6 100644
+index f634198..d678b18 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -1612,6 +1612,8 @@ struct super_operations {
+@@ -1638,6 +1638,8 @@ struct super_operations {
  #define S_IMA		1024	/* Inode has an associated IMA struct */
  #define S_AUTOMOUNT	2048	/* Automount/referral quasi-directory */
  #define S_NOSEC		4096	/* no suid or xattr security attributes */
@@ -2414,7 +2414,7 @@ index 9ab779e..ba67ac6 100644
  
  /*
   * Note that nosuid etc flags are inode-specific: setting some file-system
-@@ -2120,6 +2122,13 @@ extern struct super_block *freeze_bdev(struct block_device *);
+@@ -2147,6 +2149,13 @@ extern struct super_block *freeze_bdev(struct block_device *);
  extern void emergency_thaw_all(void);
  extern int thaw_bdev(struct block_device *bdev, struct super_block *sb);
  extern int fsync_bdev(struct block_device *);
@@ -2454,10 +2454,10 @@ index 0000000..3234135
 +struct block_device *next_bdev_of_type(struct block_device *last,
 +	const char *key);
 diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 86a977b..6e429bc 100644
+index 445d798..e7624d1 100644
 --- a/include/linux/mm.h
 +++ b/include/linux/mm.h
-@@ -2082,6 +2082,7 @@ int drop_caches_sysctl_handler(struct ctl_table *, int,
+@@ -2135,6 +2135,7 @@ int drop_caches_sysctl_handler(struct ctl_table *, int,
  unsigned long shrink_node_slabs(gfp_t gfp_mask, int nid,
  				unsigned long nr_scanned,
  				unsigned long nr_eligible);
@@ -2592,10 +2592,10 @@ index 3388c1b..31d64e5 100644
  
  /* kernel/power/autosleep.c */
 diff --git a/include/linux/swap.h b/include/linux/swap.h
-index 37a585b..6bc0a48 100644
+index 34e8b60..a603c60 100644
 --- a/include/linux/swap.h
 +++ b/include/linux/swap.h
-@@ -297,6 +297,7 @@ extern unsigned long totalram_pages;
+@@ -289,6 +289,7 @@ extern unsigned long totalram_pages;
  extern unsigned long totalreserve_pages;
  extern unsigned long dirty_balance_reserve;
  extern unsigned long nr_free_buffer_pages(void);
@@ -2603,7 +2603,7 @@ index 37a585b..6bc0a48 100644
  extern unsigned long nr_free_pagecache_pages(void);
  
  /* Definition of global_page_state not available yet */
-@@ -336,6 +337,8 @@ extern unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *mem,
+@@ -328,6 +329,8 @@ extern unsigned long mem_cgroup_shrink_node_zone(struct mem_cgroup *mem,
  						struct zone *zone,
  						unsigned long *nr_scanned);
  extern unsigned long shrink_all_memory(unsigned long nr_pages);
@@ -2612,7 +2612,7 @@ index 37a585b..6bc0a48 100644
  extern int vm_swappiness;
  extern int remove_mapping(struct address_space *mapping, struct page *page);
  extern unsigned long vm_total_pages;
-@@ -437,13 +440,17 @@ extern void swapcache_free(swp_entry_t);
+@@ -429,13 +432,17 @@ extern void swapcache_free(swp_entry_t);
  extern int free_swap_and_cache(swp_entry_t);
  extern int swap_type_of(dev_t, sector_t, struct block_device **);
  extern unsigned int count_swap_pages(int, int);
@@ -2644,7 +2644,7 @@ index 1a85940..3025606 100644
  #define NETLINK_INET_DIAG	NETLINK_SOCK_DIAG
  
 diff --git a/init/do_mounts.c b/init/do_mounts.c
-index 9b3565c..febe5b0 100644
+index eb41008..8d0a216 100644
 --- a/init/do_mounts.c
 +++ b/init/do_mounts.c
 @@ -286,6 +286,7 @@ fail:
@@ -2655,7 +2655,7 @@ index 9b3565c..febe5b0 100644
  
  static int __init root_dev_setup(char *line)
  {
-@@ -587,6 +588,8 @@ void __init prepare_namespace(void)
+@@ -589,6 +590,8 @@ void __init prepare_namespace(void)
  	if (is_floppy && rd_doload && rd_load_disk(0))
  		ROOT_DEV = Root_RAM0;
  
@@ -2689,10 +2689,10 @@ index 3e0878e..a49c596 100644
  	sys_mount("..", ".", NULL, MS_MOVE, NULL);
  	/* switch root and cwd back to / of rootfs */
 diff --git a/init/main.c b/init/main.c
-index 321d0ce..683ca0f 100644
+index 61b99376..fc37133 100644
 --- a/init/main.c
 +++ b/init/main.c
-@@ -124,6 +124,7 @@ void (*__initdata late_time_init)(void);
+@@ -126,6 +126,7 @@ void (*__initdata late_time_init)(void);
  char __initdata boot_command_line[COMMAND_LINE_SIZE];
  /* Untouched saved command line (eg. for /proc) */
  char *saved_command_line;
@@ -2701,10 +2701,10 @@ index 321d0ce..683ca0f 100644
  static char *static_command_line;
  /* Command line for per-initcall parameter parsing */
 diff --git a/ipc/shm.c b/ipc/shm.c
-index 0145479..75f2d25 100644
+index 19633b4..41b8854 100644
 --- a/ipc/shm.c
 +++ b/ipc/shm.c
-@@ -543,7 +543,7 @@ static int newseg(struct ipc_namespace *ns, struct ipc_params *params)
+@@ -544,7 +544,7 @@ static int newseg(struct ipc_namespace *ns, struct ipc_params *params)
  		if  ((shmflg & SHM_NORESERVE) &&
  				sysctl_overcommit_memory != OVERCOMMIT_NEVER)
  			acctflag = VM_NORESERVE;
@@ -2714,10 +2714,10 @@ index 0145479..75f2d25 100644
  	error = PTR_ERR(file);
  	if (IS_ERR(file))
 diff --git a/kernel/cpu.c b/kernel/cpu.c
-index 90a3d01..98b82fb 100644
+index 329ec59..375584c 100644
 --- a/kernel/cpu.c
 +++ b/kernel/cpu.c
-@@ -575,6 +575,7 @@ int disable_nonboot_cpus(void)
+@@ -586,6 +586,7 @@ int disable_nonboot_cpus(void)
  	cpu_maps_update_done();
  	return error;
  }
@@ -2725,7 +2725,7 @@ index 90a3d01..98b82fb 100644
  
  void __weak arch_enable_nonboot_cpus_begin(void)
  {
-@@ -615,6 +616,7 @@ void __ref enable_nonboot_cpus(void)
+@@ -626,6 +627,7 @@ void __ref enable_nonboot_cpus(void)
  out:
  	cpu_maps_update_done();
  }
@@ -2734,10 +2734,10 @@ index 90a3d01..98b82fb 100644
  static int __init alloc_frozen_cpus(void)
  {
 diff --git a/kernel/kmod.c b/kernel/kmod.c
-index 80f7a6d..564bf2b 100644
+index 2777f40..b6877a6 100644
 --- a/kernel/kmod.c
 +++ b/kernel/kmod.c
-@@ -451,6 +451,7 @@ void __usermodehelper_set_disable_depth(enum umh_disable_depth depth)
+@@ -429,6 +429,7 @@ void __usermodehelper_set_disable_depth(enum umh_disable_depth depth)
  	wake_up(&usermodehelper_disabled_waitq);
  	up_write(&umhelper_sem);
  }
@@ -2745,7 +2745,7 @@ index 80f7a6d..564bf2b 100644
  
  /**
   * __usermodehelper_disable - Prevent new helpers from being started.
-@@ -484,6 +485,7 @@ int __usermodehelper_disable(enum umh_disable_depth depth)
+@@ -462,6 +463,7 @@ int __usermodehelper_disable(enum umh_disable_depth depth)
  	__usermodehelper_set_disable_depth(UMH_ENABLED);
  	return -EAGAIN;
  }
@@ -2754,10 +2754,10 @@ index 80f7a6d..564bf2b 100644
  static void helper_lock(void)
  {
 diff --git a/kernel/pid.c b/kernel/pid.c
-index 82430c8..adb0238 100644
+index cd36a5e..a2cdb3c 100644
 --- a/kernel/pid.c
 +++ b/kernel/pid.c
-@@ -452,6 +452,7 @@ struct task_struct *find_task_by_pid_ns(pid_t nr, struct pid_namespace *ns)
+@@ -455,6 +455,7 @@ struct task_struct *find_task_by_pid_ns(pid_t nr, struct pid_namespace *ns)
  			   " protection");
  	return pid_task(find_pid_ns(nr, ns), PIDTYPE_PID);
  }
@@ -2766,7 +2766,7 @@ index 82430c8..adb0238 100644
  struct task_struct *find_task_by_vpid(pid_t vnr)
  {
 diff --git a/kernel/power/Kconfig b/kernel/power/Kconfig
-index bbef57f..7053e7e 100644
+index 48b28d3..2d15ffd 100644
 --- a/kernel/power/Kconfig
 +++ b/kernel/power/Kconfig
 @@ -91,6 +91,291 @@ config PM_STD_PARTITION
@@ -3121,11 +3121,11 @@ index aba9c54..856fe7f 100644
  }
 +EXPORT_SYMBOL_GPL(pm_restore_console);
 diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-index 1f35a34..63f91ee 100644
+index 2329daa..8c55224 100644
 --- a/kernel/power/hibernate.c
 +++ b/kernel/power/hibernate.c
-@@ -30,7 +30,7 @@
- #include <linux/genhd.h>
+@@ -31,7 +31,7 @@
+ #include <linux/ktime.h>
  #include <trace/events/power.h>
  
 -#include "power.h"
@@ -3133,7 +3133,7 @@ index 1f35a34..63f91ee 100644
  
  
  static int nocompress;
-@@ -38,7 +38,8 @@ static int noresume;
+@@ -39,7 +39,8 @@ static int noresume;
  static int nohibernate;
  static int resume_wait;
  static unsigned int resume_delay;
@@ -3143,7 +3143,7 @@ index 1f35a34..63f91ee 100644
  dev_t swsusp_resume_device;
  sector_t swsusp_resume_block;
  __visible int in_suspend __nosavedata;
-@@ -122,21 +123,23 @@ static int hibernation_test(int level) { return 0; }
+@@ -123,21 +124,23 @@ static int hibernation_test(int level) { return 0; }
   * platform_begin - Call platform to start hibernation.
   * @platform_mode: Whether or not to use the platform driver.
   */
@@ -3169,7 +3169,7 @@ index 1f35a34..63f91ee 100644
  
  /**
   * platform_pre_snapshot - Call platform to prepare the machine for hibernation.
-@@ -146,11 +149,12 @@ static void platform_end(int platform_mode)
+@@ -147,11 +150,12 @@ static void platform_end(int platform_mode)
   * if so configured, and return an error code if that fails.
   */
  
@@ -3183,7 +3183,7 @@ index 1f35a34..63f91ee 100644
  
  /**
   * platform_leave - Call platform to prepare a transition to the working state.
-@@ -161,11 +165,12 @@ static int platform_pre_snapshot(int platform_mode)
+@@ -162,11 +166,12 @@ static int platform_pre_snapshot(int platform_mode)
   *
   * This routine is called on one CPU with interrupts disabled.
   */
@@ -3197,7 +3197,7 @@ index 1f35a34..63f91ee 100644
  
  /**
   * platform_finish - Call platform to switch the system to the working state.
-@@ -176,11 +181,12 @@ static void platform_leave(int platform_mode)
+@@ -177,11 +182,12 @@ static void platform_leave(int platform_mode)
   *
   * This routine must be called after platform_prepare().
   */
@@ -3211,7 +3211,7 @@ index 1f35a34..63f91ee 100644
  
  /**
   * platform_pre_restore - Prepare for hibernate image restoration.
-@@ -192,11 +198,12 @@ static void platform_finish(int platform_mode)
+@@ -193,11 +199,12 @@ static void platform_finish(int platform_mode)
   * If the restore fails after this function has been called,
   * platform_restore_cleanup() must be called.
   */
@@ -3225,7 +3225,7 @@ index 1f35a34..63f91ee 100644
  
  /**
   * platform_restore_cleanup - Switch to the working state after failing restore.
-@@ -209,21 +216,23 @@ static int platform_pre_restore(int platform_mode)
+@@ -210,21 +217,23 @@ static int platform_pre_restore(int platform_mode)
   * function must be called too, regardless of the result of
   * platform_pre_restore().
   */
@@ -3251,7 +3251,7 @@ index 1f35a34..63f91ee 100644
  
  /**
   * swsusp_show_speed - Print time elapsed between two events during hibernation.
-@@ -587,6 +596,7 @@ int hibernation_platform_enter(void)
+@@ -585,6 +594,7 @@ int hibernation_platform_enter(void)
  
  	return error;
  }
@@ -3259,7 +3259,7 @@ index 1f35a34..63f91ee 100644
  
  /**
   * power_down - Shut the machine down for hibernation.
-@@ -648,6 +658,9 @@ int hibernate(void)
+@@ -646,6 +656,9 @@ int hibernate(void)
  {
  	int error;
  
@@ -3269,7 +3269,7 @@ index 1f35a34..63f91ee 100644
  	if (!hibernation_available()) {
  		pr_debug("PM: Hibernation not available.\n");
  		return -EPERM;
-@@ -737,11 +750,19 @@ int hibernate(void)
+@@ -735,11 +748,19 @@ int hibernate(void)
   * attempts to recover gracefully and make the kernel return to the normal mode
   * of operation.
   */
@@ -3290,7 +3290,7 @@ index 1f35a34..63f91ee 100644
  	/*
  	 * If the user said "noresume".. bail out early.
  	 */
-@@ -1128,6 +1149,7 @@ static int __init hibernate_setup(char *str)
+@@ -1126,6 +1147,7 @@ static int __init hibernate_setup(char *str)
  static int __init noresume_setup(char *str)
  {
  	noresume = 1;
@@ -3335,7 +3335,7 @@ index 9a59d04..c89fb80 100644
  /**
   * state - control system sleep states.
 diff --git a/kernel/power/power.h b/kernel/power/power.h
-index 2df883a..994d7677 100644
+index ce9b832..3ebe48c 100644
 --- a/kernel/power/power.h
 +++ b/kernel/power/power.h
 @@ -36,8 +36,12 @@ static inline char *check_image_kernel(struct swsusp_info *info)
@@ -3343,7 +3343,7 @@ index 2df883a..994d7677 100644
  			"architecture specific data" : NULL;
  }
 +#else
-+extern char *check_image_kernel(struct swsusp_info *info);
++char *check_image_kernel(struct swsusp_info *info);
  #endif /* CONFIG_ARCH_HIBERNATION_HEADER */
 +extern int init_header(struct swsusp_info *info);
  
@@ -3360,16 +3360,16 @@ index 2df883a..994d7677 100644
  /* Preferred image size in bytes (default 500 MB) */
  extern unsigned long image_size;
  /* Size of memory reserved for drivers (default SPARE_PAGES x PAGE_SIZE) */
-@@ -270,6 +276,31 @@ static inline void suspend_thaw_processes(void)
+@@ -269,6 +275,31 @@ static inline void suspend_thaw_processes(void)
  }
  #endif
  
 +extern struct page *saveable_page(struct zone *z, unsigned long p);
 +#ifdef CONFIG_HIGHMEM
-+extern void *saveable_highmem_page(struct zone *z, unsigned long p);
++struct page *saveable_highmem_page(struct zone *z, unsigned long p);
 +#else
 +static
-+inline void *saveable_highmem_page(struct zone *z, unsigned long p)
++inline struct page *saveable_highmem_page(struct zone *z, unsigned long p)
 +{
 +	return NULL;
 +}
@@ -3392,7 +3392,7 @@ index 2df883a..994d7677 100644
  #ifdef CONFIG_PM_AUTOSLEEP
  
  /* kernel/power/autosleep.c */
-@@ -296,3 +327,10 @@ extern int pm_wake_lock(const char *buf);
+@@ -295,3 +326,10 @@ extern int pm_wake_lock(const char *buf);
  extern int pm_wake_unlock(const char *buf);
  
  #endif /* !CONFIG_PM_WAKELOCKS */
@@ -3437,10 +3437,10 @@ index 5a6ec86..a2c292c 100644
  }
 +EXPORT_SYMBOL_GPL(thaw_kernel_threads);
 diff --git a/kernel/power/snapshot.c b/kernel/power/snapshot.c
-index 791a618..dfc1935 100644
+index 0c40c16..f20b952 100644
 --- a/kernel/power/snapshot.c
 +++ b/kernel/power/snapshot.c
-@@ -35,6 +35,9 @@
+@@ -36,6 +36,9 @@
  #include <asm/tlbflush.h>
  #include <asm/io.h>
  
@@ -3450,7 +3450,7 @@ index 791a618..dfc1935 100644
  #include "power.h"
  
  static int swsusp_page_is_free(struct page *);
-@@ -97,6 +100,9 @@ static void *get_image_page(gfp_t gfp_mask, int safe_needed)
+@@ -98,6 +101,9 @@ static void *get_image_page(gfp_t gfp_mask, int safe_needed)
  {
  	void *res;
  
@@ -3460,7 +3460,7 @@ index 791a618..dfc1935 100644
  	res = (void *)get_zeroed_page(gfp_mask);
  	if (safe_needed)
  		while (res && swsusp_page_is_free(virt_to_page(res))) {
-@@ -142,6 +148,11 @@ static inline void free_image_page(void *addr, int clear_nosave_free)
+@@ -143,6 +149,11 @@ static inline void free_image_page(void *addr, int clear_nosave_free)
  
  	page = virt_to_page(addr);
  
@@ -3472,7 +3472,7 @@ index 791a618..dfc1935 100644
  	swsusp_unset_page_forbidden(page);
  	if (clear_nosave_free)
  		swsusp_unset_page_free(page);
-@@ -301,13 +312,15 @@ struct bm_position {
+@@ -302,13 +313,15 @@ struct bm_position {
  	int node_bit;
  };
  
@@ -3489,7 +3489,7 @@ index 791a618..dfc1935 100644
  };
  
  /* Functions that operate on memory bitmaps */
-@@ -472,16 +485,39 @@ static void free_zone_bm_rtree(struct mem_zone_bm_rtree *zone,
+@@ -473,16 +486,39 @@ static void free_zone_bm_rtree(struct mem_zone_bm_rtree *zone,
  		free_image_page(node->data, clear_nosave_free);
  }
  
@@ -3534,7 +3534,7 @@ index 791a618..dfc1935 100644
  static void memory_bm_free(struct memory_bitmap *bm, int clear_nosave_free);
  
  struct mem_extent {
-@@ -594,7 +630,8 @@ memory_bm_create(struct memory_bitmap *bm, gfp_t gfp_mask, int safe_needed)
+@@ -595,7 +631,8 @@ memory_bm_create(struct memory_bitmap *bm, gfp_t gfp_mask, int safe_needed)
  	}
  
  	bm->p_list = ca.chain;
@@ -3544,7 +3544,7 @@ index 791a618..dfc1935 100644
   Exit:
  	free_mem_extents(&mem_extents);
  	return error;
-@@ -630,14 +667,24 @@ static void memory_bm_free(struct memory_bitmap *bm, int clear_nosave_free)
+@@ -631,14 +668,24 @@ static void memory_bm_free(struct memory_bitmap *bm, int clear_nosave_free)
   *	It walks the radix tree to find the page which contains the bit for
   *	pfn and returns the bit position in **addr and *bit_nr.
   */
@@ -3572,7 +3572,7 @@ index 791a618..dfc1935 100644
  
  	if (pfn >= zone->start_pfn && pfn < zone->end_pfn)
  		goto zone_found;
-@@ -661,8 +708,8 @@ zone_found:
+@@ -662,8 +709,8 @@ zone_found:
  	 * node for our pfn.
  	 */
  
@@ -3583,7 +3583,7 @@ index 791a618..dfc1935 100644
  		goto node_found;
  
  	node      = zone->rtree;
-@@ -679,9 +726,9 @@ zone_found:
+@@ -680,9 +727,9 @@ zone_found:
  
  node_found:
  	/* Update last position */
@@ -3596,7 +3596,7 @@ index 791a618..dfc1935 100644
  
  	/* Set return values */
  	*addr = node->data;
-@@ -690,66 +737,66 @@ node_found:
+@@ -691,66 +738,66 @@ node_found:
  	return 0;
  }
  
@@ -3676,7 +3676,7 @@ index 791a618..dfc1935 100644
  }
  
  /*
-@@ -762,25 +809,25 @@ static bool memory_bm_pfn_present(struct memory_bitmap *bm, unsigned long pfn)
+@@ -763,25 +810,25 @@ static bool memory_bm_pfn_present(struct memory_bitmap *bm, unsigned long pfn)
   *
   *	Returns true if there is a next node, false otherwise.
   */
@@ -3712,7 +3712,7 @@ index 791a618..dfc1935 100644
  		return true;
  	}
  
-@@ -798,38 +845,29 @@ static bool rtree_next_node(struct memory_bitmap *bm)
+@@ -799,38 +846,29 @@ static bool rtree_next_node(struct memory_bitmap *bm)
   *	It is required to run memory_bm_position_reset() before the
   *	first call to this function.
   */
@@ -3762,7 +3762,7 @@ index 791a618..dfc1935 100644
  
  /**
   *	register_nosave_region - register a range of page frames the contents
-@@ -888,37 +926,37 @@ static struct memory_bitmap *free_pages_map;
+@@ -889,37 +927,37 @@ static struct memory_bitmap *free_pages_map;
  void swsusp_set_page_free(struct page *page)
  {
  	if (free_pages_map)
@@ -3806,7 +3806,7 @@ index 791a618..dfc1935 100644
  }
  
  /**
-@@ -949,7 +987,7 @@ static void mark_nosave_pages(struct memory_bitmap *bm)
+@@ -950,7 +988,7 @@ static void mark_nosave_pages(struct memory_bitmap *bm)
  				 * touch the PFNs for which the error is
  				 * returned anyway.
  				 */
@@ -3815,7 +3815,7 @@ index 791a618..dfc1935 100644
  			}
  	}
  }
-@@ -1096,7 +1134,7 @@ static unsigned int count_free_highmem_pages(void)
+@@ -1097,7 +1135,7 @@ static unsigned int count_free_highmem_pages(void)
   *	We should save the page if it isn't Nosave or NosaveFree, or Reserved,
   *	and it isn't a part of a free chunk of pages.
   */
@@ -3824,7 +3824,7 @@ index 791a618..dfc1935 100644
  {
  	struct page *page;
  
-@@ -1143,11 +1181,6 @@ static unsigned int count_highmem_pages(void)
+@@ -1144,11 +1182,6 @@ static unsigned int count_highmem_pages(void)
  	}
  	return n;
  }
@@ -3836,7 +3836,7 @@ index 791a618..dfc1935 100644
  #endif /* CONFIG_HIGHMEM */
  
  /**
-@@ -1158,7 +1191,7 @@ static inline void *saveable_highmem_page(struct zone *z, unsigned long p)
+@@ -1159,7 +1192,7 @@ static inline void *saveable_highmem_page(struct zone *z, unsigned long p)
   *	of pages statically defined as 'unsaveable', and it isn't a part of
   *	a free chunk of pages.
   */
@@ -3845,7 +3845,7 @@ index 791a618..dfc1935 100644
  {
  	struct page *page;
  
-@@ -1296,15 +1329,15 @@ copy_data_pages(struct memory_bitmap *copy_bm, struct memory_bitmap *orig_bm)
+@@ -1297,15 +1330,15 @@ copy_data_pages(struct memory_bitmap *copy_bm, struct memory_bitmap *orig_bm)
  		max_zone_pfn = zone_end_pfn(zone);
  		for (pfn = zone->zone_start_pfn; pfn < max_zone_pfn; pfn++)
  			if (page_is_saveable(zone, pfn))
@@ -3864,7 +3864,7 @@ index 791a618..dfc1935 100644
  	}
  }
  
-@@ -1350,8 +1383,8 @@ void swsusp_free(void)
+@@ -1351,8 +1384,8 @@ void swsusp_free(void)
  	memory_bm_position_reset(free_pages_map);
  
  loop:
@@ -3875,7 +3875,7 @@ index 791a618..dfc1935 100644
  
  	/*
  	 * Find the next bit set in both bitmaps. This is guaranteed to
-@@ -1359,16 +1392,16 @@ loop:
+@@ -1360,16 +1393,16 @@ loop:
  	 */
  	do {
  		if (fb_pfn < fr_pfn)
@@ -3896,7 +3896,7 @@ index 791a618..dfc1935 100644
  		__free_page(page);
  		goto loop;
  	}
-@@ -1403,7 +1436,7 @@ static unsigned long preallocate_image_pages(unsigned long nr_pages, gfp_t mask)
+@@ -1404,7 +1437,7 @@ static unsigned long preallocate_image_pages(unsigned long nr_pages, gfp_t mask)
  		page = alloc_image_page(mask);
  		if (!page)
  			break;
@@ -3905,7 +3905,7 @@ index 791a618..dfc1935 100644
  		if (PageHighMem(page))
  			alloc_highmem++;
  		else
-@@ -1498,7 +1531,7 @@ static void free_unnecessary_pages(void)
+@@ -1499,7 +1532,7 @@ static void free_unnecessary_pages(void)
  	memory_bm_position_reset(&copy_bm);
  
  	while (to_free_normal > 0 || to_free_highmem > 0) {
@@ -3914,7 +3914,7 @@ index 791a618..dfc1935 100644
  		struct page *page = pfn_to_page(pfn);
  
  		if (PageHighMem(page)) {
-@@ -1512,7 +1545,7 @@ static void free_unnecessary_pages(void)
+@@ -1513,7 +1546,7 @@ static void free_unnecessary_pages(void)
  			to_free_normal--;
  			alloc_normal--;
  		}
@@ -3923,7 +3923,16 @@ index 791a618..dfc1935 100644
  		swsusp_unset_page_forbidden(page);
  		swsusp_unset_page_free(page);
  		__free_page(page);
-@@ -1838,7 +1871,7 @@ swsusp_alloc(struct memory_bitmap *orig_bm, struct memory_bitmap *copy_bm,
+@@ -1796,7 +1829,7 @@ alloc_highmem_pages(struct memory_bitmap *bm, unsigned int nr_highmem)
+ 		struct page *page;
+ 
+ 		page = alloc_image_page(__GFP_HIGHMEM);
+-		memory_bm_set_bit(bm, page_to_pfn(page));
++		memory_bm_set_bit(bm, 0, page_to_pfn(page));
+ 	}
+ 	return nr_highmem;
+ }
+@@ -1839,7 +1872,7 @@ swsusp_alloc(struct memory_bitmap *orig_bm, struct memory_bitmap *copy_bm,
  			page = alloc_image_page(GFP_ATOMIC | __GFP_COLD);
  			if (!page)
  				goto err_out;
@@ -3932,7 +3941,7 @@ index 791a618..dfc1935 100644
  		}
  	}
  
-@@ -1853,6 +1886,9 @@ asmlinkage __visible int swsusp_save(void)
+@@ -1854,6 +1887,9 @@ asmlinkage __visible int swsusp_save(void)
  {
  	unsigned int nr_pages, nr_highmem;
  
@@ -3942,7 +3951,16 @@ index 791a618..dfc1935 100644
  	printk(KERN_INFO "PM: Creating hibernation image:\n");
  
  	drain_local_pages(NULL);
-@@ -1921,7 +1957,7 @@ unsigned long snapshot_get_image_size(void)
+@@ -1901,7 +1937,7 @@ static int init_header_complete(struct swsusp_info *info)
+ 	return 0;
+ }
+ 
+-static char *check_image_kernel(struct swsusp_info *info)
++char *check_image_kernel(struct swsusp_info *info)
+ {
+ 	if (info->version_code != LINUX_VERSION_CODE)
+ 		return "kernel version";
+@@ -1922,7 +1958,7 @@ unsigned long snapshot_get_image_size(void)
  	return nr_copy_pages + nr_meta_pages + 1;
  }
  
@@ -3951,7 +3969,7 @@ index 791a618..dfc1935 100644
  {
  	memset(info, 0, sizeof(struct swsusp_info));
  	info->num_physpages = get_num_physpages();
-@@ -1943,7 +1979,7 @@ pack_pfns(unsigned long *buf, struct memory_bitmap *bm)
+@@ -1944,7 +1980,7 @@ pack_pfns(unsigned long *buf, struct memory_bitmap *bm)
  	int j;
  
  	for (j = 0; j < PAGE_SIZE / sizeof(long); j++) {
@@ -3960,7 +3978,7 @@ index 791a618..dfc1935 100644
  		if (unlikely(buf[j] == BM_END_OF_MAP))
  			break;
  		/* Save page key for data page (s390 only). */
-@@ -1994,7 +2030,7 @@ int snapshot_read_next(struct snapshot_handle *handle)
+@@ -1995,7 +2031,7 @@ int snapshot_read_next(struct snapshot_handle *handle)
  	} else {
  		struct page *page;
  
@@ -3969,7 +3987,7 @@ index 791a618..dfc1935 100644
  		if (PageHighMem(page)) {
  			/* Highmem pages are copied to the buffer,
  			 * because we can't return with a kmapped
-@@ -2036,7 +2072,7 @@ static int mark_unsafe_pages(struct memory_bitmap *bm)
+@@ -2037,7 +2073,7 @@ static int mark_unsafe_pages(struct memory_bitmap *bm)
  	/* Mark pages that correspond to the "original" pfns as "unsafe" */
  	memory_bm_position_reset(bm);
  	do {
@@ -3978,7 +3996,7 @@ index 791a618..dfc1935 100644
  		if (likely(pfn != BM_END_OF_MAP)) {
  			if (likely(pfn_valid(pfn)) && !is_nosave_page(pfn))
  				swsusp_set_page_free(pfn_to_page(pfn));
-@@ -2056,10 +2092,10 @@ duplicate_memory_bitmap(struct memory_bitmap *dst, struct memory_bitmap *src)
+@@ -2057,10 +2093,10 @@ duplicate_memory_bitmap(struct memory_bitmap *dst, struct memory_bitmap *src)
  	unsigned long pfn;
  
  	memory_bm_position_reset(src);
@@ -3992,7 +4010,7 @@ index 791a618..dfc1935 100644
  	}
  }
  
-@@ -2110,8 +2146,8 @@ static int unpack_orig_pfns(unsigned long *buf, struct memory_bitmap *bm)
+@@ -2111,8 +2147,8 @@ static int unpack_orig_pfns(unsigned long *buf, struct memory_bitmap *bm)
  		/* Extract and buffer page key for data page (s390 only). */
  		page_key_memorize(buf + j);
  
@@ -4003,7 +4021,40 @@ index 791a618..dfc1935 100644
  		else
  			return -EFAULT;
  	}
-@@ -2435,7 +2471,7 @@ static void *get_buffer(struct memory_bitmap *bm, struct chain_allocator *ca)
+@@ -2155,12 +2191,12 @@ static unsigned int count_highmem_image_pages(struct memory_bitmap *bm)
+ 	unsigned int cnt = 0;
+ 
+ 	memory_bm_position_reset(bm);
+-	pfn = memory_bm_next_pfn(bm);
++	pfn = memory_bm_next_pfn(bm, 0);
+ 	while (pfn != BM_END_OF_MAP) {
+ 		if (PageHighMem(pfn_to_page(pfn)))
+ 			cnt++;
+ 
+-		pfn = memory_bm_next_pfn(bm);
++		pfn = memory_bm_next_pfn(bm, 0);
+ 	}
+ 	return cnt;
+ }
+@@ -2205,7 +2241,7 @@ prepare_highmem_image(struct memory_bitmap *bm, unsigned int *nr_highmem_p)
+ 		page = alloc_page(__GFP_HIGHMEM);
+ 		if (!swsusp_page_is_free(page)) {
+ 			/* The page is "safe", set its bit the bitmap */
+-			memory_bm_set_bit(bm, page_to_pfn(page));
++			memory_bm_set_bit(bm, 0, page_to_pfn(page));
+ 			safe_highmem_pages++;
+ 		}
+ 		/* Mark the page as allocated */
+@@ -2263,7 +2299,7 @@ get_highmem_page_buffer(struct page *page, struct chain_allocator *ca)
+ 
+ 		/* Copy of the page will be stored in high memory */
+ 		kaddr = buffer;
+-		tmp = pfn_to_page(memory_bm_next_pfn(safe_highmem_bm));
++		tmp = pfn_to_page(memory_bm_next_pfn(safe_highmem_bm, 0));
+ 		safe_highmem_pages--;
+ 		last_highmem_page = tmp;
+ 		pbe->copy_page = tmp;
+@@ -2436,7 +2472,7 @@ static void *get_buffer(struct memory_bitmap *bm, struct chain_allocator *ca)
  {
  	struct pbe *pbe;
  	struct page *page;
@@ -4012,7 +4063,7 @@ index 791a618..dfc1935 100644
  
  	if (pfn == BM_END_OF_MAP)
  		return ERR_PTR(-EFAULT);
-@@ -2622,3 +2658,85 @@ int restore_highmem(void)
+@@ -2623,3 +2659,85 @@ int restore_highmem(void)
  	return 0;
  }
  #endif /* CONFIG_HIGHMEM */
@@ -13274,7 +13325,7 @@ index 0000000..5870fdd
 +
 diff --git a/kernel/power/tuxonice_io.c b/kernel/power/tuxonice_io.c
 new file mode 100644
-index 0000000..551430ce
+index 0000000..c370565
 --- /dev/null
 +++ b/kernel/power/tuxonice_io.c
 @@ -0,0 +1,1934 @@
@@ -13612,9 +13663,9 @@ index 0000000..551430ce
 +{
 +	int index, min, max;
 +	struct page *high_page = NULL,
-+		    **my_last_high_page = &__get_cpu_var(last_high_page),
-+		    **my_last_sought = &__get_cpu_var(last_sought);
-+	struct pbe *this, **my_last_low_page = &__get_cpu_var(last_low_page);
++		    **my_last_high_page = raw_cpu_ptr(last_high_page),
++		    **my_last_sought = raw_cpu_ptr(last_sought);
++	struct pbe *this, **my_last_low_page = raw_cpu_ptr(last_low_page);
 +	void *compare;
 +
 +	if (is_high) {
@@ -13693,7 +13744,7 @@ index 0000000..551430ce
 +		unsigned long *write_pfn)
 +{
 +	struct page *page;
-+	char **my_checksum_locn = &__get_cpu_var(checksum_locn);
++	char **my_checksum_locn = raw_cpu_ptr(checksum_locn);
 +	int result = 0, was_present;
 +
 +	*data_pfn = memory_bm_next_pfn(io_map, 0);
@@ -21289,7 +21340,7 @@ index 526e891..ca9566a 100644
  static int snapshot_open(struct inode *inode, struct file *filp)
  {
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index ced2b84..b95ff18 100644
+index 2cdd353..b7397f2 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -34,6 +34,7 @@
@@ -21306,9 +21357,9 @@ index ced2b84..b95ff18 100644
  };
 +EXPORT_SYMBOL_GPL(console_printk);
  
- /* Deferred messaged from sched code are marked by this special level */
- #define SCHED_MESSAGE_LOGLEVEL -2
-@@ -2039,6 +2041,7 @@ void suspend_console(void)
+ /*
+  * Low level drivers may need that to know if they can schedule in
+@@ -2063,6 +2065,7 @@ void suspend_console(void)
  	console_suspended = 1;
  	up_console_sem();
  }
@@ -21316,7 +21367,7 @@ index ced2b84..b95ff18 100644
  
  void resume_console(void)
  {
-@@ -2048,6 +2051,7 @@ void resume_console(void)
+@@ -2072,6 +2075,7 @@ void resume_console(void)
  	console_suspended = 0;
  	console_unlock();
  }
@@ -21325,7 +21376,7 @@ index ced2b84..b95ff18 100644
  /**
   * console_cpu_notify - print deferred console messages after CPU hotplug
 diff --git a/mm/debug.c b/mm/debug.c
-index 5ce45c9..8858497 100644
+index 0e58f32..885471e 100644
 --- a/mm/debug.c
 +++ b/mm/debug.c
 @@ -48,6 +48,12 @@ static const struct trace_print_flags pageflag_names[] = {
@@ -21388,7 +21439,7 @@ index bf34fb8..0990dd2 100644
  static inline int zref_in_nodemask(struct zoneref *zref, nodemask_t *nodes)
  {
 diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 437174a..6e52d88 100644
+index 6f43352..57e7486 100644
 --- a/mm/page-writeback.c
 +++ b/mm/page-writeback.c
 @@ -111,6 +111,7 @@ unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
@@ -21400,10 +21451,10 @@ index 437174a..6e52d88 100644
  /*
   * Flag that puts the machine in "laptop mode". Doubles as a timeout in jiffies:
 diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 616a2c9..e6b864d 100644
+index 8bbef06..207fcf7 100644
 --- a/mm/page_alloc.c
 +++ b/mm/page_alloc.c
-@@ -141,6 +141,7 @@ void pm_restore_gfp_mask(void)
+@@ -143,6 +143,7 @@ void pm_restore_gfp_mask(void)
  		saved_gfp_mask = 0;
  	}
  }
@@ -21411,7 +21462,7 @@ index 616a2c9..e6b864d 100644
  
  void pm_restrict_gfp_mask(void)
  {
-@@ -149,6 +150,7 @@ void pm_restrict_gfp_mask(void)
+@@ -151,6 +152,7 @@ void pm_restrict_gfp_mask(void)
  	saved_gfp_mask = gfp_allowed_mask;
  	gfp_allowed_mask &= ~GFP_IOFS;
  }
@@ -21420,7 +21471,7 @@ index 616a2c9..e6b864d 100644
  bool pm_suspended_storage(void)
  {
 diff --git a/mm/shmem.c b/mm/shmem.c
-index 0b4ba55..d54b0b0 100644
+index 993e6ba..b159ab1 100644
 --- a/mm/shmem.c
 +++ b/mm/shmem.c
 @@ -1401,7 +1401,7 @@ static int shmem_mmap(struct file *file, struct vm_area_struct *vma)
@@ -21548,7 +21599,7 @@ index 0b4ba55..d54b0b0 100644
  		return PTR_ERR(file);
  
 diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 8798b2e..fe2590e 100644
+index 63f55cc..3de0c94 100644
 --- a/mm/swapfile.c
 +++ b/mm/swapfile.c
 @@ -9,6 +9,7 @@
@@ -21708,10 +21759,10 @@ index fec39d4..db0a576 100644
  int overcommit_ratio_handler(struct ctl_table *table, int write,
  			     void __user *buffer, size_t *lenp,
 diff --git a/mm/vmscan.c b/mm/vmscan.c
-index e3b0a54..6dfc63e 100644
+index dcd90c8..d5daf89 100644
 --- a/mm/vmscan.c
 +++ b/mm/vmscan.c
-@@ -1371,7 +1371,7 @@ static int too_many_isolated(struct zone *zone, int file,
+@@ -1372,7 +1372,7 @@ static int too_many_isolated(struct zone *zone, int file,
  {
  	unsigned long inactive, isolated;
  
@@ -21720,7 +21771,7 @@ index e3b0a54..6dfc63e 100644
  		return 0;
  
  	if (!global_reclaim(sc))
-@@ -2209,6 +2209,9 @@ static inline bool should_continue_reclaim(struct zone *zone,
+@@ -2217,6 +2217,9 @@ static inline bool should_continue_reclaim(struct zone *zone,
  	unsigned long pages_for_compaction;
  	unsigned long inactive_lru_pages;
  
@@ -21730,7 +21781,7 @@ index e3b0a54..6dfc63e 100644
  	/* If not in reclaim/compaction mode, stop */
  	if (!in_reclaim_compaction(sc))
  		return false;
-@@ -2503,6 +2506,11 @@ static unsigned long do_try_to_free_pages(struct zonelist *zonelist,
+@@ -2519,6 +2522,11 @@ static unsigned long do_try_to_free_pages(struct zonelist *zonelist,
  	unsigned long writeback_threshold;
  	bool zones_reclaimable;
  
@@ -21742,7 +21793,7 @@ index e3b0a54..6dfc63e 100644
  	delayacct_freepages_start();
  
  	if (global_reclaim(sc))
-@@ -3390,6 +3398,11 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
+@@ -3393,6 +3401,11 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
  	if (!populated_zone(zone))
  		return;
  
@@ -21754,7 +21805,7 @@ index e3b0a54..6dfc63e 100644
  	if (!cpuset_zone_allowed(zone, GFP_KERNEL | __GFP_HARDWALL))
  		return;
  	pgdat = zone->zone_pgdat;
-@@ -3415,7 +3428,7 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
+@@ -3418,7 +3431,7 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
   * LRU order by reclaiming preferentially
   * inactive > active > active referenced > active mapped
   */
@@ -21763,7 +21814,7 @@ index e3b0a54..6dfc63e 100644
  {
  	struct reclaim_state reclaim_state;
  	struct scan_control sc = {
-@@ -3444,6 +3457,13 @@ unsigned long shrink_all_memory(unsigned long nr_to_reclaim)
+@@ -3447,6 +3460,13 @@ unsigned long shrink_all_memory(unsigned long nr_to_reclaim)
  
  	return nr_reclaimed;
  }
@@ -21778,7 +21829,7 @@ index e3b0a54..6dfc63e 100644
  
  /* It's optimal to keep kswapds on the same CPUs as their memory, but
 diff --git a/scripts/tuxonice_output_to_csv.sh b/scripts/tuxonice_output_to_csv.sh
-new file mode 100755
+new file mode 100644
 index 0000000..b96e680
 --- /dev/null
 +++ b/scripts/tuxonice_output_to_csv.sh
