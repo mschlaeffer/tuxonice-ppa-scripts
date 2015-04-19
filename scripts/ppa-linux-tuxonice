@@ -7,23 +7,17 @@ MINOR=$3
 PPA=$4
 TOI=$5
 DPUT=$6
-#DPUT="ppa:tuxonice/tuxonice-testing"
-#DPUT="ppa:tuxonice/ppa"
-
-DEBIAN=debian.master
 
 # clean, pull and checkout current Ubuntu kernel
 cd ubuntu-$UBUNTU
 ubuntu-git-clean
 git pull --rebase
 ubuntu-git-checkout $MAJOR.$MINOR
-git branch -D tuxonice
-git checkout -b tuxonice
 
 KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2`
-#KERNEL="2.6.35"
-
 echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
+git branch -D tuxonice
+git checkout -b tuxonice
 
 # prepare and apply tuxonice patche
 echo ../tuxoniceppa/patches/tuxonice-$TOI-$UBUNTU.patch
@@ -36,132 +30,138 @@ git add -A
 git commit -s -m "UBUNTU: SAUCE: tuxonice 3.3 patch added"
 
 # apply initramfs patch
-git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
-if [ $? -ne 0 ]; then
-  exit 1;
+if [ $UBUNTU != vivid ]; then
+  git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
+  if [ $? -ne 0 ]; then
+    exit 1;
+  fi
+  git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add lzo module and do_resume to initramfs"
+else
+  sed -i '/do-not-hibernate/d' debian/control-scripts/postinst;
+  git commit -a -s -m "UBUNTU: [Packaging] tuxonice: disable do-not-hibernate after kernel update"
 fi
-git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add lzo module and do_resume to initramfs"
 
 CONFIG="config.flavour"
 
 # rename flavours
 # files: debian.master/config/$ARCH/config.flavour.$FLAVOUR
-for i in `find $DEBIAN/config | grep "$CONFIG"`; do
+for i in `find debian.master/config | grep "$CONFIG"`; do
   git mv $i $i-tuxonice;
 done
 git commit -s -m "UBUNTU: [Config] tuxonice: rename config.flavour.* to config.flavour.*-tuxonice"
 
 # add tuxonice config
-for i in `find $DEBIAN/config | grep "$CONFIG"`; do
+for i in `find debian.master/config | grep "$CONFIG"`; do
   cat ../tuxoniceppa/config/tuxonice-$UBUNTU.config >> $i;
 done
 git commit -a -s -m "UBUNTU: [Config] tuxonice: add tuxonice config to each flavour"
 
 # add tuxonice to kernel-versions.in
 # file: debian.master/d-i/kernel-versions.in
-cp $DEBIAN/d-i/kernel-versions.in $DEBIAN/d-i/kernel-versions.in.tmp
-cat $DEBIAN/d-i/kernel-versions.in.tmp | \
+cp debian.master/d-i/kernel-versions.in debian.master/d-i/kernel-versions.in.tmp
+cat debian.master/d-i/kernel-versions.in.tmp | \
   grep -v "^$" | grep -v "^#" | \
     awk '{ print $1 "\t" $2 "\t" $3"-tuxonice" "\t" $4"-tuxonice" "\t" $5 "\t" $6 "\t" $7 }' \
-    > $DEBIAN/d-i/kernel-versions.in
-rm $DEBIAN/d-i/kernel-versions.in.tmp
+    > debian.master/d-i/kernel-versions.in
+rm debian.master/d-i/kernel-versions.in.tmp
 git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add -tuxonice to flavours in kernel-versions.in"
 
 # disable udebs since they fail in precise
 #sed -i 's/^\(.*5-udebs.mk.*\)/#\1/' debian/rules
 #sed -i -e 's/\texport SOURCEDIR/\t#export SOURCEDIR/' -e 's/\tdilist/\t#dilist/' debian/rules.d/5-udebs.mk
-sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
-git commit -a -s -m "UBUNTU: [Packaging] tuxonice: disable udebs since they fail in precise"
+#sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
+#git commit -a -s -m "UBUNTU: [Packaging] tuxonice: disable udebs since they fail in precise"
 
 # add tuxonice to vars.$FLAVOUR
 # files: debian.master/control.d/vars.$FLAVOUR
-for i in `find $DEBIAN | grep \/vars\.`; do
+for i in `find debian.master | grep \/vars\.`; do
   git mv $i $i-tuxonice;
 done
-for i in `find $DEBIAN | grep "inclusion-list"`; do
+for i in `find debian.master | grep "inclusion-list"`; do
   git mv $i `echo $i | sed 's/\.inclusion-list/-tuxonice.inclusion-list/'`;
 done
 git commit -s -m "UBUNTU: [Packaging] tuxonice: add -tuxonice to flavours in vars.* and generic.inclusion-list"
 
 # add tuxonice to $FLAVOUR.mk
 # files: debian.master/rules.d/$FLAVOUR.mk
-for i in $DEBIAN/rules.d/*; do
+for i in debian.master/rules.d/*; do
   sed -i '/^flavours/s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $i
 done
 git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add -tuxonice to flavours in *.mk"
 
 # fix modules.dep
 # (error: lzo not found in initrd)
-sed -i '/Build-Depends-Indep/s/$/, cpio/' $DEBIAN/control.stub.in
-git commit -a -s -m "UBUNTU: [Packaging] tuxonice: fix error that cpio is not found"
+#sed -i '/Build-Depends-Indep/s/$/, cpio/' debian.master/control.stub.in
+#git commit -a -s -m "UBUNTU: [Packaging] tuxonice: fix error that cpio is not found"
 
 # add tuxonice to abi
 # files: debian.master/abi/*
-for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v fwinfo | grep -v ignore | grep -v modules`; do
-  git mv $i $i-tuxonice;
-done
-for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v ignore | grep "\.modules"`; do
-  git mv $i `echo $i | sed 's/\.modules/-tuxonice.modules/'`;
-done
-for i in `find $DEBIAN/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v ignore | grep "\.compiler"`; do
-  git mv $i `echo $i | sed 's/\.compiler/-tuxonice.compiler/'`;
-done
-git commit -s -m "UBUNTU: [Packaging] tuxonice: add -tuxonice to abi flavors"
+#for i in `find debian.master/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v fwinfo | grep -v ignore | grep -v modules`; do
+#  git mv $i $i-tuxonice;
+#done
+#for i in `find debian.master/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v ignore | grep "\.modules"`; do
+#  git mv $i `echo $i | sed 's/\.modules/-tuxonice.modules/'`;
+#done
+#for i in `find debian.master/abi/ -type f | grep -v perm-blacklist | grep -v abiname | grep -v ignore | grep "\.compiler"`; do
+#  git mv $i `echo $i | sed 's/\.compiler/-tuxonice.compiler/'`;
+#done
+#git commit -s -m "UBUNTU: [Packaging] tuxonice: add -tuxonice to abi flavors"
 
 # fix abi
 # (error: abi missing while building)
-LAST=`ls -1 $DEBIAN/abi/ | grep $KERNEL | tail -n 1`
-git mv $DEBIAN/abi/$LAST $DEBIAN/abi/$KERNEL-$MAJOR.$MINOR
-echo $MAJOR > $DEBIAN/abi/$KERNEL-$MAJOR.$MINOR/abiname
-git commit -a -s -m "UBUNTU: [Packaging] tuxonice: fix abi"
+#LAST=`ls -1 debian.master/abi/ | grep $KERNEL | tail -n 1`
+#git mv debian.master/abi/$LAST debian.master/abi/$KERNEL-$MAJOR.$MINOR
+#echo $MAJOR > debian.master/abi/$KERNEL-$MAJOR.$MINOR/abiname
+#git commit -a -s -m "UBUNTU: [Packaging] tuxonice: fix abi"
 
 # manual corrections for some builds:
-#cp -a $DEBIAN/abi/$LAST $DEBIAN/abi/$KERNEL-$MAJOR.34
-#echo 21 > $DEBIAN/abi/$KERNEL-21.$MINOR/abiname
+#cp -a debian.master/abi/$LAST debian.master/abi/$KERNEL-$MAJOR.34
+#echo 21 > debian.master/abi/$KERNEL-21.$MINOR/abiname
 
-#sed -i '/exit 0/d' $DEBIAN/reconstruct
-#echo "rm -f ubuntu/vbox/vboxguest/include" >> $DEBIAN/reconstruct
-#echo "rm -f ubuntu/vbox/vboxguest/r0drv" >> $DEBIAN/reconstruct
-#echo "rm -f ubuntu/vbox/vboxsf/include" >> $DEBIAN/reconstruct
-#echo "rm -f ubuntu/vbox/vboxsf/r0drv" >> $DEBIAN/reconstruct
-#echo "rm -f ubuntu/vbox/vboxvideo/include" >> $DEBIAN/reconstruct
-#echo "exit 0" >> $DEBIAN/reconstruct
+#sed -i '/exit 0/d' debian.master/reconstruct
+#echo "rm -f ubuntu/vbox/vboxguest/include" >> debian.master/reconstruct
+#echo "rm -f ubuntu/vbox/vboxguest/r0drv" >> debian.master/reconstruct
+#echo "rm -f ubuntu/vbox/vboxsf/include" >> debian.master/reconstruct
+#echo "rm -f ubuntu/vbox/vboxsf/r0drv" >> debian.master/reconstruct
+#echo "rm -f ubuntu/vbox/vboxvideo/include" >> debian.master/reconstruct
+#echo "exit 0" >> debian.master/reconstruct
 #git commit -a -s -m "UBUNTU: [Packaging] tuxonice: remove vbox symlinks to allow using orig.tar.gz file"
-
-# edit changelog
-cp $DEBIAN/changelog $DEBIAN/changelog.old
-echo "linux ($KERNEL-$MAJOR.$MINOR~ppa$PPA) $UBUNTU; urgency=low" > $DEBIAN/changelog
-echo "" >> $DEBIAN/changelog
-echo "  * TuxOnIce $TOI added." >> $DEBIAN/changelog
-echo "" >> $DEBIAN/changelog
-echo " -- "`bzr whoami`"  "`date -R` >> $DEBIAN/changelog
-echo "" >> $DEBIAN/changelog
-cat $DEBIAN/changelog.old >> $DEBIAN/changelog
-rm $DEBIAN/changelog.old
-git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add tuxonice to debian/changelog"
-
-DEBIAN=debian
 
 # add tuxonice to getabis
 # file: debian.master/scripts/misc/getabis
-sed -i '/getall /s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $DEBIAN/scripts/misc/getabis
+sed -i '/getall /s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' debian/scripts/misc/getabis
 git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add -tuxonice to flavours in getabis file"
 
-# add skipabi
-sed -i 's/^AUTOBUILD=/skipabi=true\nAUTOBUILD=/' $DEBIAN/rules.d/0-common-vars.mk
+# add skipabi and skipmodules
+sed -i 's/^AUTOBUILD=/skipabi=true\nskipmodule=true\nAUTOBUILD=/' debian/rules.d/0-common-vars.mk
 git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add skipabi=true option"
 
 if [ "$UBUNTU" = precise ]; then
-  cp debian.master/config/enforce debian.master/config/enforce.old
-  grep -v CONFIG_INTEL_IDLE debian.master/config/enforce.old > debian.master/config/enforce
+  # disable udebs since they fail in precise
+  sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
+  git commit -a -s -m "UBUNTU: [Packaging] tuxonice: disable udebs since they fail in precise"
+  # disable CONFIG_INTEL_IDLE since it fails in precise
+  sed -i '/CONFIG_INTEL_IDLE/d' debian.master/config/enforce
   git commit -a -s -m "UBUNTU: [Config] tuxonice: removing CONFIG_INTEL_IDLE from debian/config/enforce in precise"
 fi
+
+# edit changelog
+cp debian.master/changelog debian.master/changelog.old
+echo "linux ($KERNEL-$MAJOR.$MINOR~ppa$PPA) $UBUNTU; urgency=low" > debian.master/changelog
+echo "" >> debian.master/changelog
+echo "  * TuxOnIce $TOI added." >> debian.master/changelog
+echo "" >> debian.master/changelog
+echo " -- "`bzr whoami`"  "`date -R` >> debian.master/changelog
+echo "" >> debian.master/changelog
+cat debian.master/changelog.old >> debian.master/changelog
+rm debian.master/changelog.old
+git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add tuxonice to debian/changelog"
 
 # build package and upload
 fakeroot debian/rules clean
 git add -A
 git commit -s -m "UBUNTU: [Packaging] tuxonice: run fakeroot"
-debuild -S -sd -I.git -I.gitignore -i'\.git.*'
+debuild -S -sd
 #echo dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 #ubuntu-git-clean
