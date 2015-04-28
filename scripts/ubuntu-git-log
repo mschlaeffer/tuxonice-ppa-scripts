@@ -1,8 +1,8 @@
 #!/bin/bash
 
-LOGS=1000
+LOGS=10000
 
-git log -n $LOGS origin/master | \
+git log -n $LOGS --all | \
   grep -e "^commit" -e "UBUNTU: Ubuntu-" | \
   grep "UBUNTU: Ubuntu-" -B 1 | \
   grep -v "\-\-"
