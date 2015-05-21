@@ -68,7 +68,7 @@ sed -i 's/^AUTOBUILD=/skipabi=true\nskipmodule=true\nAUTOBUILD=/' debian/rules.d
 git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add skipabi=true and skipmodules=true to build options"
 
 # apply initramfs patch
-if [ $UBUNTU != vivid ]; then
+if [ $UBUNTU = lucid -o $UBUNTU = precise -o $UBUNTU = trusty ]; then
   git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
   if [ $? -ne 0 ]; then
     exit 1;
@@ -76,10 +76,10 @@ if [ $UBUNTU != vivid ]; then
   git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add lzo module and do_resume to initramfs"
 else
   sed -i '/do-not-hibernate/s/^/#/' debian/control-scripts/postinst;
-  git commit -a -s -m "UBUNTU: [Packaging] tuxonice: disable do-not-hibernate after kernel update"
+  git commit -a -s -m "UBUNTU: [Packaging] tuxonice: disable generating /var/run/do-not-hibernate after kernel update"
 fi
 
-if [ "$UBUNTU" = precise ]; then
+if [ $UBUNTU = precise ]; then
   # disable udebs since they fail in precise
   sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
   git commit -a -s -m "UBUNTU: [Packaging] tuxonice: disable udebs since they fail in precise"
