@@ -2,7 +2,7 @@
 
 #set -x
 
-# usage: ppa-rebuild-linux lucid ppa:tuxonice/tuxonice-testing 3.2-rc2
+# usage: ppa-rebuild-linux trusty ppa:tuxonice/tuxonice-testing 3.3
 
 UBUNTU=$1
 DPUT=$2

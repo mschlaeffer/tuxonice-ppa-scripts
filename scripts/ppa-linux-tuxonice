@@ -68,7 +68,7 @@ sed -i 's/^AUTOBUILD=/skipabi=true\nskipmodule=true\nAUTOBUILD=/' debian/rules.d
 git commit -a -s -m "UBUNTU: [Packaging] tuxonice: add skipabi=true and skipmodules=true to build options"
 
 # apply initramfs patch
-if [ $UBUNTU = lucid -o $UBUNTU = precise -o $UBUNTU = trusty ]; then
+if [ $UBUNTU = precise -o $UBUNTU = trusty ]; then
   git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
   if [ $? -ne 0 ]; then
     exit 1;

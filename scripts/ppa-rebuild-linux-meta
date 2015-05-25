@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage: ppa-rebuild-linux-meta lucid ppa:tuxonice/tuxonice-testing
+# usage: ppa-rebuild-linux-meta trusty ppa:tuxonice/tuxonice-testing
 
 UBUNTU=$1
 DPUT=$2

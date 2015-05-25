@@ -4,14 +4,11 @@ UBUNTU=$1
 
 echo "  linux:"
 ubuntu-current-linux $UBUNTU linux | sort -n
+
 echo "  linux-meta:"
 ubuntu-current-linux $UBUNTU linux-meta | sort -n
 
 if [ "$UBUNTU" = precise ]; then
   echo "  linux-lbm:"
   ubuntu-current-linux $UBUNTU linux-backports-modules-3.2.0 | sort -n
-fi
-if [ "$UBUNTU" = lucid ]; then
-  echo "  linux-lbm:"
-  ubuntu-current-linux $UBUNTU linux-backports-modules-2.6.32 | sort -n
 fi
