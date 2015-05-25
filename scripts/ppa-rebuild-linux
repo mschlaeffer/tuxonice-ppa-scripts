@@ -13,7 +13,7 @@ if [ -z "$TOI" ]; then
   TOI=`tuxonice-current $UBUNTU | tail -n 1 | awk '{print $1}' | sed 's/tuxonice://'`
 fi
 
-ubuntu-current-linux $UBUNTU > ~tmp
+ubuntu-current-linux $UBUNTU linux > ~tmp
 TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | tail -n 1`
 PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`
 VERSION=`echo $TAG | awk '{print $1}'`
@@ -34,13 +34,14 @@ echo "$PPAVERSION $DPUT"
 
 PPAVERSION=`echo $PPAVERSION | cut -d~ -f1`
 
-echo "checking PPA < UBUNTU ..."
-echo "  $PPATOI < $TOI"
-if dpkg --compare-versions "$PPATOI" lt "$TOI"; then
-  REBUILD=true
-#  tuxonice-git-patch $TOI $UBUNTU
-  PPA=$(( $PPAPPA + 1))
-fi
+#echo "checking PPA < UBUNTU ..."
+#echo "  $PPATOI < $TOI"
+#if dpkg --compare-versions "$PPATOI" lt "$TOI"; then
+#  REBUILD=true
+##  tuxonice-git-patch $TOI $UBUNTU
+#  PPA=$(( $PPAPPA + 1))
+#fi
+
 echo "  $PPAVERSION < $VERSION"
 if dpkg --compare-versions "$PPAVERSION" lt "$VERSION"; then
   REBUILD=true

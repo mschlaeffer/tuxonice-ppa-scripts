@@ -21,7 +21,7 @@ git pull
 ubuntu-git-checkout $MAJOR.$MINOR
 cd meta-source
 
-KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2 | cut -d. -f1-3`
+KERNEL=`git log | grep "UBUNTU: Ubuntu-" | head -n 1 | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|' | sed "s/.$MAJOR.$MINOR//"`
 
 # add tuxonice to control.d
 # files: debian.master/control.d/*

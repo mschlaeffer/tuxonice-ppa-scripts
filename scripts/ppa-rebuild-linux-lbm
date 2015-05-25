@@ -6,7 +6,12 @@ UBUNTU=$1
 DPUT=$2
 DEMO=$3
 
-ubuntu-current-linux-lbm $UBUNTU > ~tmp
+if [ "$UBUNTU" = precise ]; then
+  ubuntu-current-linux $UBUNTU linux-backports-modules-3.2.0 > ~tmp
+fi
+if [ "$UBUNTU" = lucid ]; then
+  ubuntu-current-linux $UBUNTU linux-backports-modules-2.6.32 > ~tmp
+fi
 TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | tail -n 1`
 PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`
 VERSION=`echo $TAG | awk '{print $1}'`

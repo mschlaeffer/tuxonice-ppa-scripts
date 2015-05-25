@@ -13,7 +13,7 @@ ubuntu-git-clean
 git pull --rebase
 ubuntu-git-checkout $MAJOR.$MINOR
 
-KERNEL=`ubuntu-git-log | grep UBUNTU | head -n 1 | cut -d- -f2`
+KERNEL=`git log | grep "UBUNTU: Ubuntu-" | head -n 1 | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|'`
 echo "building $KERNEL-$MAJOR.$MINOR~ppa$PPA ($UBUNTU) with TuxOnIce $TOI"
 git branch -D tuxonice
 git checkout -b tuxonice
