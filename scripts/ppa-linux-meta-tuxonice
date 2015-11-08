@@ -6,8 +6,6 @@ MAJOR=$2
 MINOR=$3
 PPA=$4
 DPUT=$5
-#DPUT="ppa:tuxonice/tuxonice-testing"
-#DPUT="ppa:tuxonice/ppa"
 
 DEBIAN=debian
 CONTROL=control.common
@@ -21,7 +19,7 @@ git pull
 ubuntu-git-checkout $MAJOR.$MINOR
 cd meta-source
 
-KERNEL=`git log | grep "UBUNTU: Ubuntu-" | head -n 1 | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|' | sed "s/.$MAJOR.$MINOR//"`
+KERNEL=`git log | grep "UBUNTU: Ubuntu-" | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|' | grep "\.$MAJOR\.$MINOR$" | head -n 1 | sed "s/.$MAJOR.$MINOR//"`
 
 # add tuxonice to control.d
 # files: debian.master/control.d/*

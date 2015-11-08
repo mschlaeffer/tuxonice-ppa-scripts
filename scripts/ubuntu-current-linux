@@ -13,6 +13,6 @@ lynx -dump http://launchpad.net/~tuxonice/+archive/ppa/+packages | \
   grep "$PACKAGE " -A 2 | grep -i $RELEASE -B 2 | grep "$PACKAGE " | \
   sed "s|.* - \([.~+0-9a-z-]*\).*|\1 ppa:tuxonice/ppa|"
 
-lynx -dump http://launchpad.net/~tuxonice/+archive/tuxonice-testing/+packages | \
+lynx -dump http://launchpad.net/~tuxonice/+archive/daily/+packages | \
   grep "$PACKAGE " -A 2 | grep -i $RELEASE -B 2 | grep "$PACKAGE " | \
-  sed "s|.* - \([.~+0-9a-z-]*\).*|\1 ppa:tuxonice/tuxonice-testing|"
+  sed "s|.* - \([.~+0-9a-z-]*\).*|\1 ppa:tuxonice/daily|"

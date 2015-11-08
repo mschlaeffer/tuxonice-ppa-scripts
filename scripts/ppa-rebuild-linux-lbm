@@ -1,15 +1,14 @@
 #!/bin/bash
 
-# usage: ppa-rebuild-linux-lbm precise ppa:tuxonice/tuxonice-testing
+# usage: ppa-rebuild-linux-lbm precise ppa:tuxonice/daily
 
 UBUNTU=$1
 DPUT=$2
-DEMO=$3
 
 if [ "$UBUNTU" = precise ]; then
   ubuntu-current-linux $UBUNTU linux-backports-modules-3.2.0 > ~tmp
 fi
-TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | tail -n 1`
+TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | sort | tail -n 1`
 PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`
 VERSION=`echo $TAG | awk '{print $1}'`
 PPAVERSION=`echo $PPATAG | awk '{print $1}'`
@@ -38,8 +37,6 @@ fi
 
 echo "rebuilding $UBUNTU linux-meta-lbm: $VERSION~ppa$PPA for $DPUT:"
 echo "  ppa-linux-lbm-tuxonice $UBUNTU $MAJOR $MINOR $PPA $DPUT"
-if [ -z "$DEMO" ]; then
-  ppa-linux-lbm-tuxonice $UBUNTU $MAJOR $MINOR $PPA $DPUT
-fi
+ppa-linux-lbm-tuxonice $UBUNTU $MAJOR $MINOR $PPA $DPUT
 cd ..
 

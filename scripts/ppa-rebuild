@@ -1,16 +1,15 @@
 #!/bin/bash
 
 TOI=$1
-DEMO=$2
 
-for RELEASE in vivid utopic trusty precise; do
+for RELEASE in wily vivid trusty precise; do
   echo "checking updates for UBUNTU $RELEASE:"
   ubuntu-current $RELEASE
   echo
-  ppa-rebuild-linux $RELEASE ppa:tuxonice/tuxonice-testing $TOI $DEMO
-  ppa-rebuild-linux-meta $RELEASE ppa:tuxonice/tuxonice-testing $DEMO
+  ppa-rebuild-linux $RELEASE ppa:tuxonice/daily $TOI
+  ppa-rebuild-linux-meta $RELEASE ppa:tuxonice/daily
   if [ "$RELEASE" == "precise" ]; then
-    ppa-rebuild-linux-lbm $RELEASE ppa:tuxonice/tuxonice-testing $DEMO
+    ppa-rebuild-linux-lbm $RELEASE ppa:tuxonice/daily
   fi
   echo
   echo

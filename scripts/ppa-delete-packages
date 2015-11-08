@@ -1,0 +1,23 @@
+#!/usr/bin/python
+
+import sys
+from launchpadlib.launchpad import Launchpad
+
+ppa = sys.argv[1]
+ubuntu = sys.argv[2]
+
+cachedir = "/home/mschlaef/.launchpadlib/cache/"
+launchpad = Launchpad.login_with('copypackages', 'edge', cachedir)
+
+archive = launchpad.people['tuxonice'].getPPAByName(name=ppa)
+
+if len(ubuntu) == 0:
+    l = archive.getPublishedSources()
+else:
+    link = 'https://api.launchpad.net/1.0/ubuntu/' + ubuntu
+    l = archive.getPublishedSources(distro_series=link)
+    
+print('deleting ', len(l), ' packages')
+#for p in l:
+#    p.requestDeletion()
+

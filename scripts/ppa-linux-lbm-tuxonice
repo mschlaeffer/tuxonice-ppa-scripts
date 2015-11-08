@@ -6,8 +6,6 @@ MAJOR=$2
 MINOR=$3
 PPA=$4
 DPUT=$5
-#DPUT="ppa:tuxonice/tuxonice-testing"
-#DPUT="ppa:tuxonice/ppa"
 DEBIAN=debian
 
 # clean, pull and checkout current Ubuntu kernel

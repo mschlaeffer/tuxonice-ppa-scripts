@@ -2,19 +2,18 @@
 
 #set -x
 
-# usage: ppa-rebuild-linux trusty ppa:tuxonice/tuxonice-testing 3.3
+# usage: ppa-rebuild-linux trusty ppa:tuxonice/daily 3.3
 
 UBUNTU=$1
 DPUT=$2
 TOI=$3
-DEMO=$4
 
 if [ -z "$TOI" ]; then
   TOI=`tuxonice-current $UBUNTU | tail -n 1 | awk '{print $1}' | sed 's/tuxonice://'`
 fi
 
 ubuntu-current-linux $UBUNTU linux > ~tmp
-TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | tail -n 1`
+TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | sort | tail -n 1`
 PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`
 VERSION=`echo $TAG | awk '{print $1}'`
 PPAVERSION=`echo $PPATAG | awk '{print $1}'`
@@ -55,8 +54,6 @@ fi
 
 echo "rebuilding $UBUNTU linux-tuxonice: $VERSION~ppa$PPA with TuxOnIce $TOI for $DPUT:"
 echo "  ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT"
-if [ -z "$DEMO" ]; then
-  ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT
-fi
+ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT
 cd ..
 

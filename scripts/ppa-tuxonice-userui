@@ -7,8 +7,6 @@ MINOR=$3
 PPA=$4
 UVER=$5
 DPUT=$6
-#DPUT="ppa:tuxonice/tuxonice-testing"
-#DPUT="ppa:tuxonice/ppa"
 
 # clean, pull and checkout
 cd tuxonice-userui

@@ -34,18 +34,3 @@ diff -Nurp a/debian/control-scripts/postinst b/debian/control-scripts/postinst
  # The initrd symlink should probably be in the same dir that the
  # symlinks are in
  if ($initrd) {
-@@ -889,10 +914,10 @@ if (-x $notifier) {
- 
- # Let programs know not to hibernate if the kernel that would be used for
- # resume-from-hibernate is likely to differ from the currently running kernel.
--system("mountpoint -q /var/run");
--if ($? eq 0) {
--	system("touch /var/run/do-not-hibernate");
--}
-+#system("mountpoint -q /var/run");
-+#if ($? eq 0) {
-+#	system("touch /var/run/do-not-hibernate");
-+#}
- 
- # Only change the symlinks if we are not being upgraded
- if (! defined $ARGV[1] || ! $ARGV[1] || $ARGV[1] =~ m/<unknown>/og) {
