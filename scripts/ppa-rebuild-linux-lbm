@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage: ppa-rebuild-linux-lbm precise ppa:tuxonice/daily
+# usage: ppa-rebuild-linux-lbm precise ppa:tuxonice/staging
 
 UBUNTU=$1
 DPUT=$2

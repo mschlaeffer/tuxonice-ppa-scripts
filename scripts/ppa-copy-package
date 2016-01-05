@@ -9,7 +9,7 @@ ver = sys.argv[2]
 cachedir = "/home/mschlaef/.launchpadlib/cache/"
 launchpad = Launchpad.login_with('copypackages', 'edge', cachedir)
 
-testing_archive = launchpad.people['tuxonice'].getPPAByName(name='daily')
+testing_archive = launchpad.people['tuxonice'].getPPAByName(name='staging')
 stable_archive = launchpad.people['tuxonice'].getPPAByName(name='ppa')
 
 stable_archive.copyPackage(source_name=pkg,version=ver,from_archive=testing_archive,to_pocket='release',include_binaries=True)

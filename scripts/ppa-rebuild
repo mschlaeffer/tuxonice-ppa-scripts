@@ -6,10 +6,10 @@ for RELEASE in wily vivid trusty precise; do
   echo "checking updates for UBUNTU $RELEASE:"
   ubuntu-current $RELEASE
   echo
-  ppa-rebuild-linux $RELEASE ppa:tuxonice/daily $TOI
-  ppa-rebuild-linux-meta $RELEASE ppa:tuxonice/daily
+  ppa-rebuild-linux $RELEASE ppa:tuxonice/staging $TOI
+  ppa-rebuild-linux-meta $RELEASE ppa:tuxonice/staging
   if [ "$RELEASE" == "precise" ]; then
-    ppa-rebuild-linux-lbm $RELEASE ppa:tuxonice/daily
+    ppa-rebuild-linux-lbm $RELEASE ppa:tuxonice/staging
   fi
   echo
   echo

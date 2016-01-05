@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage: ppa-rebuild-linux-meta trusty ppa:tuxonice/daily
+# usage: ppa-rebuild-linux-meta trusty ppa:tuxonice/staging
 
 UBUNTU=$1
 DPUT=$2
