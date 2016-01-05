@@ -26,7 +26,7 @@ if [ $? -ne 0 ]; then
   exit 1;
 fi
 git add -A
-git commit -s -m "TuxOnIce: Apply upstream patch"
+git commit -s -m "UBUNTU: SAUCE: (noup) TuxOnIce: Apply tuxonice patch"
 
 # rename flavours to contain -tuxonice in debian.master/config
 for i in `find debian.master/config | grep "config.flavour"`; do
@@ -39,6 +39,12 @@ for i in `find debian.master/config | grep "config.flavour"`; do
   cat ../tuxoniceppa/config/tuxonice-$UBUNTU.config >> $i;
 done
 git commit -a -s -m "UBUNTU: [Config] TuxOnIce: Add tuxonice specific config to each flavour"
+
+if [ $UBUNTU = precise ]; then
+  # disable CONFIG_INTEL_IDLE since it fails in precise
+  sed -i '/CONFIG_INTEL_IDLE/d' debian.master/config/enforce
+  git commit -a -s -m "UBUNTU: [Config] TuxOnIce: Remove CONFIG_INTEL_IDLE from debian/config/enforce in precise"
+fi
 
 # rename flavours to contain -tuxonice in debian.master/control.d
 for i in `find debian.master/control.d | grep \/vars\.`; do
@@ -83,9 +89,6 @@ if [ $UBUNTU = precise ]; then
   # disable udebs since they fail in precise
   sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
   git commit -a -s -m "UBUNTU: [Packaging] TuxOnIce: Disable udebs since they fail in precise"
-  # disable CONFIG_INTEL_IDLE since it fails in precise
-  sed -i '/CONFIG_INTEL_IDLE/d' debian.master/config/enforce
-  git commit -a -s -m "UBUNTU: [Config] TuxOnIce: Remove CONFIG_INTEL_IDLE from debian/config/enforce in precise"
 fi
 
 # edit changelog
