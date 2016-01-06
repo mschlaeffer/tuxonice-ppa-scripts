@@ -1,0 +1,17 @@
+#!/bin/bash
+
+UBUNTU=$1
+KERNEL=$2
+MAJOR=$3
+MINOR=$4
+
+LINUX=`echo $KERNEL | sed 's/\.[0-9]*$//'`
+
+# clean, pull and checkout current Ubuntu kernel
+git reset --hard
+git clean -xdf
+
+git checkout Ubuntu-$KERNEL-$MAJOR.$MINOR
+git branch -D ubuntu-linux-$UBUNTU-tuxonice
+git checkout -b ubuntu-linux-$UBUNTU-tuxonice
+

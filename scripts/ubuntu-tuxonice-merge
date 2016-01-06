@@ -1,0 +1,31 @@
+#!/bin/sh
+
+UBUNTU=$1
+
+KERNEL=`echo $UBUNTU | sed -e 's/Ubuntu-//' -e 's/\.[0-9]*-.*//'`
+echo
+echo kernel:
+echo $KERNEL
+
+SINCE="`git log v$KERNEL -n 1 --format='%ad'`"
+echo
+echo since:
+echo $SINCE
+
+echo
+echo tuxonice:
+git --no-pager log --oneline --decorate --since="$SINCE" --grep="^Linux [^ ]*$" --grep="^Merge" tuxonice/tuxonice-$KERNEL
+
+echo
+echo ubuntu:
+git --no-pager log --oneline --decorate --since="$SINCE" --grep="^Linux [^ ]*$" $UBUNTU
+
+LINUX=`git log --oneline --since="$SINCE" --grep="^Linux [^ ]*$" $UBUNTU | head -n 1 | cut -d\  -f3 | cut -d- -f1`
+echo
+echo linux:
+echo $LINUX
+
+echo
+echo merge:
+git log --oneline --since="$SINCE" --grep="^Linux $KERNEL" --grep="^Merge .* into tuxonice" tuxonice/tuxonice-$KERNEL | grep -B 1 -A 1000 "Linux $LINUX$" | grep "Merge .* into tuxonice" | head -n 1 | cut -d\  -f1
+
