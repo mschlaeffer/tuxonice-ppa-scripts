@@ -7,24 +7,25 @@ MINOR=$4
 PPA=$5
 DPUT=$6
 
+cd linux
 echo "Building linux $KERNEL-$MAJOR.$MINOR~ppa$PPA for $UBUNTU with TuxOnIce"
 
-# fetch and clean
-cd linux
-git fetch --all
+# cleanup git repository
 git reset --hard
 git clean -xdf
+git fetch --all
 
-# checkout tuxonice release branch 
-git checkout ubuntu-linux-$UBUNTU-tuxonice
+# checkout ubuntu-kernel-with-tuxonice release branch 
+git checkout $UBUNTU
 
-# merge new ubuntu release 
+# merge new upstream ubuntu release 
 git merge Ubuntu-$KERNEL-$MAJOR.$MINOR -S -m "Merge tag 'Ubuntu-$KERNEL-$MAJOR.$MINOR'"
 if [ $? -ne 0 ]; then
-  exit 1;
+    echo "Merge failed! Resolve the conflicts, commit and rerun $0"
+    exit 1;
 fi
 
-# tag this tuxonice release
+# tag this ubuntu-kernel-with-tuxonice release
 git tag Ubuntu-$KERNEL-$MAJOR.$MINOR-tuxonice
 
 # edit debian/changelog
@@ -34,6 +35,6 @@ dch -b -v "$KERNEL-$MAJOR.$MINOR~ppa$PPA" -D $UBUNTU "Add TuxOnIce." -c debian.m
 # build package and upload
 fakeroot debian/rules clean
 debuild -S -sd
-#dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
+dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 cd ..
 
