@@ -2,7 +2,7 @@
 
 TOI=$1
 
-for RELEASE in wily vivid trusty precise; do
+for RELEASE in xenial wily vivid trusty precise; do
   echo "checking updates for UBUNTU $RELEASE:"
   ubuntu-current $RELEASE
   echo
