@@ -10,16 +10,18 @@ DPUT=$5
 DEBIAN=debian
 CONTROL=control.common
 
+cd linux-meta
 echo "building $UBUNTU $MAJOR $MINOR $PPA $DPUT"
 
 # clean, pull and checkout current Ubuntu kernel
-cd ubuntu-$UBUNTU-meta
-ubuntu-git-clean
-git pull
-ubuntu-git-checkout $MAJOR.$MINOR
-cd meta-source
+git reset --hard
+git clean -xdf
+git fetch --all
 
-KERNEL=`git log | grep "UBUNTU: Ubuntu-" | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|' | grep "\.$MAJOR\.$MINOR$" | head -n 1 | sed "s/.$MAJOR.$MINOR//"`
+KERNEL=`git log $UBUNTU/master | grep "UBUNTU: Ubuntu-" | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|' | grep "\.$MAJOR\.$MINOR$" | head -n 1 | sed "s/.$MAJOR.$MINOR//"`
+
+git checkout Ubuntu-$KERNEL.$MAJOR.$MINOR
+cd meta-source
 
 # add tuxonice to control.d
 # files: debian.master/control.d/*
@@ -60,6 +62,5 @@ debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 dput $DPUT ../linux-meta_$KERNEL.$MAJOR.$MINOR~ppa${PPA}_source.changes
 cd ..
-ubuntu-git-clean
 cd ..
 

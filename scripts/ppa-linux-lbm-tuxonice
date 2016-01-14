@@ -9,12 +9,14 @@ DPUT=$5
 DEBIAN=debian
 
 # clean, pull and checkout current Ubuntu kernel
-cd ubuntu-$UBUNTU-lbm
-ubuntu-git-clean
-git pull
-ubuntu-git-checkout $MAJOR.$MINOR
+cd linux-backports-modules
+git reset --hard
+git clean -xdf
+git fetch --all
 
-KERNEL=`git log | grep "UBUNTU: Ubuntu-" | head -n 1 | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|'`
+KERNEL=`git log $UBUNTU/master | grep "UBUNTU: Ubuntu-" | head -n 1 | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|'`
+
+git checkout Ubuntu-$KERNEL-$MAJOR.$MINOR
 
 # add tuxonice to kernel-versions.in
 # file: debian.master/d-i/kernel-versions.in
@@ -56,6 +58,7 @@ fakeroot debian/rules clean
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo dput $DPUT ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 dput $DPUT ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
-ubuntu-git-clean
+git reset --hard
+git clean -xdf
 cd ..
 
