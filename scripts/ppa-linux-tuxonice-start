@@ -48,15 +48,12 @@ sed -i 's/^AUTOBUILD=/skipabi=true\nskipmodule=true\nAUTOBUILD=/' debian/rules.d
 git commit -a -s -m "TuxOnIce: [Packaging] Add skipabi=true and skipmodules=true to build options"
 
 # apply initramfs patch
-if [ $UBUNTU = precise -o $UBUNTU = trusty ]; then
+if [ $UBUNTU = precise ]; then
   git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
   if [ $? -ne 0 ]; then
     exit 1;
   fi
   git commit -a -s -m "TuxOnIce: [Packaging] Add lzo module and do_resume to initramfs"
-else
-  sed -i '/do-not-hibernate/s/^/#/' debian/control-scripts/postinst;
-  git commit -a -s -m "TuxOnIce: [Packaging] Disable generating /var/run/do-not-hibernate after kernel update"
 fi
 
 if [ $UBUNTU = precise ]; then
