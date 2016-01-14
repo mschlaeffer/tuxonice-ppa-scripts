@@ -1,7 +1,0 @@
-#!/bin/bash
-
-MERGE=$1
-LINUX=$2
-
-git merge $MERGE -S -m "TuxOnIce: Merge branch 'tuxonice-$LINUX' of git://github.com/NigelCunningham/tuxonice-kernel.git"
-
