@@ -10,7 +10,7 @@ DPUT=$6
 # clean, pull and checkout current Ubuntu kernel
 cd linux
 ubuntu-git-clean
-git fetch --all
+#git fetch --all
 ubuntu-git-checkout $MAJOR.$MINOR
 
 KERNEL=`git log | grep "UBUNTU: Ubuntu-" | head -n 1 | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|'`
@@ -73,18 +73,6 @@ git commit -a -s -m "UBUNTU: [Packaging] TuxOnIce: Add -tuxonice to flavours in 
 sed -i 's/^AUTOBUILD=/skipabi=true\nskipmodule=true\nAUTOBUILD=/' debian/rules.d/0-common-vars.mk
 git commit -a -s -m "UBUNTU: [Packaging] TuxOnIce: Add skipabi=true and skipmodules=true to build options"
 
-# apply initramfs patch
-if [ $UBUNTU = precise -o $UBUNTU = trusty ]; then
-  git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
-  if [ $? -ne 0 ]; then
-    exit 1;
-  fi
-  git commit -a -s -m "UBUNTU: [Packaging] TuxOnIce: Add lzo module and do_resume to initramfs"
-else
-  sed -i '/do-not-hibernate/s/^/#/' debian/control-scripts/postinst;
-  git commit -a -s -m "UBUNTU: [Packaging] TuxOnIce: Disable generating /var/run/do-not-hibernate after kernel update"
-fi
-
 if [ $UBUNTU = precise ]; then
   # disable udebs since they fail in precise
   sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
@@ -92,7 +80,7 @@ if [ $UBUNTU = precise ]; then
 fi
 
 # edit changelog
-dch -b -v "$KERNEL-$MAJOR.$MINOR~ppa$PPA" -D $UBUNTU "TuxOnIce 3.3 added." -c debian.master/changelog
+dch -b -v "$KERNEL-$MAJOR.$MINOR~ppa$PPA" -D $UBUNTU "Add TuxOnIce" -c debian.master/changelog
 git commit -a -s -m "UBUNTU: [Packaging] TuxOnIce: Add tuxonice to debian/changelog"
 
 # build package and upload
