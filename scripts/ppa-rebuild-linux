@@ -40,7 +40,12 @@ if [ -z "$REBUILD" ]; then
 fi
 
 echo "rebuilding $UBUNTU linux-tuxonice: $VERSION~ppa$PPA with TuxOnIce for $DPUT:"
-echo "  ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT"
-ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT
+if [ $UBUNTU == vivid -o $UBUNTU == precise ]; then
+  echo "  ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA 3.3 $DPUT"
+  ppa-linux-tuxonice-patch $UBUNTU $MAJOR $MINOR $PPA 3.3 $DPUT
+else
+  echo "  ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT"
+  ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT
+fi
 cd ..
 
