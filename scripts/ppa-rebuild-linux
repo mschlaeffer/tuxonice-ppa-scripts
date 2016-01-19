@@ -2,15 +2,10 @@
 
 #set -x
 
-# usage: ppa-rebuild-linux trusty ppa:tuxonice/staging 3.3
+# usage: ppa-rebuild-linux trusty ppa:tuxonice/staging
 
 UBUNTU=$1
 DPUT=$2
-TOI=$3
-
-if [ -z "$TOI" ]; then
-  TOI=`tuxonice-current $UBUNTU | tail -n 1 | awk '{print $1}' | sed 's/tuxonice://'`
-fi
 
 ubuntu-current-linux $UBUNTU linux > ~tmp
 TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | sort | tail -n 1`
@@ -33,14 +28,6 @@ echo "$PPAVERSION $DPUT"
 
 PPAVERSION=`echo $PPAVERSION | cut -d~ -f1`
 
-#echo "checking PPA < UBUNTU ..."
-#echo "  $PPATOI < $TOI"
-#if dpkg --compare-versions "$PPATOI" lt "$TOI"; then
-#  REBUILD=true
-##  tuxonice-git-patch $TOI $UBUNTU
-#  PPA=$(( $PPAPPA + 1))
-#fi
-
 echo "  $PPAVERSION < $VERSION"
 if dpkg --compare-versions "$PPAVERSION" lt "$VERSION"; then
   REBUILD=true
@@ -48,12 +35,12 @@ if dpkg --compare-versions "$PPAVERSION" lt "$VERSION"; then
 fi
 
 if [ -z "$REBUILD" ]; then
-  echo "not rebuilding $UBUNTU linux-tuxonice: $VERSION with TuxOnIce $TOI for $DPUT"
+  echo "not rebuilding $UBUNTU linux-tuxonice: $VERSION with TuxOnIce for $DPUT"
   exit 0
 fi
 
-echo "rebuilding $UBUNTU linux-tuxonice: $VERSION~ppa$PPA with TuxOnIce $TOI for $DPUT:"
-echo "  ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT"
-ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA $TOI $DPUT
+echo "rebuilding $UBUNTU linux-tuxonice: $VERSION~ppa$PPA with TuxOnIce for $DPUT:"
+echo "  ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT"
+ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT
 cd ..
 

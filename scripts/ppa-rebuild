@@ -1,12 +1,10 @@
 #!/bin/bash
 
-TOI=$1
-
-for RELEASE in xenial wily vivid trusty precise; do
+for RELEASE in xenial wily trusty; do
   echo "checking updates for UBUNTU $RELEASE:"
   ubuntu-current $RELEASE
   echo
-  ppa-rebuild-linux $RELEASE ppa:tuxonice/staging $TOI
+  ppa-rebuild-linux $RELEASE ppa:tuxonice/staging
   ppa-rebuild-linux-meta $RELEASE ppa:tuxonice/staging
   if [ "$RELEASE" == "precise" ]; then
     ppa-rebuild-linux-lbm $RELEASE ppa:tuxonice/staging
