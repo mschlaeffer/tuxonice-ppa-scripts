@@ -3,4 +3,4 @@
 #git reset --hard HEAD^
 git reset --hard
 git clean -xdf
-git checkout master
+#git checkout master

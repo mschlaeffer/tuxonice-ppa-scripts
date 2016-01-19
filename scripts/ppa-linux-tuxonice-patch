@@ -9,8 +9,9 @@ DPUT=$6
 
 # clean, pull and checkout current Ubuntu kernel
 cd linux
-ubuntu-git-clean
 #git fetch --all
+ubuntu-git-clean
+git checkout $UBUNTU/master
 ubuntu-git-checkout $MAJOR.$MINOR
 
 KERNEL=`git log | grep "UBUNTU: Ubuntu-" | head -n 1 | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|'`
