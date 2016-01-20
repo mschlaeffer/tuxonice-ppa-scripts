@@ -26,7 +26,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # tag this ubuntu-kernel-with-tuxonice release
-git tag Ubuntu-$KERNEL-$MAJOR.$MINOR-tuxonice
+git tag -s -a Ubuntu-$KERNEL-$MAJOR.$MINOR-tuxonice -m "Ubuntu-$KERNEL-$MAJOR.$MINOR with TuxOnIce"
 
 # edit debian/changelog
 dch -b -v "$KERNEL-$MAJOR.$MINOR~ppa$PPA" -D $UBUNTU "Add TuxOnIce." -c debian.master/changelog
