@@ -3,12 +3,12 @@
 UBUNTU=$1
 
 echo "  linux:"
-ubuntu-current-linux $UBUNTU linux | sort -n
+ubuntu-current-linux $UBUNTU linux | sort -V
 
 echo "  linux-meta:"
-ubuntu-current-linux $UBUNTU linux-meta | sort -n
+ubuntu-current-linux $UBUNTU linux-meta | sort -V
 
 if [ "$UBUNTU" = precise ]; then
   echo "  linux-lbm:"
-  ubuntu-current-linux $UBUNTU linux-backports-modules-3.2.0 | sort -n
+  ubuntu-current-linux $UBUNTU linux-backports-modules-3.2.0 | sort -V
 fi
