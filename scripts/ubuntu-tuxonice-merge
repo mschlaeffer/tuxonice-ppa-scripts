@@ -14,7 +14,7 @@ echo $SINCE
 
 echo
 echo tuxonice:
-git --no-pager log --oneline --decorate --since="$SINCE" --grep="^Linux [^ ]*$" --grep="^Merge" tuxonice/tuxonice-$KERNEL
+git --no-pager log --oneline --decorate --since="$SINCE" --grep="^Linux [^ ]*$" --grep="^Merge" toi/tuxonice-$KERNEL
 
 echo
 echo ubuntu:
@@ -27,5 +27,5 @@ echo $LINUX
 
 echo
 echo merge:
-git log --oneline --since="$SINCE" --grep="^Linux $KERNEL" --grep="^Merge .* into tuxonice" tuxonice/tuxonice-$KERNEL | grep -B 1 -A 1000 "Linux $LINUX$" | grep "Merge .* into tuxonice" | head -n 1 | cut -d\  -f1
+git log --oneline --since="$SINCE" --grep="^Linux $KERNEL" --grep="^Merge .* into tuxonice" toi/tuxonice-$KERNEL | grep -B 1 -A 1000 "Linux $LINUX$" | grep "Merge .* into tuxonice" | head -n 1 | cut -d\  -f1
 

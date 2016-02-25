@@ -1,64 +1,33 @@
 #!/bin/bash
 
 UBUNTU=$1
+KERNEL=$2
+MAJOR=$3
+MINOR=$4
+PPA=$5
+DPUT=$6
+MERGE=$7
 
-# rename flavours to contain -tuxonice in debian.master/config
-for i in `find debian.master/config | grep "config.flavour"`; do
-  git mv $i $i-tuxonice;
-done
-git commit -s -m "TuxOnIce: [Config] Rename flavours to contain -tuxonice in debian.master/config"
+LINUX=`echo $KERNEL | sed 's/\.[0-9]*$//'`
 
-# add tuxonice specific config to each flavour
-for i in `find debian.master/config | grep "config.flavour"`; do
-  cat ../tuxoniceppa/config/tuxonice-$UBUNTU.config >> $i;
-done
-git commit -a -s -m "TuxOnIce: [Config] Add tuxonice specific config to each flavour"
+# cleaup git repository
+git reset --hard
+git clean -xdf
+git fetch --all
 
-if [ $UBUNTU = precise ]; then
-  # disable CONFIG_INTEL_IDLE since it fails in precise
-  sed -i '/CONFIG_INTEL_IDLE/d' debian.master/config/enforce
-  git commit -a -s -m "TuxOnIce: [Config] Remove CONFIG_INTEL_IDLE from debian/config/enforce in precise"
-fi
+# checkout ubuntu release
+git checkout Ubuntu-$KERNEL-$MAJOR.$MINOR
 
-# rename flavours to contain -tuxonice in debian.master/control.d
-for i in `find debian.master/control.d | grep \/vars\.`; do
-  git mv $i $i-tuxonice;
-done
-for i in `find debian.master/control.d | grep "inclusion-list"`; do
-  git mv $i `echo $i | sed 's/\.inclusion-list/-tuxonice.inclusion-list/'`;
-done
-git commit -s -m "TuxOnIce: [Packaging] Rename flavours to contain -tuxonice in debian.master/control.d"
+# create new ubuntu-kernel-with-tuxonice release branch
+git branch -D $UBUNTU
+git checkout -b $UBUNTU
 
-# add -tuxonice to flavours in debian.master/rules.d
-for i in debian.master/rules.d/*; do
-  sed -i '/^flavours/s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' $i
-done
-git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/rules.d"
+# merge tuxonice (branch, tag or commit)
+git merge $MERGE -S -m "TuxOnIce: Merge branch 'tuxonice-$LINUX' of git://github.com/NigelCunningham/tuxonice-kernel.git"
 
-# add -tuxonice to flavours in debian.master/d-i/kernel-versions.in
-sed -i -e '/^#/!s/\(\t\+\)/-tuxonice\1/3' -e '/^#/!s/\(\t\+\)/-tuxonice\1/4' debian.master/d-i/kernel-versions.in
-git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/d-i/kernel-versions.in"
+# add packaging specific changes
+ppa-linux-tuxonice-package $UBUNTU
 
-# add -tuxonice to flavours in getabis file
-sed -i '/getall /s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' debian/scripts/misc/getabis
-git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in getabis file"
-
-# add skipabi=true and skipmodules=true to build options
-sed -i 's/^AUTOBUILD=/skipabi=true\nskipmodule=true\nAUTOBUILD=/' debian/rules.d/0-common-vars.mk
-git commit -a -s -m "TuxOnIce: [Packaging] Add skipabi=true and skipmodules=true to build options"
-
-# apply initramfs patch
-if [ $UBUNTU = precise ]; then
-  git apply ../tuxoniceppa/patches/tuxonice-initramfs-$UBUNTU.patch
-  if [ $? -ne 0 ]; then
-    exit 1;
-  fi
-  git commit -a -s -m "TuxOnIce: [Packaging] Add lzo module and do_resume to initramfs"
-fi
-
-if [ $UBUNTU = precise ]; then
-  # disable udebs since they fail in precise
-  sed -i '/export SOURCEDIR/,$d' debian/rules.d/5-udebs.mk
-  git commit -a -s -m "TuxOnIce: [Packaging] Disable udebs since they fail in precise"
-fi
+# build and upload tuxonice package
+ppa-linux-tuxonice $1 $2 $3 $4 $5 $6
 

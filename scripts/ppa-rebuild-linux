@@ -40,7 +40,7 @@ if [ -z "$REBUILD" ]; then
 fi
 
 echo "rebuilding $UBUNTU linux-tuxonice: $VERSION~ppa$PPA with TuxOnIce for $DPUT:"
-if [ $UBUNTU == vivid -o $UBUNTU == precise ]; then
+if [ $UBUNTU == vivid ]; then
   echo "  ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA 3.3 $DPUT"
   ppa-linux-tuxonice-patch $UBUNTU $MAJOR $MINOR $PPA 3.3 $DPUT
 else

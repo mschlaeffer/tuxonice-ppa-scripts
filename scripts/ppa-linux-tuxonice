@@ -21,7 +21,7 @@ git checkout $UBUNTU
 # merge new upstream ubuntu release 
 git merge Ubuntu-$KERNEL-$MAJOR.$MINOR -S -m "Merge tag 'Ubuntu-$KERNEL-$MAJOR.$MINOR'"
 if [ $? -ne 0 ]; then
-    echo "Merge failed! Resolve the conflicts, commit and rerun $0"
+    echo "Merge failed! Please resolve the conflicts, then commit and rerun $0"
     exit 1;
 fi
 

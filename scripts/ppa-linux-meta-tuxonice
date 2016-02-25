@@ -1,24 +1,24 @@
 #!/bin/bash
 
 UBUNTU=$1
-#KERNEL=$2
-MAJOR=$2
-MINOR=$3
-PPA=$4
-DPUT=$5
+KERNEL=$2
+MAJOR=$3
+MINOR=$4
+PPA=$5
+DPUT=$6
 
 DEBIAN=debian
 CONTROL=control.common
 
 cd linux-meta
-echo "building $UBUNTU $MAJOR $MINOR $PPA $DPUT"
+echo "building $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT"
 
 # clean, pull and checkout current Ubuntu kernel
 git reset --hard
 git clean -xdf
 git fetch --all
 
-KERNEL=`git log $UBUNTU/master | grep "UBUNTU: Ubuntu-" | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|' | grep "\.$MAJOR\.$MINOR$" | head -n 1 | sed "s/.$MAJOR.$MINOR//"`
+#KERNEL=`git log $UBUNTU/master | grep "UBUNTU: Ubuntu-" | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|' | grep "\.$MAJOR\.$MINOR$" | head -n 1 | sed "s/.$MAJOR.$MINOR//"`
 
 git checkout Ubuntu-$KERNEL.$MAJOR.$MINOR
 cd meta-source

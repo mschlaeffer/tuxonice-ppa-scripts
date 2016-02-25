@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for RELEASE in xenial wily vivid trusty precise; do
+for RELEASE in precise trusty vivid wily xenial; do
   echo "checking updates for UBUNTU $RELEASE:"
   ubuntu-current $RELEASE
   echo
