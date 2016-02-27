@@ -1,9 +1,0 @@
-#!/bin/sh
-
-set -e
-
-update-initramfs -u
-
-#DEBHELPER#
-
-exit 0

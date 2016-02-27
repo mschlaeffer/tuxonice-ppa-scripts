@@ -1,4 +1,0 @@
-# tuxonice-userui needs to be  statically linked because called by the
-# kernel at startup
-tuxonice-userui: statically-linked-binary
-tuxonice-userui: embedded-zlib
