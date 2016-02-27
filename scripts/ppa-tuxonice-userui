@@ -1,7 +1,6 @@
 #!/bin/bash
 
 UBUNTU=$1
-#KERNEL=$2
 MAJOR=$2
 MINOR=$3
 PPA=$4
@@ -9,10 +8,10 @@ UVER=$5
 DPUT=$6
 
 # clean, pull and checkout
-ubuntu-git-clean
+git reset --hard
+git clean -xdf
+git checkout master
 git pull --rebase
-git checkout ubuntu
-#git rebase master
 
 # remove hibernate from suggests since we do not need it
 sed '/Suggests/d' debian/control
@@ -30,8 +29,5 @@ rm debian/changelog.old
 
 # build package and upload
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
-#echo tuxonice-userui_$MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER\_source.changes
 dput $DPUT ../tuxonice-userui_$MAJOR-${MINOR}ppa$PPA~$UBUNTU$UVER\_source.changes
-
-#ubuntu-git-clean
 

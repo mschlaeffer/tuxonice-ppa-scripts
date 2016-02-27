@@ -1,8 +1,0 @@
-#!/bin/bash
-
-LOGS=1000
-
-git log -n $LOGS --parents | \
-  grep -i -e ^commit -e "bump version to" -e "merge branch" -e ^"    tuxonice 3" | \
-  grep -i -e "bump version to" -e "merge branch" -e ^"    tuxonice 3" -B 1 | \
-  grep -v "\-\-"

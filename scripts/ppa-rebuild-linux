@@ -1,50 +1,20 @@
 #!/bin/bash
 
-#set -x
-
-# usage: ppa-rebuild-linux trusty ppa:tuxonice/staging
-
-UBUNTU=$1
-DPUT=$2
-
-ubuntu-current-linux $UBUNTU linux > ~tmp
-TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | sort | tail -n 1`
-PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`
-VERSION=`echo $TAG | awk '{print $1}'`
-PPAVERSION=`echo $PPATAG | awk '{print $1}'`
-PPATOI=`echo $PPATAG | awk '{print $3}'`
-rm ~tmp
-
-KERNEL=`echo $VERSION | sed "s/^\([0-9.]*\)-.*/\1/"`
-MAJOR=`echo $VERSION | sed "s/$KERNEL-\([0-9]*\)\.[0-9]*/\1/"`
-MINOR=`echo $VERSION | sed "s/$KERNEL-[0-9]*\.\([0-9]*\)/\1/"`
-PPAKERNEL=`echo $PPAVERSION | sed "s/^\([0-9.]*\)-.*/\1/"`
-PPAMAJOR=`echo $PPAVERSION | sed "s/$PPAKERNEL-\([0-9]*\)\..*/\1/"`
-PPAMINOR=`echo $PPAVERSION | sed "s/$PPAKERNEL-[0-9]*\.\([0-9]*\).*/\1/"`
-PPAPPA=`echo $PPAVERSION | sed "s/$PPAKERNEL-[0-9]*\.[0-9]*[~+][a-z]*\([0-9]*\).*/\1/"`
-
-echo "$VERSION $UBUNTU"
-echo "$PPAVERSION $DPUT"
-
-PPAVERSION=`echo $PPAVERSION | cut -d~ -f1`
-
-echo "  $PPAVERSION < $VERSION"
-if dpkg --compare-versions "$PPAVERSION" lt "$VERSION"; then
-  REBUILD=true
-  PPA=1
-fi
-
-if [ -z "$REBUILD" ]; then
-  echo "not rebuilding $UBUNTU linux-tuxonice: $VERSION with TuxOnIce for $DPUT"
-  exit 0
-fi
-
-echo "rebuilding $UBUNTU linux-tuxonice: $VERSION~ppa$PPA with TuxOnIce for $DPUT:"
-if [ $UBUNTU == vivid ]; then
-  echo "  ppa-linux-tuxonice $UBUNTU $MAJOR $MINOR $PPA 3.3 $DPUT"
-  ppa-linux-tuxonice-patch $UBUNTU $MAJOR $MINOR $PPA 3.3 $DPUT
-else
-  echo "  ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT"
-  ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT
-fi
+for RELEASE in precise trusty vivid wily xenial; do
+  echo "checking updates for UBUNTU $RELEASE:"
+  ubuntu-current-linux $RELEASE
+  echo
+  cd linux
+  ppa-rebuild linux $RELEASE ppa:tuxonice/staging
+  cd ..
+  cd linux-meta
+  ppa-rebuild linux-meta $RELEASE ppa:tuxonice/staging
+  cd ..
+  if [ "$RELEASE" == "precise" ]; then
+    cd linux-lbm
+    ppa-rebuild linux-lbm $RELEASE ppa:tuxonice/staging
+    cd ..
+  fi
+  echo
+done
 

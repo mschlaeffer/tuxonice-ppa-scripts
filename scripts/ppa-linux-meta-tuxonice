@@ -16,9 +16,6 @@ echo "building $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT"
 git reset --hard
 git clean -xdf
 git fetch --all --tags
-
-#KERNEL=`git log $UBUNTU/master | grep "UBUNTU: Ubuntu-" | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|' | grep "\.$MAJOR\.$MINOR$" | head -n 1 | sed "s/.$MAJOR.$MINOR//"`
-
 git checkout Ubuntu-$KERNEL.$MAJOR.$MINOR
 cd meta-source
 

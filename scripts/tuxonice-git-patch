@@ -1,9 +1,0 @@
-#!/bin/bash
-
-VERSION=$1
-UBUNTU=$2
-
-cd ubuntu-$UBUNTU+tuxonice
-git diff -r `tuxonice-git-commits $VERSION` `ls | grep -v debian` \
-  > ../tuxonice-$VERSION-$UBUNTU.patch
-cd ..

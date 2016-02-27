@@ -1,18 +1,15 @@
 #!/bin/bash
 
-RELEASE=$1
-PACKAGE=$2
+UBUNTU=$1
 
-lynx -dump https://launchpad.net/ubuntu/$RELEASE/+source/$PACKAGE | \
-  grep -e " \[.*\]$PACKAGE " -e "   Release" -e "   Security" -e "   Updates" -e "   Proposed" | \
-  sed -e "s/^ *//g" -e "s/^[ +]*[[0-9]*]$PACKAGE //g" -e "y/RSUP/rsup/" | \
-  sed ':a;N;$!ba;s/\([a-z]\)\n/\1 /g' | \
-  awk '{print $2 " " $1}'
+echo "  linux:"
+ubuntu-current linux $UBUNTU | sort -V
 
-lynx -dump http://launchpad.net/~tuxonice/+archive/ppa/+packages | \
-  grep "$PACKAGE " -A 2 | grep -i $RELEASE -B 2 | grep "$PACKAGE " | \
-  sed "s|.* - \([.~+0-9a-z-]*\).*|\1 ppa:tuxonice/ppa|"
+echo "  linux-meta:"
+ubuntu-current linux-meta $UBUNTU | sort -V
 
-lynx -dump http://launchpad.net/~tuxonice/+archive/staging/+packages | \
-  grep "$PACKAGE " -A 2 | grep -i $RELEASE -B 2 | grep "$PACKAGE " | \
-  sed "s|.* - \([.~+0-9a-z-]*\).*|\1 ppa:tuxonice/staging|"
+if [ "$UBUNTU" = precise ]; then
+  echo "  linux-lbm:"
+  ubuntu-current linux-backports-modules-3.2.0 $UBUNTU | sort -V
+fi
+
