@@ -9,10 +9,9 @@ DPUT=$5
 DEBIAN=debian
 
 # clean, pull and checkout current Ubuntu kernel
-cd linux-backports-modules
 git reset --hard
 git clean -xdf
-git fetch --all
+git fetch --all --tags
 
 KERNEL=`git log $UBUNTU/master | grep "UBUNTU: Ubuntu-" | head -n 1 | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|'`
 
@@ -60,5 +59,4 @@ debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 dput $DPUT ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 git reset --hard
 git clean -xdf
-cd ..
 

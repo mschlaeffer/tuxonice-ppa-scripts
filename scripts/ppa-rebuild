@@ -4,10 +4,16 @@ for RELEASE in precise trusty vivid wily xenial; do
   echo "checking updates for UBUNTU $RELEASE:"
   ubuntu-current $RELEASE
   echo
+  cd linux
   ppa-rebuild-linux $RELEASE ppa:tuxonice/staging
+  cd ..
+  cd linux-meta
   ppa-rebuild-linux-meta $RELEASE ppa:tuxonice/staging
+  cd ..
   if [ "$RELEASE" == "precise" ]; then
+    cd linux-backports-modules
     ppa-rebuild-linux-lbm $RELEASE ppa:tuxonice/staging
+    cd ..
   fi
   echo
   echo

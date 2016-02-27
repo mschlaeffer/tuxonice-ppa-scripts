@@ -47,5 +47,4 @@ else
   echo "  ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT"
   ppa-linux-tuxonice $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT
 fi
-cd ..
 

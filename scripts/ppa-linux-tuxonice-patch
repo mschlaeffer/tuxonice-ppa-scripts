@@ -8,8 +8,7 @@ TOI=$5
 DPUT=$6
 
 # clean, pull and checkout current Ubuntu kernel
-cd linux
-#git fetch --all
+git fetch --all --tags
 ubuntu-git-clean
 git checkout $UBUNTU/master
 ubuntu-git-checkout $MAJOR.$MINOR
@@ -88,5 +87,4 @@ git commit -a -s -m "UBUNTU: [Packaging] TuxOnIce: Add tuxonice to debian/change
 fakeroot debian/rules clean
 debuild -S -sd
 dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
-cd ..
 

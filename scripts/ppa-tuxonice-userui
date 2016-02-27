@@ -9,7 +9,6 @@ UVER=$5
 DPUT=$6
 
 # clean, pull and checkout
-cd tuxonice-userui
 ubuntu-git-clean
 git pull --rebase
 git checkout ubuntu
@@ -33,7 +32,6 @@ rm debian/changelog.old
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo tuxonice-userui_$MAJOR$MINOR~ppa$PPA~$UBUNTU$UVER\_source.changes
 dput $DPUT ../tuxonice-userui_$MAJOR-${MINOR}ppa$PPA~$UBUNTU$UVER\_source.changes
-cd ..
 
 #ubuntu-git-clean
 

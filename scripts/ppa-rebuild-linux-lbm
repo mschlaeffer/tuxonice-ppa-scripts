@@ -38,5 +38,4 @@ fi
 echo "rebuilding $UBUNTU linux-meta-lbm: $VERSION~ppa$PPA for $DPUT:"
 echo "  ppa-linux-lbm-tuxonice $UBUNTU $MAJOR $MINOR $PPA $DPUT"
 ppa-linux-lbm-tuxonice $UBUNTU $MAJOR $MINOR $PPA $DPUT
-cd ..
 

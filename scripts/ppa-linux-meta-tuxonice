@@ -10,13 +10,12 @@ DPUT=$6
 DEBIAN=debian
 CONTROL=control.common
 
-cd linux-meta
 echo "building $UBUNTU $KERNEL $MAJOR $MINOR $PPA $DPUT"
 
 # clean, pull and checkout current Ubuntu kernel
 git reset --hard
 git clean -xdf
-git fetch --all
+git fetch --all --tags
 
 #KERNEL=`git log $UBUNTU/master | grep "UBUNTU: Ubuntu-" | sed 's|.*[A-Za-z-]\+-\([.0-9]\+\).*|\1|' | grep "\.$MAJOR\.$MINOR$" | head -n 1 | sed "s/.$MAJOR.$MINOR//"`
 
@@ -61,6 +60,5 @@ fakeroot $DEBIAN/rules clean
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 #echo dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 dput $DPUT ../linux-meta_$KERNEL.$MAJOR.$MINOR~ppa${PPA}_source.changes
-cd ..
 cd ..
 

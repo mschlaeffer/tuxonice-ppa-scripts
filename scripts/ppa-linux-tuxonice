@@ -6,23 +6,38 @@ MAJOR=$3
 MINOR=$4
 PPA=$5
 DPUT=$6
+MERGE=$7
 
-cd linux
-echo "Building linux $KERNEL-$MAJOR.$MINOR~ppa$PPA for $UBUNTU with TuxOnIce"
+LINUX=`echo $KERNEL | sed 's/\.[0-9]*$//'`
 
 # cleanup git repository
 git reset --hard
 git clean -xdf
-git fetch --all
+git fetch --all --tags
 
-# checkout ubuntu-kernel-with-tuxonice release branch 
-git checkout $UBUNTU
+if [ -z $MERGE ]; then
 
-# merge new upstream ubuntu release 
-git merge Ubuntu-$KERNEL-$MAJOR.$MINOR -S -m "Merge tag 'Ubuntu-$KERNEL-$MAJOR.$MINOR'"
-if [ $? -ne 0 ]; then
-    echo "Merge failed! Please resolve the conflicts, then commit and rerun $0"
-    exit 1;
+    # checkout ubuntu-kernel-with-tuxonice release branch and merge new ubuntu release 
+    git checkout $UBUNTU
+    git merge Ubuntu-$KERNEL-$MAJOR.$MINOR -S -m "Merge tag 'Ubuntu-$KERNEL-$MAJOR.$MINOR'"
+    if [ $? -ne 0 ]; then
+        echo "Merge failed! Please resolve the conflicts, commit and rerun $0"
+        exit 1;
+    fi
+
+else
+
+    # checkout ubuntu release, create branch, merge tuxonice and start ubuntu-kernel-with-tuxonice release
+    git checkout Ubuntu-$KERNEL-$MAJOR.$MINOR
+    git branch -D $UBUNTU
+    git checkout -b $UBUNTU
+    git merge $MERGE -S -m "TuxOnIce: Merge branch 'tuxonice-$LINUX' of git://github.com/NigelCunningham/tuxonice-kernel.git"
+    if [ $? -ne 0 ]; then
+        echo "Merge failed! Please resolve the conflicts, commit and rerun $0"
+        exit 1;
+    fi
+    ppa-linux-tuxonice-start $UBUNTU
+
 fi
 
 # tag this ubuntu-kernel-with-tuxonice release
@@ -36,5 +51,4 @@ dch -b -v "$KERNEL-$MAJOR.$MINOR~ppa$PPA" -D $UBUNTU "Add TuxOnIce." -c debian.m
 fakeroot debian/rules clean
 debuild -S -sd
 dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
-cd ..
 
