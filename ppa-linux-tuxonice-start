@@ -10,7 +10,7 @@ git commit -s -m "TuxOnIce: [Config] Rename flavours to contain -tuxonice in deb
 
 # add tuxonice specific config to each flavour
 for i in `find debian.master/config | grep "config.flavour"`; do
-  cat ../tuxoniceppa/config/tuxonice-$UBUNTU.config >> $i;
+  cat ../tuxonice-ppa-scripts/config/tuxonice-$UBUNTU.config >> $i;
 done
 git commit -a -s -m "TuxOnIce: [Config] Add tuxonice specific config to each flavour"
 

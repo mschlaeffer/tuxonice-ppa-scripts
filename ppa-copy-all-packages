@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 for i in `lynx -dump http://launchpad.net/~tuxonice/+archive/staging/+packages | grep -i -e "\[package-source\] " | awk '{print $2 "§" $4}'`; do
   echo copypackage `echo $i | sed 's/§/ /'`;

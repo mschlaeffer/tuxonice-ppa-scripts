@@ -44,8 +44,7 @@ fi
 git tag -s -a Ubuntu-$KERNEL-$MAJOR.$MINOR-tuxonice -m "Ubuntu-$KERNEL-$MAJOR.$MINOR with TuxOnIce"
 
 # edit debian/changelog
-dch -b -v "$KERNEL-$MAJOR.$MINOR~ppa$PPA" -D $UBUNTU "Add TuxOnIce." -c debian.master/changelog
-#git commit -a -s -m "TuxOnIce: [Packaging] Add tuxonice to debian/changelog"
+dch -b -v "$KERNEL-$MAJOR.$MINOR~ppa$PPA" -D $UBUNTU "Add TuxOnIce" -c debian.master/changelog
 
 # build package and upload
 fakeroot debian/rules clean

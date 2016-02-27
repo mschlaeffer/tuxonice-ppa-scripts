@@ -8,7 +8,7 @@ PACKAGE=$1
 UBUNTU=$2
 DPUT=$3
 
-if [ "$PACKAGE" = "linux-lbm" ]; then
+if [ $PACKAGE = linux-lbm ]; then
   ubuntu-current linux-backports-modules-3.2.0 $UBUNTU > ~tmp
 else
   ubuntu-current $PACKAGE $UBUNTU > ~tmp

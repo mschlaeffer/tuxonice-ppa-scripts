@@ -10,7 +10,7 @@ for RELEASE in precise trusty vivid wily xenial; do
   cd linux-meta
   ppa-rebuild linux-meta $RELEASE ppa:tuxonice/staging
   cd ..
-  if [ "$RELEASE" == "precise" ]; then
+  if [ $RELEASE = precise ]; then
     cd linux-lbm
     ppa-rebuild linux-lbm $RELEASE ppa:tuxonice/staging
     cd ..
