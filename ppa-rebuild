@@ -14,7 +14,7 @@ else
   ubuntu-current $PACKAGE $UBUNTU > ~tmp
 fi
 
-TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | sort | tail -n 1`
+TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | sort -V | tail -n 1`
 PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`
 VERSION=`echo $TAG | awk '{print $1}'`
 PPAVERSION=`echo $PPATAG | awk '{print $1}'`
