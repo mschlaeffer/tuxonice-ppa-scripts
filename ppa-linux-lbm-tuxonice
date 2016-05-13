@@ -52,5 +52,5 @@ rm debian/changelog.old
 fakeroot debian/rules clean
 debuild -S -sd -I.git -I.gitignore -i'\.git.*'
 dput $DPUT ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
-rm -f ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}*
+mv ../linux-backports-modules-${KERNEL}_$KERNEL-$MAJOR.$MINOR~ppa${PPA}* .
 

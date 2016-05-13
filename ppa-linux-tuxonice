@@ -50,7 +50,7 @@ dch -b -v "$KERNEL-$MAJOR.$MINOR~ppa$PPA" -D $UBUNTU "Add TuxOnIce" -c debian.ma
 fakeroot debian/rules clean
 debuild -S -sd
 dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
-rm -f ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}*
+mv ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}* .
 
 # push to github and launchpad
 ppa-git-push $UBUNTU $KERNEL $MAJOR $MINOR
