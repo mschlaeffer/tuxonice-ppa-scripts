@@ -52,6 +52,6 @@ debuild -S -sd
 dput $DPUT ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}_source.changes
 mv ../linux_$KERNEL-$MAJOR.$MINOR~ppa${PPA}* .
 
-# push to github and launchpad
+# push to github (and launchpad)
 ppa-git-push $UBUNTU $KERNEL $MAJOR $MINOR
 

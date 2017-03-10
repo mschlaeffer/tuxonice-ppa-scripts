@@ -5,7 +5,10 @@ KERNEL=$2
 MAJOR=$3
 MINOR=$4
 
-for i in lp github; do
+#HOSTS="lp github"
+HOSTS="github"
+
+for i in $HOSTS; do
     git push $i $UBUNTU:$UBUNTU --force
     git push $i Ubuntu-$KERNEL-$MAJOR.$MINOR-tuxonice
 done

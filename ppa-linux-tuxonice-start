@@ -36,8 +36,13 @@ done
 git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/rules.d"
 
 # add -tuxonice to flavours in debian.master/d-i/kernel-versions.in
-sed -i -e '/^#/!s/\(\t\+\)/-tuxonice\1/3' -e '/^#/!s/\(\t\+\)/-tuxonice\1/4' debian.master/d-i/kernel-versions.in
-git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/d-i/kernel-versions.in"
+if [ $UBUNTU = yakkety ]; then
+  sed -i -e '/^#/!s/\(\t\+\)/-tuxonice\1/3' debian.master/d-i/kernel-versions
+  git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/d-i/kernel-versions"
+else
+  sed -i -e '/^#/!s/\(\t\+\)/-tuxonice\1/3' -e '/^#/!s/\(\t\+\)/-tuxonice\1/4' debian.master/d-i/kernel-versions.in
+  git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/d-i/kernel-versions.in"
+fi
 
 # add -tuxonice to flavours in getabis file
 sed -i '/getall /s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' debian/scripts/misc/getabis
