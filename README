@@ -2,12 +2,9 @@
 
 === download original kernel sources to reduce upload size:
 
-wget https://launchpad.net/ubuntu/+archive/primary/+files/linux_3.2.0.orig.tar.gz
 wget https://launchpad.net/ubuntu/+archive/primary/+files/linux_3.13.0.orig.tar.gz
-wget https://launchpad.net/ubuntu/+archive/primary/+files/linux_3.19.0.orig.tar.gz
-wget https://launchpad.net/ubuntu/+archive/primary/+files/linux_4.2.0.orig.tar.gz
 wget https://launchpad.net/ubuntu/+archive/primary/+files/linux_4.4.0.orig.tar.gz
-wget https://launchpad.net/ubuntu/+archive/primary/+files/linux_4.8.0.orig.tar.gz
+wget https://launchpad.net/ubuntu/+archive/primary/+files/linux_4.10.0.orig.tar.gz
 
 === setup git repositories:
 
@@ -20,32 +17,25 @@ lp      git+ssh://mschlaeffer@git.launchpad.net/~tuxonice/linux
 toi     git://github.com/NigelCunningham/tuxonice-kernel.git
 linux   git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 stable  git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
-precise git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/precise
 trusty  git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/trusty
-vivid   git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/vivid
 xenial  git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/xenial
+zesty   git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/zesty
 
 - in folder linux-meta:
-precise git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux-meta/+git/precise
 trusty  git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux-meta/+git/trusty
-vivid   git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux-meta/+git/vivid
 xenial  git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux-meta/+git/xenial
-
-- in folder linux-lbm:
-precise git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux-backports-modules-3.2.0
+zesty   git://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux-meta/+git/zesty
 
 == build
 
 - add tuxonice-ppa-scripts to your $PATH
 
 - build linux-image:
-ppa-linux-tuxonice precise 3.2.0 111 153 1 ppa:tuxonice/staging
+ppa-linux-tuxonice xenial 4.4.0 83 106 1 ppa:tuxonice/staging
 
 - build linux-meta:
-ppa-linux-meta-tuxonice precise 111 127 1 ppa:tuxonice/staging
-
-- build linux-lbm:
-ppa-linux-lbm-tuxonice precise 111 103 1 ppa:tuxonice/staging
+ppa-linux-meta-tuxonice xenial 83 89 1 ppa:tuxonice/staging
 
 - rebuild all packages with newer versions available:
 ppa-rebuild-linux
+

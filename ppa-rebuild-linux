@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for RELEASE in precise trusty vivid xenial yakkety; do
+for RELEASE in trusty xenial zesty; do
   echo "checking updates for UBUNTU $RELEASE:"
   ubuntu-current-linux $RELEASE
   echo
@@ -10,11 +10,6 @@ for RELEASE in precise trusty vivid xenial yakkety; do
   cd linux-meta
   ppa-rebuild linux-meta $RELEASE ppa:tuxonice/staging
   cd ..
-  if [ $RELEASE = precise ]; then
-    cd linux-lbm
-    ppa-rebuild linux-lbm $RELEASE ppa:tuxonice/staging
-    cd ..
-  fi
   echo
 done
 
