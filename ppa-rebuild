@@ -1,18 +1,13 @@
 #!/bin/bash
 
-# usage: ppa-rebuild linux precise ppa:tuxonice/staging
-# usage: ppa-rebuild linux-lbm precise ppa:tuxonice/staging
-# usage: ppa-rebuild linux-meta precise ppa:tuxonice/staging
+# usage: ppa-rebuild linux xenial ppa:tuxonice/staging
+# usage: ppa-rebuild linux-meta xenial ppa:tuxonice/staging
 
 PACKAGE=$1
 UBUNTU=$2
 DPUT=$3
 
-if [ $PACKAGE = linux-lbm ]; then
-  ubuntu-current linux-backports-modules-3.2.0 $UBUNTU > ~tmp
-else
-  ubuntu-current $PACKAGE $UBUNTU > ~tmp
-fi
+ubuntu-current $PACKAGE $UBUNTU > ~tmp
 
 TAG=`cat ~tmp | grep -v -e proposed -e tuxonice | sort -V | tail -n 1`
 PPATAG=`cat ~tmp | grep ppa:tuxonice | tail -n 1`

@@ -10,6 +10,6 @@ HOSTS="github"
 
 for i in $HOSTS; do
     git push $i $UBUNTU:$UBUNTU --force
-    git push $i Ubuntu-$KERNEL-$MAJOR.$MINOR-tuxonice
+    git push $i Ubuntu-$KERNEL-$MAJOR.$MINOR-tuxonice --force
 done
 

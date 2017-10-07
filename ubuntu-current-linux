@@ -8,8 +8,3 @@ ubuntu-current linux $UBUNTU | sort -V
 echo "  linux-meta:"
 ubuntu-current linux-meta $UBUNTU | sort -V
 
-if [ "$UBUNTU" = precise ]; then
-  echo "  linux-lbm:"
-  ubuntu-current linux-backports-modules-3.2.0 $UBUNTU | sort -V
-fi
-

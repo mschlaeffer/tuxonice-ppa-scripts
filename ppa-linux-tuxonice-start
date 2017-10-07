@@ -14,7 +14,7 @@ for i in `find debian.master/config | grep "config.flavour"`; do
 done
 git commit -a -s -m "TuxOnIce: [Config] Add tuxonice specific config to each flavour"
 
-if [ $UBUNTU = zesty ]; then
+if [ $UBUNTU = zesty -o $UBUNTU = artful ]; then
   # disable KASLR since it breaks TuxOnIce 
   sed -i 's/CONFIG_RANDOMIZE_BASE=y/# CONFIG_RANDOMIZE_BASE is not set/' debian.master/config/config.common.ubuntu 
   git commit -a -s -m "TuxOnIce: [Config] Disable CONFIG_RANDOMIZE_BASE (KASLR) since it breaks TuxOnIce (github issue #29)"
@@ -36,7 +36,7 @@ done
 git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/rules.d"
 
 # add -tuxonice to flavours in debian.master/d-i/kernel-versions.in
-if [ $UBUNTU = zesty ]; then
+if [ $UBUNTU = zesty -o $UBUNTU = artful ]; then
   sed -i -e '/^#/!s/\(\t\+\)/-tuxonice\1/3' debian.master/d-i/kernel-versions
   git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/d-i/kernel-versions"
 else
