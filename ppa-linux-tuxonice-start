@@ -14,7 +14,7 @@ for i in `find debian.master/config | grep "config.flavour"`; do
 done
 git commit -a -s -m "TuxOnIce: [Config] Add tuxonice specific config to each flavour"
 
-if [ $UBUNTU = zesty -o $UBUNTU = artful ]; then
+if [ $UBUNTU = artful -o $UBUNTU = bionic ]; then
   # disable KASLR since it breaks TuxOnIce 
   sed -i 's/CONFIG_RANDOMIZE_BASE=y/# CONFIG_RANDOMIZE_BASE is not set/' debian.master/config/config.common.ubuntu 
   git commit -a -s -m "TuxOnIce: [Config] Disable CONFIG_RANDOMIZE_BASE (KASLR) since it breaks TuxOnIce (github issue #29)"
@@ -36,19 +36,19 @@ done
 git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/rules.d"
 
 # add -tuxonice to flavours in debian.master/d-i/kernel-versions.in
-if [ $UBUNTU = zesty -o $UBUNTU = artful ]; then
-  sed -i -e '/^#/!s/\(\t\+\)/-tuxonice\1/3' debian.master/d-i/kernel-versions
-  git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/d-i/kernel-versions"
-else
+if [ $UBUNTU = trusty -o $UBUNTU = xenial ]; then
   sed -i -e '/^#/!s/\(\t\+\)/-tuxonice\1/3' -e '/^#/!s/\(\t\+\)/-tuxonice\1/4' debian.master/d-i/kernel-versions.in
   git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/d-i/kernel-versions.in"
+else
+  sed -i '/^#/!s/\(\t\+\)/-tuxonice\1/3' debian.master/d-i/kernel-versions
+  git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in debian.master/d-i/kernel-versions"
 fi
 
 # add -tuxonice to flavours in getabis file
 sed -i '/getall /s/\( [a-z0-9-][a-z0-9-]*\)/\1-tuxonice/g' debian/scripts/misc/getabis
 git commit -a -s -m "TuxOnIce: [Packaging] Add -tuxonice to flavours in getabis file"
 
-# add skipabi=true and skipmodules=true to build options
-sed -i 's/^AUTOBUILD=/skipabi=true\nskipmodule=true\nAUTOBUILD=/' debian/rules.d/0-common-vars.mk
-git commit -a -s -m "TuxOnIce: [Packaging] Add skipabi=true and skipmodules=true to build options"
+# add skipabi=true and skipmodules=true and skipretpoline=true to build options
+sed -i 's/^AUTOBUILD=/skipabi=true\nskipmodule=true\nskipretpoline=true\nAUTOBUILD=/' debian/rules.d/0-common-vars.mk
+git commit -a -s -m "TuxOnIce: [Packaging] Add AUTOBUILD skip options"
 

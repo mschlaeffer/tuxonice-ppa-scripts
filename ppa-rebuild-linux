@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for RELEASE in trusty xenial zesty artful; do
+for RELEASE in trusty xenial artful bionic; do
   echo "checking updates for UBUNTU $RELEASE:"
   ubuntu-current-linux $RELEASE
   echo
